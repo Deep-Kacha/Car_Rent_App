@@ -13,6 +13,11 @@ class HomePage extends StatelessWidget {
       "image": "assets/images/2car.jpg",
       "details": "5.0 ★ 114 Trips | Price: ₹2500/day",
     },
+    {
+      "name": "Maruti Suziki Ertiga",
+      "image": "assets/images/4car.jpg",
+      "details": "5.0 ★ 12 Trips | Price: ₹2500/day",
+    },
   ];
 
   @override
@@ -67,7 +72,7 @@ class HomePage extends StatelessWidget {
 
             // Categories
             Container(
-              height: 40,
+              height: 60,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: EdgeInsets.symmetric(horizontal: 16),
@@ -108,7 +113,7 @@ class HomePage extends StatelessWidget {
                       children: [
                         Image.asset(
                           cars[index]["image"]!,
-                          height: 160,
+                          height: 180,
                           width: double.infinity,
                           fit: BoxFit.cover,
                         ),
