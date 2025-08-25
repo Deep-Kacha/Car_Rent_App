@@ -1,3 +1,4 @@
+import 'package:car_rental_project/Home%20Page/home_page.dart';
 import 'package:car_rental_project/authentication/Screens/login.dart';
 import 'package:flutter/material.dart';
 
@@ -13,11 +14,9 @@ class MyApp extends StatelessWidget {
     return MaterialApp(
       title: 'Flutter Demo',
       theme: ThemeData(
-        
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: Login(),
+      home: HomePage(),
     );
   }
 }
-
