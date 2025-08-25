@@ -5,12 +5,14 @@ class HomePage extends StatelessWidget {
   final List<Map<String, String>> cars = [
     {
       "name": "Brezzo 2020",
-      "image": "https://imgd.aeplcdn.com/1280x720/n/cw/ec/41595/vitara-brezza-exterior-right-front-three-quarter.jpeg?q=80",
+      "image":
+          "https://imgd.aeplcdn.com/1280x720/n/cw/ec/41595/vitara-brezza-exterior-right-front-three-quarter.jpeg?q=80",
       "details": "5.0 ★ 143 Trips | Price: ₹2000/day",
     },
     {
       "name": "Mahindra Scorpio 2014",
-      "image": "https://imgd.aeplcdn.com/1280x720/n/cw/ec/41595/scorpio-exterior-right-front-three-quarter.jpeg?q=80",
+      "image":
+          "https://imgd.aeplcdn.com/1280x720/n/cw/ec/41595/scorpio-exterior-right-front-three-quarter.jpeg?q=80",
       "details": "5.0 ★ 114 Trips | Price: ₹2500/day",
     },
   ];
@@ -34,14 +36,18 @@ class HomePage extends StatelessWidget {
                       CircleAvatar(
                         radius: 25,
                         backgroundImage: NetworkImage(
-                            "https://i.pravatar.cc/150?img=3"),
+                          "https://i.pravatar.cc/150?img=3",
+                        ),
                       ),
                       SizedBox(width: 10),
-                      Text("Ethan John",
-                          style: TextStyle(
-                              fontSize: 18,
-                              fontWeight: FontWeight.bold,
-                              color: Colors.white)),
+                      Text(
+                        "Ethan John",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.bold,
+                          color: Colors.white,
+                        ),
+                      ),
                     ],
                   ),
                   SizedBox(height: 15),
@@ -52,8 +58,9 @@ class HomePage extends StatelessWidget {
                       filled: true,
                       fillColor: Colors.white,
                       border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none),
+                        borderRadius: BorderRadius.circular(12),
+                        borderSide: BorderSide.none,
+                      ),
                     ),
                   ),
                 ],
@@ -72,9 +79,12 @@ class HomePage extends StatelessWidget {
                     margin: EdgeInsets.only(right: 10),
                     child: Chip(
                       label: Text(categories[index]),
-                      backgroundColor: index == 0 ? Colors.orange : Colors.white,
+                      backgroundColor: index == 0
+                          ? Colors.orange
+                          : Colors.white,
                       labelStyle: TextStyle(
-                          color: index == 0 ? Colors.white : Colors.black),
+                        color: index == 0 ? Colors.white : Colors.black,
+                      ),
                     ),
                   );
                 },
@@ -91,7 +101,8 @@ class HomePage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return Card(
                     shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(15)),
+                      borderRadius: BorderRadius.circular(15),
+                    ),
                     margin: EdgeInsets.only(bottom: 15),
                     clipBehavior: Clip.antiAlias,
                     child: Column(
@@ -108,16 +119,21 @@ class HomePage extends StatelessWidget {
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(cars[index]["name"]!,
-                                  style: TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold)),
+                              Text(
+                                cars[index]["name"]!,
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
+                              ),
                               SizedBox(height: 5),
-                              Text(cars[index]["details"]!,
-                                  style: TextStyle(color: Colors.grey[700])),
+                              Text(
+                                cars[index]["details"]!,
+                                style: TextStyle(color: Colors.grey[700]),
+                              ),
                             ],
                           ),
-                        )
+                        ),
                       ],
                     ),
                   );
