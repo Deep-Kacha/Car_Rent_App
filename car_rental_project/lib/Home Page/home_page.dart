@@ -5,14 +5,12 @@ class HomePage extends StatelessWidget {
   final List<Map<String, String>> cars = [
     {
       "name": "Brezzo 2020",
-      "image":
-          "https://imgd.aeplcdn.com/1280x720/n/cw/ec/41595/vitara-brezza-exterior-right-front-three-quarter.jpeg?q=80",
+      "image": "assets/images/1car.jpg",
       "details": "5.0 ★ 143 Trips | Price: ₹2000/day",
     },
     {
       "name": "Mahindra Scorpio 2014",
-      "image":
-          "https://imgd.aeplcdn.com/1280x720/n/cw/ec/41595/scorpio-exterior-right-front-three-quarter.jpeg?q=80",
+      "image": "assets/images/2car.jpg",
       "details": "5.0 ★ 114 Trips | Price: ₹2500/day",
     },
   ];
@@ -108,12 +106,13 @@ class HomePage extends StatelessWidget {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Image.network(
+                        Image.asset(
                           cars[index]["image"]!,
                           height: 160,
                           width: double.infinity,
                           fit: BoxFit.cover,
                         ),
+
                         Padding(
                           padding: const EdgeInsets.all(10),
                           child: Column(
