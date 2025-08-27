@@ -23,14 +23,15 @@ class HomePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black87,
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             // Profile and Search
             Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -46,9 +47,9 @@ class HomePage extends StatelessWidget {
                       Text(
                         "Ethan John",
                         style: TextStyle(
-                          fontSize: 18,
+                          fontSize: 22,
                           fontWeight: FontWeight.bold,
-                          color: Colors.white,
+                          color: Colors.black,
                         ),
                       ),
                     ],
@@ -59,7 +60,7 @@ class HomePage extends StatelessWidget {
                       hintText: "Search cars near you...",
                       prefixIcon: Icon(Icons.search),
                       filled: true,
-                      fillColor: Colors.white,
+                      fillColor: Color(0xFFF5F5F5),
                       border: OutlineInputBorder(
                         borderRadius: BorderRadius.circular(12),
                         borderSide: BorderSide.none,
@@ -69,7 +70,15 @@ class HomePage extends StatelessWidget {
                 ],
               ),
             ),
-
+            Padding(
+              padding: const EdgeInsets.all(16),
+              child: Container(
+                child: Text(
+                  "Categories",
+                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                ),
+              ),
+            ),
             // Categories
             Container(
               height: 60,
@@ -80,14 +89,18 @@ class HomePage extends StatelessWidget {
                 itemBuilder: (context, index) {
                   return Container(
                     margin: EdgeInsets.only(right: 10),
-                    child: Chip(
-                      label: Text(categories[index]),
-                      backgroundColor: index == 0
-                          ? Colors.orange
-                          : Colors.white,
-                      labelStyle: TextStyle(
-                        color: index == 0 ? Colors.white : Colors.black,
-                      ),
+                    child: Column(
+                      children: [
+                        Chip(
+                          label: Text(categories[index]),
+                          backgroundColor: index == 0
+                              ? Colors.orange
+                              : Colors.white,
+                          labelStyle: TextStyle(
+                            color: index == 0 ? Colors.white : Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 },
