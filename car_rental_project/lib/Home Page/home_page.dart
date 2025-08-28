@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class HomePage extends StatelessWidget {
-  final List<String> categories = ["All", "Cars", "SUVs", "XLUVs", "Vans"];
+  final List<String> categories = ["All", "Cars", "SUVs", "XUVs", "Vans"];
   final List<Map<String, String>> cars = [
     {
       "name": "Brezzo 2020",
