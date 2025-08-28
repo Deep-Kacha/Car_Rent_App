@@ -1,27 +1,43 @@
 import 'package:flutter/material.dart';
 
-class HomePage extends StatelessWidget {
+class HomePage extends StatefulWidget {
+  @override
+  _HomePageState createState() => _HomePageState();
+}
+
+class _HomePageState extends State<HomePage> {
   final List<String> categories = ["All", "Cars", "SUVs", "XUVs", "Vans"];
+
   final List<Map<String, String>> cars = [
     {
       "name": "Brezzo 2020",
       "image": "assets/images/1car.jpg",
       "details": "5.0 ★ 143 Trips | Price: ₹2000/day",
+      "category": "Cars",
     },
     {
       "name": "Mahindra Scorpio 2014",
       "image": "assets/images/2car.jpg",
       "details": "5.0 ★ 114 Trips | Price: ₹2500/day",
+      "category": "SUVs",
     },
     {
       "name": "Maruti Suziki Ertiga",
       "image": "assets/images/4car.jpg",
       "details": "5.0 ★ 12 Trips | Price: ₹2500/day",
+      "category": "Vans",
     },
   ];
 
+  String selectedCategory = "All";
+
   @override
   Widget build(BuildContext context) {
+    // Filter cars based on selected category
+    List<Map<String, String>> filteredCars = selectedCategory == "All"
+        ? cars
+        : cars.where((car) => car["category"] == selectedCategory).toList();
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -31,7 +47,6 @@ class HomePage extends StatelessWidget {
             // Profile and Search
             Padding(
               padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
-
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
@@ -70,37 +85,44 @@ class HomePage extends StatelessWidget {
                 ],
               ),
             ),
+
+            // Categories
             Padding(
               padding: const EdgeInsets.all(16),
-              child: Container(
-                child: Text(
-                  "Categories",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-                ),
+              child: Text(
+                "Categories",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
               ),
             ),
-            // Categories
-            Container(
-              height: 60,
+            SizedBox(
+              height: 40,
               child: ListView.builder(
                 scrollDirection: Axis.horizontal,
                 padding: EdgeInsets.symmetric(horizontal: 16),
                 itemCount: categories.length,
                 itemBuilder: (context, index) {
-                  return Container(
-                    margin: EdgeInsets.only(right: 10),
-                    child: Column(
-                      children: [
-                        Chip(
-                          label: Text(categories[index]),
-                          backgroundColor: index == 0
-                              ? Colors.orange
-                              : Colors.white,
-                          labelStyle: TextStyle(
-                            color: index == 0 ? Colors.white : Colors.black,
-                          ),
+                  final category = categories[index];
+                  final isSelected = selectedCategory == category;
+
+                  return GestureDetector(
+                    onTap: () {
+                      setState(() {
+                        selectedCategory = category;
+                      });
+                    },
+                    child: Container(
+                      margin: EdgeInsets.only(right: 20),
+                      alignment: Alignment.center,
+                      child: Text(
+                        category,
+                        style: TextStyle(
+                          fontSize: 15,
+                          fontWeight: isSelected
+                              ? FontWeight.bold
+                              : FontWeight.normal,
+                          color: isSelected ? Colors.orange : Colors.grey,
                         ),
-                      ],
+                      ),
                     ),
                   );
                 },
@@ -111,51 +133,57 @@ class HomePage extends StatelessWidget {
 
             // Available Cars
             Expanded(
-              child: ListView.builder(
-                padding: EdgeInsets.symmetric(horizontal: 16),
-                itemCount: cars.length,
-                itemBuilder: (context, index) {
-                  return Card(
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(15),
-                    ),
-                    margin: EdgeInsets.only(bottom: 15),
-                    clipBehavior: Clip.antiAlias,
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Image.asset(
-                          cars[index]["image"]!,
-                          height: 180,
-                          width: double.infinity,
-                          fit: BoxFit.cover,
-                        ),
-
-                        Padding(
-                          padding: const EdgeInsets.all(10),
+              child: filteredCars.isEmpty
+                  ? Center(
+                      child: Text(
+                        "No cars available in this category",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    )
+                  : ListView.builder(
+                      padding: EdgeInsets.symmetric(horizontal: 16),
+                      itemCount: filteredCars.length,
+                      itemBuilder: (context, index) {
+                        return Card(
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(15),
+                          ),
+                          margin: EdgeInsets.only(bottom: 15),
+                          clipBehavior: Clip.antiAlias,
                           child: Column(
                             crossAxisAlignment: CrossAxisAlignment.start,
                             children: [
-                              Text(
-                                cars[index]["name"]!,
-                                style: TextStyle(
-                                  fontSize: 16,
-                                  fontWeight: FontWeight.bold,
-                                ),
+                              Image.asset(
+                                filteredCars[index]["image"]!,
+                                height: 180,
+                                width: double.infinity,
+                                fit: BoxFit.cover,
                               ),
-                              SizedBox(height: 5),
-                              Text(
-                                cars[index]["details"]!,
-                                style: TextStyle(color: Colors.grey[700]),
+                              Padding(
+                                padding: const EdgeInsets.all(10),
+                                child: Column(
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Text(
+                                      filteredCars[index]["name"]!,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        fontWeight: FontWeight.bold,
+                                      ),
+                                    ),
+                                    SizedBox(height: 5),
+                                    Text(
+                                      filteredCars[index]["details"]!,
+                                      style: TextStyle(color: Colors.grey[700]),
+                                    ),
+                                  ],
+                                ),
                               ),
                             ],
                           ),
-                        ),
-                      ],
+                        );
+                      },
                     ),
-                  );
-                },
-              ),
             ),
           ],
         ),
