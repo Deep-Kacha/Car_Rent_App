@@ -112,15 +112,26 @@ class _HomePageState extends State<HomePage> {
                     },
                     child: Container(
                       margin: EdgeInsets.only(right: 20),
+                      padding: isSelected
+                          ? EdgeInsets.symmetric(horizontal: 30, vertical: 8)
+                          : EdgeInsets.zero,
+                      decoration: isSelected
+                          ? BoxDecoration(
+                              color: Colors.orange,
+                              borderRadius: BorderRadius.circular(30),
+                            )
+                          : null,
                       alignment: Alignment.center,
                       child: Text(
                         category,
                         style: TextStyle(
-                          fontSize: 15,
+                          fontSize: 17,
                           fontWeight: isSelected
                               ? FontWeight.bold
                               : FontWeight.normal,
-                          color: isSelected ? Colors.orange : Colors.grey,
+                          color: isSelected
+                              ? Colors.white
+                              : Colors.grey, // ✅ white text for selected
                         ),
                       ),
                     ),
