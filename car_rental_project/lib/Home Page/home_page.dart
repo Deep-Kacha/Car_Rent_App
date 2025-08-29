@@ -7,6 +7,35 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int selectedIndex = 0; // 👈 add this
+  Widget buildNavItem(IconData icon, String label, int index) {
+    bool isSelected = selectedIndex == index;
+    return GestureDetector(
+      onTap: () {
+        setState(() {
+          selectedIndex = index;
+        });
+      },
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          Icon(
+            icon,
+            size: 25, // 👈 increase icon size
+            color: isSelected ? Colors.black : Colors.grey,
+          ),
+          SizedBox(height: 6), // 👈 add spacing between icon & text
+          Text(
+            label,
+            style: TextStyle(
+              color: isSelected ? Colors.black : Colors.grey,
+              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
+              fontSize: 14, // 👈 increase text size
+            ),
+          ),
+        ],
+      ),
+    );
+  }
 
   final List<String> categories = ["All", "Cars", "SUVs", "XUVs", "Vans"];
 
@@ -295,22 +324,33 @@ class _HomePageState extends State<HomePage> {
       ),
 
       // ✅ Bottom Navigation
-      bottomNavigationBar: BottomNavigationBar(
-        currentIndex: selectedIndex,
-        onTap: (index) {
-          setState(() {
-            selectedIndex = index;
-          });
-        },
-        selectedItemColor: Colors.orange,
-        unselectedItemColor: Colors.grey,
-        type: BottomNavigationBarType.fixed,
-        items: [
-          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
-          BottomNavigationBarItem(icon: Icon(Icons.favorite), label: "Saved"),
-          BottomNavigationBarItem(icon: Icon(Icons.book), label: "Bookings"),
-          BottomNavigationBarItem(icon: Icon(Icons.person), label: "Profile"),
-        ],
+      bottomNavigationBar: Container(
+        height: 70, // 👈 increase height of nav bar
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.only(
+            topLeft: Radius.circular(20),
+            topRight: Radius.circular(20),
+          ),
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black12,
+              blurRadius: 5,
+              offset: Offset(0, -3),
+            ),
+          ],
+        ),
+        padding: EdgeInsets.symmetric(vertical: 8), // 👈 more padding
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.spaceAround,
+          children: [
+            buildNavItem(Icons.home, "Home", 0),
+            buildNavItem(Icons.car_rental, "Host", 1),
+            buildNavItem(Icons.directions_car, "Booked Car", 2),
+            buildNavItem(Icons.favorite_border, "Favorite", 3),
+            buildNavItem(Icons.menu, "Menu", 4),
+          ],
+        ),
       ),
     );
   }
