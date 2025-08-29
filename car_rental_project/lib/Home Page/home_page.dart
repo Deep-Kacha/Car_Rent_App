@@ -188,8 +188,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ),
 
-                                  // Footer (brown background)
-                                  // Footer (brown background)
+                      
                                   Container(
                                     width: double.infinity,
                                     decoration: BoxDecoration(
