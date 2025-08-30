@@ -46,9 +46,9 @@ class _HomePageState extends State<HomePage> {
     {
       "name": "Mahindra Scorpio 2014",
       "image": "assets/images/2car.jpg",
-      "details": "5.0 ★ 114 Trips | Price: ₹2500/day",
+      "details": "5.0 ★ 114 Trips | Price: ₹2550/day",
       "category": "SUVs",
-      "price": "₹2500/day",
+      "price": "₹2550/day",
     },
     {
       "name": "Maruti Suziki Ertiga",
