@@ -6,7 +6,7 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  int selectedIndex = 0; // 👈 add this
+  int selectedIndex = 0;
   Widget buildNavItem(IconData icon, String label, int index) {
     bool isSelected = selectedIndex == index;
     return GestureDetector(
@@ -18,18 +18,14 @@ class _HomePageState extends State<HomePage> {
       child: Column(
         mainAxisSize: MainAxisSize.min,
         children: [
-          Icon(
-            icon,
-            size: 25, // 👈 increase icon size
-            color: isSelected ? Colors.black : Colors.grey,
-          ),
-          SizedBox(height: 6), // 👈 add spacing between icon & text
+          Icon(icon, size: 25, color: isSelected ? Colors.black : Colors.grey),
+          SizedBox(height: 6),
           Text(
             label,
             style: TextStyle(
               color: isSelected ? Colors.black : Colors.grey,
               fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              fontSize: 14, // 👈 increase text size
+              fontSize: 14,
             ),
           ),
         ],
@@ -45,18 +41,21 @@ class _HomePageState extends State<HomePage> {
       "image": "assets/images/1car.jpg",
       "details": "5.0 ★ 143 Trips | Price: ₹2000/day",
       "category": "Cars",
+      "price": "₹2000/day",
     },
     {
       "name": "Mahindra Scorpio 2014",
       "image": "assets/images/2car.jpg",
-      "details": "5.0 ★ 114 Trips | Price: ₹2500/day",
+      "details": "5.0 ★ 114 Trips | Price: ₹2550/day",
       "category": "SUVs",
+      "price": "₹2550/day",
     },
     {
       "name": "Maruti Suziki Ertiga",
       "image": "assets/images/4car.jpg",
-      "details": "5.0 ★ 12 Trips | Price: ₹2500/day",
+      "details": "5.0 ★ 12 Trips | Price: ₹3000/day",
       "category": "Vans",
+      "price": "₹3000/day",
     },
   ];
 
@@ -76,14 +75,11 @@ class _HomePageState extends State<HomePage> {
 
     return Scaffold(
       backgroundColor: Colors.white,
-
-      // ✅ Show correct page based on selectedIndex
       body: SafeArea(
         child: selectedIndex == 0
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  // Profile and Search
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                     child: Column(
@@ -124,8 +120,6 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   ),
-
-                  // Categories
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(
@@ -182,10 +176,7 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                   ),
-
                   SizedBox(height: 10),
-
-                  // Available Cars
                   Expanded(
                     child: filteredCars.isEmpty
                         ? Center(
@@ -299,7 +290,7 @@ class _HomePageState extends State<HomePage> {
                                                       BorderRadius.circular(8),
                                                 ),
                                                 child: Text(
-                                                  "₹2000 /day",
+                                                  filteredCars[index]["price"]!,
                                                   style: TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.bold,
@@ -320,12 +311,10 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               )
-            : pages[selectedIndex - 1], // ✅ show Saved, Bookings, Profile
+            : pages[selectedIndex - 1],
       ),
-
-      // ✅ Bottom Navigation
       bottomNavigationBar: Container(
-        height: 70, // 👈 increase height of nav bar
+        height: 70,
         decoration: BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.only(
@@ -340,7 +329,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        padding: EdgeInsets.symmetric(vertical: 8), // 👈 more padding
+        padding: EdgeInsets.symmetric(vertical: 8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
