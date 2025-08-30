@@ -41,18 +41,21 @@ class _HomePageState extends State<HomePage> {
       "image": "assets/images/1car.jpg",
       "details": "5.0 ★ 143 Trips | Price: ₹2000/day",
       "category": "Cars",
+      "price": "₹2000/day",
     },
     {
       "name": "Mahindra Scorpio 2014",
       "image": "assets/images/2car.jpg",
       "details": "5.0 ★ 114 Trips | Price: ₹2500/day",
       "category": "SUVs",
+      "price": "₹2500/day",
     },
     {
       "name": "Maruti Suziki Ertiga",
       "image": "assets/images/4car.jpg",
-      "details": "5.0 ★ 12 Trips | Price: ₹2500/day",
+      "details": "5.0 ★ 12 Trips | Price: ₹3000/day",
       "category": "Vans",
+      "price": "₹3000/day",
     },
   ];
 
@@ -287,7 +290,7 @@ class _HomePageState extends State<HomePage> {
                                                       BorderRadius.circular(8),
                                                 ),
                                                 child: Text(
-                                                  "₹2000 /day",
+                                                  filteredCars[index]["price"]!,
                                                   style: TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.bold,
