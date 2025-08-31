@@ -58,6 +58,76 @@ class _HomePageState extends State<HomePage> {
       "category": "Vans",
       "price": "₹3000/day",
     },
+    {
+      "name": "Hyundai Creta 2021",
+      "image": "assets/images/creta.jpg",
+      "details": "4.8 ★ 95 Trips | Price: ₹2800/day",
+      "category": "SUVs",
+      "price": "₹2800/day",
+    },
+    {
+      "name": "Toyota Innova Crysta",
+      "image": "assets/images/innova.jpg",
+      "details": "4.9 ★ 210 Trips | Price: ₹3500/day",
+      "category": "Vans",
+      "price": "₹3500/day",
+    },
+    {
+      "name": "Tata Harrier 2022",
+      "image": "assets/images/harrier.jpg",
+      "details": "5.0 ★ 65 Trips | Price: ₹3200/day",
+      "category": "SUVs",
+      "price": "₹3200/day",
+    },
+    {
+      "name": "Kia Seltos 2021",
+      "image": "assets/images/seltos.jpg",
+      "details": "4.7 ★ 130 Trips | Price: ₹2700/day",
+      "category": "SUVs",
+      "price": "₹2700/day",
+    },
+    {
+      "name": "Honda City 2020",
+      "image": "assets/images/city.jpg",
+      "details": "4.9 ★ 180 Trips | Price: ₹2200/day",
+      "category": "Cars",
+      "price": "₹2200/day",
+    },
+    {
+      "name": "Suzuki Swift Dzire",
+      "image": "assets/images/dzire.jpg",
+      "details": "4.8 ★ 200 Trips | Price: ₹1900/day",
+      "category": "Cars",
+      "price": "₹1900/day",
+    },
+    {
+      "name": "Mahindra XUV700",
+      "image": "assets/images/xuv700.jpg",
+      "details": "5.0 ★ 50 Trips | Price: ₹4000/day",
+      "category": "XUVs",
+      "price": "₹4000/day",
+    },
+    {
+      "name": "Hyundai Venue",
+      "image": "assets/images/venue.jpg",
+      "details": "4.6 ★ 80 Trips | Price: ₹2400/day",
+      "category": "SUVs",
+      "price": "₹2400/day",
+    },
+    {
+      "name": "Renault Triber",
+      "image": "assets/images/triber.jpg",
+      "details": "4.7 ★ 70 Trips | Price: ₹2100/day",
+      "category": "Vans",
+      "price": "₹2100/day",
+    },
+    {
+      "name": "Maruti Baleno",
+      "image": "assets/images/baleno.jpg",
+      "details": "4.8 ★ 160 Trips | Price: ₹2000/day",
+      "category": "Cars",
+      "price": "₹2000/day",
+    },
   ];
 
   String selectedCategory = "All";
@@ -261,15 +331,21 @@ class _HomePageState extends State<HomePage> {
                                                 size: 16,
                                               ),
                                               SizedBox(width: 4),
-                                              Text(
-                                                "5.0 ★ (10 trips)",
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 12,
+                                              Expanded(
+                                                child: Text(
+                                                  filteredCars[index]["details"] ??
+                                                      "",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 12,
+                                                  ),
+                                                  overflow:
+                                                      TextOverflow.ellipsis,
                                                 ),
                                               ),
                                             ],
                                           ),
+
                                           SizedBox(height: 4),
                                           Row(
                                             mainAxisAlignment:
