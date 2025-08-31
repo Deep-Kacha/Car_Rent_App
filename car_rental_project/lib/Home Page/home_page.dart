@@ -7,6 +7,7 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int selectedIndex = 0;
+
   Widget buildNavItem(IconData icon, String label, int index) {
     bool isSelected = selectedIndex == index;
     return GestureDetector(
@@ -61,11 +62,13 @@ class _HomePageState extends State<HomePage> {
 
   String selectedCategory = "All";
 
-  final List<Widget> pages = [
-    Center(child: Text("❤️ Saved Cars")),
-    Center(child: Text("📖 My Bookings")),
-    Center(child: Text("👤 Profile")),
-  ];
+  /// Align pages with navigation indexes (0,2,3,4)
+  final Map<int, Widget> pages = {
+    0: SizedBox(),
+    2: Center(child: Text("📖 My Bookings")),
+    3: Center(child: Text("⭐ Favorites")),
+    4: Center(child: Text("📂 Menu")),
+  };
 
   @override
   Widget build(BuildContext context) {
@@ -311,7 +314,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               )
-            : pages[selectedIndex - 1],
+            : pages[selectedIndex] ?? Center(child: Text("Page not found")),
       ),
       bottomNavigationBar: Container(
         height: 70,
@@ -334,7 +337,6 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             buildNavItem(Icons.home, "Home", 0),
-            buildNavItem(Icons.car_rental, "Host", 1),
             buildNavItem(Icons.directions_car, "Booked Car", 2),
             buildNavItem(Icons.favorite_border, "Favorite", 3),
             buildNavItem(Icons.menu, "Menu", 4),
