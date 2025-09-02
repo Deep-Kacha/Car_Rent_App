@@ -52,7 +52,7 @@ class _HomePageState extends State<HomePage> {
       "price": "₹2550/day",
     },
     {
-      "name": "Maruti Suziki Ertiga",
+      "name": "Maruti Suzuki Ertiga",
       "image": "assets/images/4car.jpg",
       "details": "12 Trips",
       "category": "Vans",
@@ -60,10 +60,52 @@ class _HomePageState extends State<HomePage> {
     },
     {
       "name": "Hyundai Creta 2021",
-      "image": "assets/images/1car.jpg",
+      "image": "assets/images/creta.jpg",
       "details": "95 Trips",
       "category": "SUVs",
       "price": "₹2800/day",
+    },
+    {
+      "name": "Tata Nexon EV 2023",
+      "image": "assets/images/5car.jpg",
+      "details": "47 Trips",
+      "category": "XUVs",
+      "price": "₹3200/day",
+    },
+    {
+      "name": "Honda City 2019",
+      "image": "assets/images/6car.jpg",
+      "details": "68 Trips",
+      "category": "Cars",
+      "price": "₹2200/day",
+    },
+    {
+      "name": "Toyota Innova Crysta 2022",
+      "image": "assets/images/7car.jpg",
+      "details": "133 Trips",
+      "category": "Vans",
+      "price": "₹3500/day",
+    },
+    {
+      "name": "Kia Seltos 2021",
+      "image": "assets/images/8car.jpg",
+      "details": "89 Trips",
+      "category": "SUVs",
+      "price": "₹2900/day",
+    },
+    {
+      "name": "Ford EcoSport 2020",
+      "image": "assets/images/9car.jpg",
+      "details": "75 Trips",
+      "category": "XUVs",
+      "price": "₹2500/day",
+    },
+    {
+      "name": "Volkswagen Polo 2018",
+      "image": "assets/images/10car.jpg",
+      "details": "54 Trips",
+      "category": "Cars",
+      "price": "₹2100/day",
     },
   ];
 
