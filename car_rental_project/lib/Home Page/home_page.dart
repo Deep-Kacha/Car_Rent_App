@@ -40,99 +40,35 @@ class _HomePageState extends State<HomePage> {
     {
       "name": "Brezzo 2020",
       "image": "assets/images/1car.jpg",
-      "details": "5.0 ★ 143 Trips | Price: ₹2000/day",
+      "details": "143 Trips",
       "category": "Cars",
       "price": "₹2000/day",
     },
     {
       "name": "Mahindra Scorpio 2014",
       "image": "assets/images/2car.jpg",
-      "details": "5.0 ★ 114 Trips | Price: ₹2550/day",
+      "details": "114 Trips",
       "category": "SUVs",
       "price": "₹2550/day",
     },
     {
       "name": "Maruti Suziki Ertiga",
       "image": "assets/images/4car.jpg",
-      "details": "5.0 ★ 12 Trips | Price: ₹3000/day",
+      "details": "12 Trips",
       "category": "Vans",
       "price": "₹3000/day",
     },
     {
       "name": "Hyundai Creta 2021",
-      "image": "assets/images/creta.jpg",
-      "details": "4.8 ★ 95 Trips | Price: ₹2800/day",
+      "image": "assets/images/1car.jpg",
+      "details": "95 Trips",
       "category": "SUVs",
       "price": "₹2800/day",
-    },
-    {
-      "name": "Toyota Innova Crysta",
-      "image": "assets/images/innova.jpg",
-      "details": "4.9 ★ 210 Trips | Price: ₹3500/day",
-      "category": "Vans",
-      "price": "₹3500/day",
-    },
-    {
-      "name": "Tata Harrier 2022",
-      "image": "assets/images/harrier.jpg",
-      "details": "5.0 ★ 65 Trips | Price: ₹3200/day",
-      "category": "SUVs",
-      "price": "₹3200/day",
-    },
-    {
-      "name": "Kia Seltos 2021",
-      "image": "assets/images/seltos.jpg",
-      "details": "4.7 ★ 130 Trips | Price: ₹2700/day",
-      "category": "SUVs",
-      "price": "₹2700/day",
-    },
-    {
-      "name": "Honda City 2020",
-      "image": "assets/images/city.jpg",
-      "details": "4.9 ★ 180 Trips | Price: ₹2200/day",
-      "category": "Cars",
-      "price": "₹2200/day",
-    },
-    {
-      "name": "Suzuki Swift Dzire",
-      "image": "assets/images/dzire.jpg",
-      "details": "4.8 ★ 200 Trips | Price: ₹1900/day",
-      "category": "Cars",
-      "price": "₹1900/day",
-    },
-    {
-      "name": "Mahindra XUV700",
-      "image": "assets/images/xuv700.jpg",
-      "details": "5.0 ★ 50 Trips | Price: ₹4000/day",
-      "category": "XUVs",
-      "price": "₹4000/day",
-    },
-    {
-      "name": "Hyundai Venue",
-      "image": "assets/images/venue.jpg",
-      "details": "4.6 ★ 80 Trips | Price: ₹2400/day",
-      "category": "SUVs",
-      "price": "₹2400/day",
-    },
-    {
-      "name": "Renault Triber",
-      "image": "assets/images/triber.jpg",
-      "details": "4.7 ★ 70 Trips | Price: ₹2100/day",
-      "category": "Vans",
-      "price": "₹2100/day",
-    },
-    {
-      "name": "Maruti Baleno",
-      "image": "assets/images/baleno.jpg",
-      "details": "4.8 ★ 160 Trips | Price: ₹2000/day",
-      "category": "Cars",
-      "price": "₹2000/day",
     },
   ];
 
   String selectedCategory = "All";
 
-  /// Align pages with navigation indexes (0,2,3,4)
   final Map<int, Widget> pages = {
     0: SizedBox(),
     2: Center(child: Text("📖 My Bookings")),
@@ -153,6 +89,7 @@ class _HomePageState extends State<HomePage> {
             ? Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
+                  /// Profile + Search
                   Padding(
                     padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
                     child: Column(
@@ -193,6 +130,8 @@ class _HomePageState extends State<HomePage> {
                       ],
                     ),
                   ),
+
+                  /// Categories
                   Padding(
                     padding: const EdgeInsets.all(16),
                     child: Text(
@@ -249,7 +188,10 @@ class _HomePageState extends State<HomePage> {
                       },
                     ),
                   ),
+
                   SizedBox(height: 10),
+
+                  /// Cars List
                   Expanded(
                     child: filteredCars.isEmpty
                         ? Center(
@@ -304,6 +246,7 @@ class _HomePageState extends State<HomePage> {
                                         crossAxisAlignment:
                                             CrossAxisAlignment.start,
                                         children: [
+                                          /// Car Name + Favorite
                                           Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -323,30 +266,20 @@ class _HomePageState extends State<HomePage> {
                                             ],
                                           ),
                                           SizedBox(height: 4),
-                                          Row(
-                                            children: [
-                                              Icon(
-                                                Icons.star,
-                                                color: Colors.yellow,
-                                                size: 16,
-                                              ),
-                                              SizedBox(width: 4),
-                                              Expanded(
-                                                child: Text(
-                                                  filteredCars[index]["details"] ??
-                                                      "",
-                                                  style: TextStyle(
-                                                    color: Colors.white,
-                                                    fontSize: 12,
-                                                  ),
-                                                  overflow:
-                                                      TextOverflow.ellipsis,
-                                                ),
-                                              ),
-                                            ],
+
+                                          /// Only Trips Count
+                                          Text(
+                                            filteredCars[index]["details"] ??
+                                                "",
+                                            style: TextStyle(
+                                              color: Colors.white,
+                                              fontSize: 12,
+                                            ),
                                           ),
 
                                           SizedBox(height: 4),
+
+                                          /// Location + Price
                                           Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -392,6 +325,8 @@ class _HomePageState extends State<HomePage> {
               )
             : pages[selectedIndex] ?? Center(child: Text("Page not found")),
       ),
+
+      /// Bottom Nav
       bottomNavigationBar: Container(
         height: 70,
         decoration: BoxDecoration(
