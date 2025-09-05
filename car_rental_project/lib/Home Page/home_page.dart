@@ -7,6 +7,8 @@ class HomePage extends StatefulWidget {
 
 class _HomePageState extends State<HomePage> {
   int selectedIndex = 0;
+  String selectedCategory = "All";
+  String searchQuery = "";
 
   Widget buildNavItem(IconData icon, String label, int index) {
     bool isSelected = selectedIndex == index;
@@ -38,23 +40,23 @@ class _HomePageState extends State<HomePage> {
 
   final List<Map<String, String>> cars = [
     {
-      "name": "Brezzo 2020",
+      "name": "Brezza 2020",
       "image": "assets/images/1car.jpg",
-      "details": "5.0 ★ 143 Trips | Price: ₹2000/day",
+      "details": "143 Trips | Price: ₹2000/day",
       "category": "Cars",
       "price": "₹2000/day",
     },
     {
       "name": "Mahindra Scorpio 2014",
       "image": "assets/images/2car.jpg",
-      "details": "5.0 ★ 114 Trips | Price: ₹2550/day",
+      "details": "114 Trips | Price: ₹2550/day",
       "category": "SUVs",
       "price": "₹2550/day",
     },
     {
-      "name": "Maruti Suziki Ertiga",
+      "name": "Maruti Suzuki Ertiga",
       "image": "assets/images/4car.jpg",
-      "details": "5.0 ★ 12 Trips | Price: ₹3000/day",
+      "details": "12 Trips | Price: ₹3000/day",
       "category": "Vans",
       "price": "₹3000/day",
     },
@@ -130,7 +132,21 @@ class _HomePageState extends State<HomePage> {
     },
   ];
 
-  String selectedCategory = "All";
+  /// Getter for filtered cars (Category + Search)
+  List<Map<String, String>> get filteredCars {
+    final carsByCategory = selectedCategory == "All"
+        ? cars
+        : cars.where((car) => car["category"] == selectedCategory).toList();
+
+    if (searchQuery.isEmpty) return carsByCategory;
+
+    return carsByCategory
+        .where(
+          (car) =>
+              car["name"]!.toLowerCase().contains(searchQuery.toLowerCase()),
+        )
+        .toList();
+  }
 
   /// Align pages with navigation indexes (0,2,3,4)
   final Map<int, Widget> pages = {
@@ -142,10 +158,6 @@ class _HomePageState extends State<HomePage> {
 
   @override
   Widget build(BuildContext context) {
-    List<Map<String, String>> filteredCars = selectedCategory == "All"
-        ? cars
-        : cars.where((car) => car["category"] == selectedCategory).toList();
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -189,6 +201,11 @@ class _HomePageState extends State<HomePage> {
                               borderSide: BorderSide.none,
                             ),
                           ),
+                          onChanged: (value) {
+                            setState(() {
+                              searchQuery = value;
+                            });
+                          },
                         ),
                       ],
                     ),
@@ -345,7 +362,6 @@ class _HomePageState extends State<HomePage> {
                                               ),
                                             ],
                                           ),
-
                                           SizedBox(height: 4),
                                           Row(
                                             mainAxisAlignment:
