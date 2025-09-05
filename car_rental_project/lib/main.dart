@@ -1,6 +1,4 @@
 // import 'package:car_rental_project/authentication/Screens/login.dart';
-import 'package:car_rental_project/Home%20Page/home_page.dart';
-import 'package:car_rental_project/authentication/Screens/sign_up.dart';
 import 'package:flutter/material.dart';
 
 void main() {
