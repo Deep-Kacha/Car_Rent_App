@@ -1,19 +1,16 @@
 import 'package:car_rental_project/Home%20Page/home_page.dart';
 import 'package:car_rental_project/Splash/GetStart.dart';
-import 'package:car_rental_project/Tems%20&%20Conditions/TermsConditions.dart';
-import 'package:car_rental_project/authentication/Screens/sign_in.dart';
-import 'package:flutter/gestures.dart';
+import 'package:car_rental_project/authentication/Screens/sign_up.dart';
 import 'package:flutter/material.dart';
 
-class SingUp extends StatefulWidget {
-  const SingUp({Key? key}) : super(key: key);
+class SignIn extends StatefulWidget {
+  const SignIn({Key? key}) : super(key: key);
 
   @override
-  State<SingUp> createState() => _SingUpState();
+  State<SignIn> createState() => _SignInState();
 }
 
-class _SingUpState extends State<SingUp> {
-  bool agreeTerms = false;
+class _SignInState extends State<SignIn> {
   bool isPasswordVisible = false;
 
   @override
@@ -45,20 +42,20 @@ class _SingUpState extends State<SingUp> {
               // Title + Subtitle
               Column(
                 crossAxisAlignment: CrossAxisAlignment.center,
-                children: [
-                  const Text(
-                    "Create Account",
+                children: const [
+                  Text(
+                    "Sign in",
                     style: TextStyle(
                       fontSize: 26,
                       fontWeight: FontWeight.bold,
                       color: Colors.black,
                     ),
                   ),
-                  const SizedBox(height: 6),
+                  SizedBox(height: 6),
                   Text(
-                    "Fill your information below or register\nwith your social account.",
+                    "Hi! Welcome back, you’ve been missed",
                     textAlign: TextAlign.center,
-                    style: TextStyle(fontSize: 14, color: Colors.grey[600]),
+                    style: TextStyle(fontSize: 14, color: Colors.grey),
                   ),
                 ],
               ),
@@ -71,7 +68,7 @@ class _SingUpState extends State<SingUp> {
                   labelText: "Email",
                   hintText: "example@gmail.com",
                   filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
+                  fillColor: Color(0xFFF5F5F5),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -88,7 +85,7 @@ class _SingUpState extends State<SingUp> {
                   labelText: "Password",
                   hintText: "********",
                   filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
+                  fillColor: Color(0xFFF5F5F5),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
                     borderSide: BorderSide.none,
@@ -109,55 +106,9 @@ class _SingUpState extends State<SingUp> {
                 ),
               ),
 
-              const SizedBox(height: 5),
+              const SizedBox(height: 20),
 
-              // Terms & Conditions
-              Row(
-                children: [
-                  Checkbox(
-                    activeColor: Colors.brown,
-                    value: agreeTerms,
-                    onChanged: (value) {
-                      setState(() {
-                        agreeTerms = value ?? false;
-                      });
-                    },
-                  ),
-                  Expanded(
-                    child: RichText(
-                      text: TextSpan(
-                        text: "Agree with ",
-                        style: const TextStyle(
-                          color: Colors.black,
-                          fontSize: 14,
-                        ),
-                        children: [
-                          TextSpan(
-                            text: "Terms & conditions",
-                            style: const TextStyle(
-                              color: Colors.brown,
-                              fontWeight: FontWeight.bold,
-                            ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => TermsConditions(),
-                                  ),
-                                );
-                              },
-                          ),
-                        ],
-                      ),
-                    ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 5),
-
-              // Sign Up button
+              // Sign in button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -169,14 +120,13 @@ class _SingUpState extends State<SingUp> {
                     ),
                   ),
                   onPressed: () {
-                    // Navigate to HomePage after sign up
                     Navigator.pushReplacement(
                       context,
                       MaterialPageRoute(builder: (context) => HomePage()),
                     );
                   },
                   child: const Text(
-                    "Sign Up",
+                    "Sign in",
                     style: TextStyle(
                       fontSize: 18,
                       fontWeight: FontWeight.bold,
@@ -188,14 +138,14 @@ class _SingUpState extends State<SingUp> {
 
               const SizedBox(height: 40),
 
-              // Divider with "Or sign up with"
+              // Divider with "Or sign in with"
               Row(
                 children: const [
                   Expanded(child: Divider(thickness: 2, height: 40)),
                   Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
-                      "Or Sign Up With",
+                      "Or Sign In With",
                       style: TextStyle(
                         fontSize: 18,
                         fontWeight: FontWeight.bold,
@@ -211,7 +161,7 @@ class _SingUpState extends State<SingUp> {
               // Google Button
               GestureDetector(
                 onTap: () {
-                  // Google sign up logic
+                  // Google sign in logic
                 },
                 child: Container(
                   padding: const EdgeInsets.all(12),
@@ -225,23 +175,23 @@ class _SingUpState extends State<SingUp> {
 
               const Spacer(),
 
-              // Sign in link
+              // Sign up link
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    "Already have an account? ",
+                    "Don’t have an account? ",
                     style: TextStyle(fontSize: 17),
                   ),
                   GestureDetector(
                     onTap: () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(builder: (context) => SignIn()),
+                        MaterialPageRoute(builder: (context) => const SingUp()),
                       );
                     },
                     child: const Text(
-                      "Sign in",
+                      "Sign up",
                       style: TextStyle(
                         color: Colors.brown,
                         fontWeight: FontWeight.bold,
