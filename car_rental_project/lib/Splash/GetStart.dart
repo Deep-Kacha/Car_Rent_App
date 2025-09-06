@@ -14,7 +14,7 @@ class GetStart extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            const SizedBox(height: 80),
+            const SizedBox(height: 50),
 
             // Title
             const Text(
@@ -34,7 +34,7 @@ class GetStart extends StatelessWidget {
               style: TextStyle(fontSize: 18, color: Colors.grey),
             ),
 
-            const SizedBox(height: 40),
+            const SizedBox(height: 50),
 
             // Car Image
             Center(

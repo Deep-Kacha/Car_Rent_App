@@ -1,4 +1,6 @@
+import 'package:car_rental_project/Home%20Page/Favorite.dart';
 import 'package:flutter/material.dart';
+import 'package:car_rental_project/Home%20Page/Menu.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -9,6 +11,9 @@ class _HomePageState extends State<HomePage> {
   int selectedIndex = 0;
   String selectedCategory = "All";
   String searchQuery = "";
+
+  /// Store favorite car names
+  Set<String> favoriteCars = {};
 
   Widget buildNavItem(IconData icon, String label, int index) {
     bool isSelected = selectedIndex == index;
@@ -67,48 +72,6 @@ class _HomePageState extends State<HomePage> {
       "category": "SUVs",
       "price": "₹2800/day",
     },
-    {
-      "name": "Tata Nexon EV 2023",
-      "image": "assets/images/5car.jpg",
-      "details": "47 Trips",
-      "category": "XUVs",
-      "price": "₹3200/day",
-    },
-    {
-      "name": "Honda City 2019",
-      "image": "assets/images/6car.jpg",
-      "details": "68 Trips",
-      "category": "Cars",
-      "price": "₹2200/day",
-    },
-    {
-      "name": "Toyota Innova Crysta 2022",
-      "image": "assets/images/7car.jpg",
-      "details": "133 Trips",
-      "category": "Vans",
-      "price": "₹3500/day",
-    },
-    {
-      "name": "Kia Seltos 2021",
-      "image": "assets/images/8car.jpg",
-      "details": "89 Trips",
-      "category": "SUVs",
-      "price": "₹2900/day",
-    },
-    {
-      "name": "Ford EcoSport 2020",
-      "image": "assets/images/9car.jpg",
-      "details": "75 Trips",
-      "category": "XUVs",
-      "price": "₹2500/day",
-    },
-    {
-      "name": "Volkswagen Polo 2018",
-      "image": "assets/images/10car.jpg",
-      "details": "54 Trips",
-      "category": "Cars",
-      "price": "₹2100/day",
-    },
   ];
 
   /// Getter for filtered cars (Category + Search)
@@ -127,15 +90,28 @@ class _HomePageState extends State<HomePage> {
         .toList();
   }
 
-  final Map<int, Widget> pages = {
-    0: SizedBox(),
-    2: Center(child: Text("📖 My Bookings")),
-    3: Center(child: Text("⭐ Favorites")),
-    4: Center(child: Text("📂 Menu")),
-  };
-
   @override
   Widget build(BuildContext context) {
+    final Map<int, Widget> pages = {
+      0: SizedBox(), // Home
+      2: Center(child: Text("📖 My Bookings")),
+      3: FavoritePage(
+        favoriteCars: cars
+            .where((car) => favoriteCars.contains(car["name"]))
+            .toList(),
+        onToggleFavorite: (String carName) {
+          setState(() {
+            if (favoriteCars.contains(carName)) {
+              favoriteCars.remove(carName);
+            } else {
+              favoriteCars.add(carName);
+            }
+          });
+        },
+      ),
+      4: MenuPage(),
+    };
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -162,7 +138,7 @@ class _HomePageState extends State<HomePage> {
                               "Ethan John",
                               style: TextStyle(
                                 fontSize: 22,
-                                fontWeight: FontWeight.bold,
+                                fontWeight: FontWeight.w500,
                                 color: Colors.black,
                               ),
                             ),
@@ -263,6 +239,11 @@ class _HomePageState extends State<HomePage> {
                             padding: EdgeInsets.symmetric(horizontal: 16),
                             itemCount: filteredCars.length,
                             itemBuilder: (context, index) {
+                              final car = filteredCars[index];
+                              final isFavorite = favoriteCars.contains(
+                                car["name"],
+                              );
+
                               return Container(
                                 margin: EdgeInsets.only(bottom: 16),
                                 decoration: BoxDecoration(
@@ -285,7 +266,7 @@ class _HomePageState extends State<HomePage> {
                                         topRight: Radius.circular(15),
                                       ),
                                       child: Image.asset(
-                                        filteredCars[index]["image"]!,
+                                        car["image"]!,
                                         height: 180,
                                         width: double.infinity,
                                         fit: BoxFit.cover,
@@ -311,25 +292,40 @@ class _HomePageState extends State<HomePage> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                filteredCars[index]["name"]!,
+                                                car["name"]!,
                                                 style: TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.bold,
                                                   color: Colors.white,
                                                 ),
                                               ),
-                                              Icon(
-                                                Icons.favorite_border,
-                                                color: Colors.white,
+                                              GestureDetector(
+                                                onTap: () {
+                                                  setState(() {
+                                                    if (isFavorite) {
+                                                      favoriteCars.remove(
+                                                        car["name"],
+                                                      );
+                                                    } else {
+                                                      favoriteCars.add(
+                                                        car["name"]!,
+                                                      );
+                                                    }
+                                                  });
+                                                },
+                                                child: Icon(
+                                                  isFavorite
+                                                      ? Icons.favorite
+                                                      : Icons.favorite_border,
+                                                  color: Colors.redAccent,
+                                                ),
                                               ),
                                             ],
                                           ),
                                           SizedBox(height: 4),
 
-                                          /// Only Trips Count
                                           Text(
-                                            filteredCars[index]["details"] ??
-                                                "",
+                                            car["details"] ?? "",
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 12,
@@ -337,7 +333,6 @@ class _HomePageState extends State<HomePage> {
                                           ),
                                           SizedBox(height: 4),
 
-                                          /// Location + Price
                                           Row(
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
@@ -360,7 +355,7 @@ class _HomePageState extends State<HomePage> {
                                                       BorderRadius.circular(8),
                                                 ),
                                                 child: Text(
-                                                  filteredCars[index]["price"]!,
+                                                  car["price"]!,
                                                   style: TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.bold,
