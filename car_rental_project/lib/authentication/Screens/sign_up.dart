@@ -152,7 +152,7 @@ class _SingUpState extends State<SingUp> {
                 Row(
                   children: [
                     Checkbox(
-                      activeColor: Colors.brown,
+                      activeColor: const Color.fromARGB(255, 89, 58, 48),
                       value: agreeTerms,
                       onChanged: (value) {
                         setState(() {
