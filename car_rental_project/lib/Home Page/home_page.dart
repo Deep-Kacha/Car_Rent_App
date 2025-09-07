@@ -50,13 +50,15 @@ class _HomePageState extends State<HomePage> {
       "details": "143 Trips",
       "category": "Cars",
       "price": "₹2000/day",
+      "address": "Race Course • 9 Km",
     },
     {
       "name": "Mahindra Scorpio 2014",
       "image": "assets/images/2car.jpg",
       "details": "114 Trips",
-      "category": "SUVs",
+      "category": "XUVs",
       "price": "₹2550/day",
+      "address": "Ramnath para",
     },
     {
       "name": "Maruti Suzuki Ertiga",
@@ -64,6 +66,7 @@ class _HomePageState extends State<HomePage> {
       "details": "12 Trips",
       "category": "Vans",
       "price": "₹3000/day",
+      "address": "Sahakar road",
     },
     {
       "name": "Hyundai Creta 2021",
@@ -71,6 +74,47 @@ class _HomePageState extends State<HomePage> {
       "details": "95 Trips",
       "category": "SUVs",
       "price": "₹2800/day",
+      "address": "Satellite chowk",
+    },
+    {
+      "name": "Kia seltos 2020",
+      "image": "assets/images/8car.jpg",
+      "details": "13 Trips",
+      "category": "SUVs",
+      "price": "₹2100/day",
+      "address": "Bhaktinagar circle",
+    },
+    {
+      "name": "Tata Nexon EV 2023",
+      "image": "assets/images/5car.jpg",
+      "details": "15 Trips",
+      "category": "SUVs",
+      "price": "₹3000/day",
+      "address": "University road ",
+    },
+    {
+      "name": "Inova Crysta 2021",
+      "image": "assets/images/7car.jpg",
+      "details": "75 Trips",
+      "category": "XUVs",
+      "price": "₹2500/day",
+      "address": "morbi road ",
+    },
+    {
+      "name": "VollksWagen Polo tdi 2021",
+      "image": "assets/images/10car.jpg",
+      "details": "50 Trips",
+      "category": "Cars",
+      "price": "₹2700/day",
+      "address": "Bhavnath Park",
+    },
+    {
+      "name": "Ford Ecosport 2016",
+      "image": "assets/images/9car.jpg",
+      "details": "90 Trips",
+      "category": "SUVs",
+      "price": "₹2300/day",
+      "address": "Kotecha Chowk",
     },
   ];
 
@@ -337,13 +381,16 @@ class _HomePageState extends State<HomePage> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              Text(
-                                                "Race course • 9 Km",
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 12,
+                                              Expanded(
+                                                child: Text(
+                                                  car["address"] ?? "",
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    fontSize: 12,
+                                                  ),
                                                 ),
                                               ),
+
                                               Container(
                                                 padding: EdgeInsets.symmetric(
                                                   horizontal: 14,
