@@ -50,6 +50,7 @@ class _HomePageState extends State<HomePage> {
       "details": "143 Trips",
       "category": "Cars",
       "price": "₹2000/day",
+      "location": "Race Course, Rajkot",
     },
     {
       "name": "Mahindra Scorpio 2014",
@@ -57,6 +58,7 @@ class _HomePageState extends State<HomePage> {
       "details": "114 Trips",
       "category": "SUVs",
       "price": "₹2550/day",
+      "location": "Ring Road, Ahmedabad",
     },
     {
       "name": "Maruti Suzuki Ertiga",
@@ -64,6 +66,7 @@ class _HomePageState extends State<HomePage> {
       "details": "12 Trips",
       "category": "Vans",
       "price": "₹3000/day",
+      "location": "Nanpura, Surat",
     },
     {
       "name": "Hyundai Creta 2021",
@@ -71,6 +74,7 @@ class _HomePageState extends State<HomePage> {
       "details": "95 Trips",
       "category": "SUVs",
       "price": "₹2800/day",
+      "location": "Location : Gota Road, Ahmedabad",
     },
   ];
 
@@ -338,12 +342,13 @@ class _HomePageState extends State<HomePage> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                "Race course",
+                                                car["location"] ?? "",
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 12,
                                                 ),
                                               ),
+
                                               Container(
                                                 padding: EdgeInsets.symmetric(
                                                   horizontal: 14,

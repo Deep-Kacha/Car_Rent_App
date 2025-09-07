@@ -1,3 +1,9 @@
+import 'package:car_rental_project/Menu/Account.dart';
+import 'package:car_rental_project/Menu/ChangePassword.dart';
+import 'package:car_rental_project/Menu/EditProfile.dart';
+import 'package:car_rental_project/Menu/HandleBusiness.dart';
+import 'package:car_rental_project/Menu/ViewProfile.dart';
+import 'package:car_rental_project/Splash/GetStart.dart';
 import 'package:flutter/material.dart';
 
 class MenuPage extends StatelessWidget {
@@ -6,7 +12,7 @@ class MenuPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black87, // outer bg
+      backgroundColor: Colors.white, // outer bg
       body: SafeArea(
         child: Container(
           width: double.infinity,
@@ -32,7 +38,7 @@ class MenuPage extends StatelessWidget {
               Row(
                 children: const [
                   CircleAvatar(
-                    radius: 35,
+                    radius: 23,
                     backgroundImage: NetworkImage(
                       "https://i.pravatar.cc/150?img=3",
                     ),
@@ -41,8 +47,8 @@ class MenuPage extends StatelessWidget {
                   Text(
                     "Ethan John",
                     style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.bold,
+                      fontSize: 26,
+                      fontWeight: FontWeight.w500,
                       color: Colors.black,
                     ),
                   ),
@@ -60,20 +66,58 @@ class MenuPage extends StatelessWidget {
               Expanded(
                 child: ListView(
                   children: [
-                    _buildMenuItem(Icons.person_outline, "Account", () {}),
-                    _buildMenuItem(Icons.badge_outlined, "View Profile", () {}),
-                    _buildMenuItem(Icons.edit, "Edit Profile", () {}),
-                    _buildMenuItem(
-                      Icons.lock_outline,
-                      "Change Password",
-                      () {},
-                    ),
+                    _buildMenuItem(Icons.person_outline, "Account", () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AccountPage(),
+                        ),
+                      );
+                    }),
+                    _buildMenuItem(Icons.badge_outlined, "View Profile", () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ViewProfilePage(),
+                        ),
+                      );
+                    }),
+                    _buildMenuItem(Icons.edit, "Edit Profile", () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const EditProfilePage(),
+                        ),
+                      );
+                    }),
+                    _buildMenuItem(Icons.lock_outline, "Change Password", () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ChangePasswordPage(),
+                        ),
+                      );
+                    }),
                     _buildMenuItem(
                       Icons.business_center,
                       "Handle Business",
-                      () {},
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => const HandleBusinessPage(),
+                          ),
+                        );
+                      },
                     ),
-                    _buildMenuItem(Icons.logout, "Log Out", () {}),
+                    _buildMenuItem(Icons.logout, "Log Out", () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const GetStart(),
+                        ),
+                      );
+                    }),
                   ],
                 ),
               ),
