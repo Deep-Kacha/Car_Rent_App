@@ -128,16 +128,16 @@ class _HomePageState extends State<HomePage> {
                         Row(
                           children: [
                             CircleAvatar(
-                              radius: 25,
+                              radius: 21,
                               backgroundImage: NetworkImage(
                                 "https://i.pravatar.cc/150?img=3",
                               ),
                             ),
-                            SizedBox(width: 10),
+                            SizedBox(width: 15),
                             Text(
                               "Ethan John",
                               style: TextStyle(
-                                fontSize: 22,
+                                fontSize: 25,
                                 fontWeight: FontWeight.w500,
                                 color: Colors.black,
                               ),
@@ -338,7 +338,7 @@ class _HomePageState extends State<HomePage> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                "Race course • 9 Km",
+                                                "Race course",
                                                 style: TextStyle(
                                                   color: Colors.white,
                                                   fontSize: 12,

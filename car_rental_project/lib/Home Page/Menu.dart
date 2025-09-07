@@ -68,12 +68,12 @@ class MenuPage extends StatelessWidget {
                       "Change Password",
                       () {},
                     ),
-                    _buildMenuItem(Icons.logout, "Log Out", () {}),
                     _buildMenuItem(
                       Icons.business_center,
                       "Handle Business",
                       () {},
                     ),
+                    _buildMenuItem(Icons.logout, "Log Out", () {}),
                   ],
                 ),
               ),
