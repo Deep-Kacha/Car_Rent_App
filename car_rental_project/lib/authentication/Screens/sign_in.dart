@@ -1,5 +1,6 @@
 import 'package:car_rental_project/Home%20Page/home_page.dart';
 import 'package:car_rental_project/Splash/GetStart.dart';
+import 'package:car_rental_project/authentication/Screens/ForgatPassword.dart';
 import 'package:car_rental_project/authentication/Screens/sign_up.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +14,6 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
   bool isPasswordVisible = false;
 
-  // Form key & controllers
   final _formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -22,11 +22,9 @@ class _SignInState extends State<SignIn> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
-      resizeToAvoidBottomInset:
-          true, // ✅ Prevent overflow when keyboard appears
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
         child: SingleChildScrollView(
-          // ✅ Makes whole page scrollable
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Form(
             key: _formKey,
@@ -137,8 +135,30 @@ class _SignInState extends State<SignIn> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 10),
+                //  Forgot Password button
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordPage(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "Forgot Password?",
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 89, 58, 48),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
 
                 // Sign in button
                 SizedBox(

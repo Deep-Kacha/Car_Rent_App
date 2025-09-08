@@ -71,13 +71,13 @@ class HandleBusinessPage extends StatelessWidget {
 
               const SizedBox(height: 30),
 
-              // Menu Items
-              _buildMenuItem("Dashboard", () {}),
-              _buildMenuItem("Add Car", () {}),
-              _buildMenuItem("Manage Cars", () {}),
-              _buildMenuItem("Manage Bookings", () {}),
-              _buildMenuItem("Profile", () {}),
-              _buildMenuItem("Logout", () {}),
+              // Menu Items with icons
+              _buildMenuItem(Icons.dashboard, "Dashboard", () {}),
+              _buildMenuItem(Icons.directions_car, "Add Car", () {}),
+              _buildMenuItem(Icons.car_rental, "Manage Cars", () {}),
+              _buildMenuItem(Icons.book_online, "Manage Bookings", () {}),
+              _buildMenuItem(Icons.person, "Profile", () {}),
+              _buildMenuItem(Icons.logout, "Logout", () {}),
 
               const Spacer(),
 
@@ -111,8 +111,8 @@ class HandleBusinessPage extends StatelessWidget {
     );
   }
 
-  // Reusable Menu Item
-  Widget _buildMenuItem(String title, VoidCallback onTap) {
+  // Reusable Menu Item with icon
+  Widget _buildMenuItem(IconData icon, String title, VoidCallback onTap) {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
       decoration: BoxDecoration(
@@ -120,6 +120,7 @@ class HandleBusinessPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
+        leading: Icon(icon, color: Colors.black), //  Icon added
         title: Text(
           title,
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),
