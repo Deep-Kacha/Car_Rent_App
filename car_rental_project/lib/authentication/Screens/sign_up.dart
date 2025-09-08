@@ -25,13 +25,17 @@ class _SingUpState extends State<SingUp> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+
+      // This helps keyboard push up the screen instead of overflow
+      resizeToAvoidBottomInset: true,
+
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
+          // Prevent overflow with scrolling
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Form(
             key: _formKey,
-            autovalidateMode: AutovalidateMode
-                .onUserInteraction, // enables real-time validation
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -74,12 +78,10 @@ class _SingUpState extends State<SingUp> {
 
                 const SizedBox(height: 50),
 
-                // Email field with real-time validation
+                // Email field
                 TextFormField(
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
-                  autovalidateMode:
-                      AutovalidateMode.onUserInteraction, // real-time
                   decoration: InputDecoration(
                     labelText: "Email",
                     hintText: "example@gmail.com",
@@ -103,12 +105,10 @@ class _SingUpState extends State<SingUp> {
 
                 const SizedBox(height: 20),
 
-                // Password field with real-time validation
+                // Password field
                 TextFormField(
                   controller: passwordController,
                   obscureText: !isPasswordVisible,
-                  autovalidateMode:
-                      AutovalidateMode.onUserInteraction, // real-time
                   decoration: InputDecoration(
                     labelText: "Password",
                     hintText: "********",
@@ -194,7 +194,7 @@ class _SingUpState extends State<SingUp> {
 
                 const SizedBox(height: 5),
 
-                // Sign Up button with validation check
+                // Sign Up button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -217,7 +217,6 @@ class _SingUpState extends State<SingUp> {
                           );
                           return;
                         }
-                        // Navigate to HomePage after validation
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => HomePage()),
@@ -272,7 +271,7 @@ class _SingUpState extends State<SingUp> {
                   ),
                 ),
 
-                const Spacer(),
+                const SizedBox(height: 30),
 
                 // Sign in link
                 Row(
