@@ -1,3 +1,4 @@
+import 'package:car_rental_project/Home%20Page/Booked_Car.dart';
 import 'package:car_rental_project/Home%20Page/Favorite.dart';
 import 'package:flutter/material.dart';
 import 'package:car_rental_project/Home%20Page/Menu.dart';
@@ -50,11 +51,11 @@ class _HomePageState extends State<HomePage> {
       "details": "143 Trips",
       "category": "Cars",
       "price": "₹2000/day",
-// <<<<<<< HEAD
+      // <<<<<<< HEAD
       "address": "Race Course • 9 Km",
-// =======
+      // =======
       "location": "Race Course, Rajkot",
-// >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
+      // >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
     },
     {
       "name": "Mahindra Scorpio 2014",
@@ -62,11 +63,11 @@ class _HomePageState extends State<HomePage> {
       "details": "114 Trips",
       "category": "XUVs",
       "price": "₹2550/day",
-// <<<<<<< HEAD
+      // <<<<<<< HEAD
       "address": "Ramnath para",
-// =======
+      // =======
       "location": "Ring Road, Ahmedabad",
-// >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
+      // >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
     },
     {
       "name": "Maruti Suzuki Ertiga",
@@ -74,11 +75,11 @@ class _HomePageState extends State<HomePage> {
       "details": "12 Trips",
       "category": "Vans",
       "price": "₹3000/day",
-// <<<<<<< HEAD
+      // <<<<<<< HEAD
       "address": "Sahakar road",
-// =======
+      // =======
       "location": "Nanpura, Surat",
-// >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
+      // >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
     },
     {
       "name": "Hyundai Creta 2021",
@@ -86,7 +87,7 @@ class _HomePageState extends State<HomePage> {
       "details": "95 Trips",
       "category": "SUVs",
       "price": "₹2800/day",
-// <<<<<<< HEAD
+      // <<<<<<< HEAD
       "address": "Satellite chowk",
     },
     {
@@ -128,11 +129,12 @@ class _HomePageState extends State<HomePage> {
       "category": "SUVs",
       "price": "₹2300/day",
       "address": "Kotecha Chowk",
-// =======
-//       "location": "Location : Gota Road, Ahmedabad",
-// >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
+      // =======
+      //       "location": "Location : Gota Road, Ahmedabad",
+      // >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
     },
   ];
+  List<Map<String, String>> bookedCars = [];
 
   /// Getter for filtered cars (Category + Search)
   List<Map<String, String>> get filteredCars {
@@ -154,7 +156,7 @@ class _HomePageState extends State<HomePage> {
   Widget build(BuildContext context) {
     final Map<int, Widget> pages = {
       0: SizedBox(), // Home
-      2: Center(child: Text("📖 My Bookings")),
+      2: BookedCar(bookedCars: bookedCars),
       3: FavoritePage(
         favoriteCars: cars
             .where((car) => favoriteCars.contains(car["name"]))
@@ -397,7 +399,7 @@ class _HomePageState extends State<HomePage> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-// <<<<<<< HEAD
+                                              // <<<<<<< HEAD
                                               Expanded(
                                                 child: Text(
                                                   car["address"] ?? "",
@@ -407,27 +409,40 @@ class _HomePageState extends State<HomePage> {
                                                   ),
                                                 ),
                                               ),
-                                                
-// =======
-//                                               Text(
-//                                                 car["location"] ?? "",
-//                                                 style: TextStyle(
-//                                                   color: Colors.white,
-//                                                   fontSize: 12,
-// // >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
-//                                                 ),
-//                                               ),
 
-                                              Container(
-                                                padding: EdgeInsets.symmetric(
-                                                  horizontal: 14,
-                                                  vertical: 6,
+                                              // =======
+                                              //                                               Text(
+                                              //                                                 car["location"] ?? "",
+                                              //                                                 style: TextStyle(
+                                              //                                                   color: Colors.white,
+                                              //                                                   fontSize: 12,
+                                              // // >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
+                                              //                                                 ),
+                                              //                                               ),
+                                              ElevatedButton(
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor:
+                                                      Colors.orange,
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                          8,
+                                                        ),
+                                                  ),
+                                                  padding: EdgeInsets.symmetric(
+                                                    horizontal: 14,
+                                                    vertical: 6,
+                                                  ),
                                                 ),
-                                                decoration: BoxDecoration(
-                                                  color: Colors.orange,
-                                                  borderRadius:
-                                                      BorderRadius.circular(8),
-                                                ),
+                                                onPressed: () {
+                                                  // Your action here
+                                                  // Navigator.push(
+                                                  //   context,
+                                                  //   MaterialPageRoute(
+                                                  //     builder: (context) =>
+
+                                                  //   ),
+                                                },
                                                 child: Text(
                                                   car["price"]!,
                                                   style: TextStyle(
@@ -437,8 +452,6 @@ class _HomePageState extends State<HomePage> {
                                                   ),
                                                 ),
                                               ),
-                                                
-                                              
                                             ],
                                           ),
                                         ],
@@ -449,7 +462,6 @@ class _HomePageState extends State<HomePage> {
                               );
                             },
                           ),
-              
                   ),
                 ],
               )
