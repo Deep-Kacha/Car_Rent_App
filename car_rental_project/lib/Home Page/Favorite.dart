@@ -20,12 +20,11 @@ class FavoritePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Center(
-                child: const Text(
-                  "Favorite",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
-                ),
+              Text(
+                "Favorite",
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
               ),
+
               const SizedBox(height: 20),
 
               Expanded(
