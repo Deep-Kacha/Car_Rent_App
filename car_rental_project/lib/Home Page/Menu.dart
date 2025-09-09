@@ -25,11 +25,9 @@ class MenuPage extends StatelessWidget {
               const SizedBox(height: 10),
 
               // Title
-              Center(
-                child: const Text(
-                  "Menu",
-                  style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
-                ),
+              Text(
+                "Menu",
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
               ),
 
               const SizedBox(height: 20),

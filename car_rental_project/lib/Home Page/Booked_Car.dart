@@ -1,14 +1,9 @@
 import 'package:flutter/material.dart';
 
-class FavoritePage extends StatelessWidget {
-  final List<Map<String, String>> favoriteCars;
-  final Function(String) onToggleFavorite;
+class BookedCar extends StatelessWidget {
+  final List<Map<String, String>> bookedCars;
 
-  const FavoritePage({
-    Key? key,
-    required this.favoriteCars,
-    required this.onToggleFavorite,
-  }) : super(key: key);
+  const BookedCar({Key? key, required this.bookedCars}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
@@ -21,24 +16,25 @@ class FavoritePage extends StatelessWidget {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Text(
-                "Favorite",
+                "Booked Car",
                 style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
               ),
 
               const SizedBox(height: 20),
 
+              /// List of booked cars
               Expanded(
-                child: favoriteCars.isEmpty
+                child: bookedCars.isEmpty
                     ? Center(
                         child: Text(
-                          "No Favorite Cars Yet",
+                          "No Cars Booked Yet",
                           style: TextStyle(color: Colors.grey, fontSize: 16),
                         ),
                       )
                     : ListView.builder(
-                        itemCount: favoriteCars.length,
+                        itemCount: bookedCars.length,
                         itemBuilder: (context, index) {
-                          final car = favoriteCars[index];
+                          final car = bookedCars[index];
                           return Container(
                             margin: EdgeInsets.only(bottom: 16),
                             decoration: BoxDecoration(
@@ -93,14 +89,6 @@ class FavoritePage extends StatelessWidget {
                                               color: Colors.white,
                                             ),
                                           ),
-                                          GestureDetector(
-                                            onTap: () =>
-                                                onToggleFavorite(car["name"]!),
-                                            child: Icon(
-                                              Icons.favorite,
-                                              color: Colors.redAccent,
-                                            ),
-                                          ),
                                         ],
                                       ),
                                       SizedBox(height: 4),
@@ -117,24 +105,38 @@ class FavoritePage extends StatelessWidget {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            "Bhaktinagar Circle • 10 Km",
+                                            car["address"] ?? "",
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 12,
                                             ),
                                           ),
-                                          Container(
-                                            padding: EdgeInsets.symmetric(
-                                              horizontal: 14,
-                                              vertical: 6,
+                                          ElevatedButton(
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor: Colors.red,
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(8),
+                                              ),
+                                              padding: EdgeInsets.symmetric(
+                                                horizontal: 14,
+                                                vertical: 6,
+                                              ),
                                             ),
-                                            decoration: BoxDecoration(
-                                              color: Colors.orange,
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
-                                            ),
+                                            onPressed: () {
+                                              // Cancel booking action
+                                              ScaffoldMessenger.of(
+                                                context,
+                                              ).showSnackBar(
+                                                SnackBar(
+                                                  content: Text(
+                                                    "${car["name"]} booking cancelled",
+                                                  ),
+                                                ),
+                                              );
+                                            },
                                             child: Text(
-                                              car["price"]!,
+                                              "Cancel",
                                               style: TextStyle(
                                                 color: Colors.white,
                                                 fontWeight: FontWeight.bold,
