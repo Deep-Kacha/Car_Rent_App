@@ -1,5 +1,6 @@
 import 'package:car_rental_project/Home%20Page/home_page.dart';
 import 'package:car_rental_project/Splash/GetStart.dart';
+import 'package:car_rental_project/authentication/Screens/ForgatPassword.dart';
 import 'package:car_rental_project/authentication/Screens/sign_up.dart';
 import 'package:flutter/material.dart';
 
@@ -13,7 +14,6 @@ class SignIn extends StatefulWidget {
 class _SignInState extends State<SignIn> {
   bool isPasswordVisible = false;
 
-  // Form key & controllers
   final _formKey = GlobalKey<FormState>();
   final TextEditingController emailController = TextEditingController();
   final TextEditingController passwordController = TextEditingController();
@@ -22,13 +22,13 @@ class _SignInState extends State<SignIn> {
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
+      resizeToAvoidBottomInset: true,
       body: SafeArea(
-        child: Padding(
+        child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 16),
           child: Form(
             key: _formKey,
-            autovalidateMode:
-                AutovalidateMode.onUserInteraction, // Real-time validation
+            autovalidateMode: AutovalidateMode.onUserInteraction,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
@@ -71,11 +71,10 @@ class _SignInState extends State<SignIn> {
 
                 const SizedBox(height: 50),
 
-                // Email field with real-time validation
+                // Email field
                 TextFormField(
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   decoration: InputDecoration(
                     labelText: "Email",
                     hintText: "example@gmail.com",
@@ -99,11 +98,10 @@ class _SignInState extends State<SignIn> {
 
                 const SizedBox(height: 20),
 
-                // Password field with real-time validation
+                // Password field
                 TextFormField(
                   controller: passwordController,
                   obscureText: !isPasswordVisible,
-                  autovalidateMode: AutovalidateMode.onUserInteraction,
                   decoration: InputDecoration(
                     labelText: "Password",
                     hintText: "********",
@@ -137,10 +135,32 @@ class _SignInState extends State<SignIn> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 10),
+                //  Forgot Password button
+                Align(
+                  alignment: Alignment.centerRight,
+                  child: TextButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const ForgotPasswordPage(),
+                        ),
+                      );
+                    },
+                    child: const Text(
+                      "Forgot Password?",
+                      style: TextStyle(
+                        color: Color.fromARGB(255, 89, 58, 48),
+                        fontWeight: FontWeight.bold,
+                      ),
+                    ),
+                  ),
+                ),
 
-                const SizedBox(height: 20),
+                const SizedBox(height: 10),
 
-                // Sign in button with validation
+                // Sign in button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -153,7 +173,6 @@ class _SignInState extends State<SignIn> {
                     ),
                     onPressed: () {
                       if (_formKey.currentState!.validate()) {
-                        // If valid → Navigate to HomePage
                         Navigator.pushReplacement(
                           context,
                           MaterialPageRoute(builder: (context) => HomePage()),
@@ -173,7 +192,7 @@ class _SignInState extends State<SignIn> {
 
                 const SizedBox(height: 40),
 
-                // Divider with "Or sign in with"
+                // Divider
                 Row(
                   children: const [
                     Expanded(child: Divider(thickness: 2, height: 40)),
@@ -195,9 +214,7 @@ class _SignInState extends State<SignIn> {
 
                 // Google Button
                 GestureDetector(
-                  onTap: () {
-                    // Google sign in logic
-                  },
+                  onTap: () {},
                   child: Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
@@ -208,7 +225,7 @@ class _SignInState extends State<SignIn> {
                   ),
                 ),
 
-                const Spacer(),
+                const SizedBox(height: 30),
 
                 // Sign up link
                 Row(
