@@ -50,11 +50,11 @@ class _HomePageState extends State<HomePage> {
       "details": "143 Trips",
       "category": "Cars",
       "price": "₹2000/day",
-<<<<<<< HEAD
+// <<<<<<< HEAD
       "address": "Race Course • 9 Km",
-=======
+// =======
       "location": "Race Course, Rajkot",
->>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
+// >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
     },
     {
       "name": "Mahindra Scorpio 2014",
@@ -62,11 +62,11 @@ class _HomePageState extends State<HomePage> {
       "details": "114 Trips",
       "category": "XUVs",
       "price": "₹2550/day",
-<<<<<<< HEAD
+// <<<<<<< HEAD
       "address": "Ramnath para",
-=======
+// =======
       "location": "Ring Road, Ahmedabad",
->>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
+// >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
     },
     {
       "name": "Maruti Suzuki Ertiga",
@@ -74,11 +74,11 @@ class _HomePageState extends State<HomePage> {
       "details": "12 Trips",
       "category": "Vans",
       "price": "₹3000/day",
-<<<<<<< HEAD
+// <<<<<<< HEAD
       "address": "Sahakar road",
-=======
+// =======
       "location": "Nanpura, Surat",
->>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
+// >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
     },
     {
       "name": "Hyundai Creta 2021",
@@ -86,7 +86,7 @@ class _HomePageState extends State<HomePage> {
       "details": "95 Trips",
       "category": "SUVs",
       "price": "₹2800/day",
-<<<<<<< HEAD
+// <<<<<<< HEAD
       "address": "Satellite chowk",
     },
     {
@@ -128,9 +128,9 @@ class _HomePageState extends State<HomePage> {
       "category": "SUVs",
       "price": "₹2300/day",
       "address": "Kotecha Chowk",
-=======
-      "location": "Location : Gota Road, Ahmedabad",
->>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
+// =======
+//       "location": "Location : Gota Road, Ahmedabad",
+// >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
     },
   ];
 
@@ -397,7 +397,7 @@ class _HomePageState extends State<HomePage> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-<<<<<<< HEAD
+// <<<<<<< HEAD
                                               Expanded(
                                                 child: Text(
                                                   car["address"] ?? "",
@@ -405,15 +405,18 @@ class _HomePageState extends State<HomePage> {
                                                     color: Colors.white,
                                                     fontSize: 12,
                                                   ),
-=======
-                                              Text(
-                                                car["location"] ?? "",
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  fontSize: 12,
->>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
                                                 ),
                                               ),
+                                                
+// =======
+//                                               Text(
+//                                                 car["location"] ?? "",
+//                                                 style: TextStyle(
+//                                                   color: Colors.white,
+//                                                   fontSize: 12,
+// // >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
+//                                                 ),
+//                                               ),
 
                                               Container(
                                                 padding: EdgeInsets.symmetric(
@@ -434,6 +437,8 @@ class _HomePageState extends State<HomePage> {
                                                   ),
                                                 ),
                                               ),
+                                                
+                                              
                                             ],
                                           ),
                                         ],
@@ -444,6 +449,7 @@ class _HomePageState extends State<HomePage> {
                               );
                             },
                           ),
+              
                   ),
                 ],
               )
