@@ -10,7 +10,7 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   bool _obscurePassword = true; //  password toggle
-  final String _password = "mySecret@123"; //  your actual password
+  final String _password = "Example@123"; //  your actual password
 
   @override
   Widget build(BuildContext context) {
@@ -55,7 +55,7 @@ class _AccountPageState extends State<AccountPage> {
               TextField(
                 readOnly: true,
                 decoration: InputDecoration(
-                  hintText: "example@gmail.com",
+                  hintText: "ethanjohn@gmail.com",
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   border: OutlineInputBorder(
@@ -113,7 +113,7 @@ class _AccountPageState extends State<AccountPage> {
               TextField(
                 readOnly: true,
                 decoration: InputDecoration(
-                  hintText: "+91 41555 50132",
+                  hintText: "+91 98765 43210",
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   border: OutlineInputBorder(
