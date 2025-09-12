@@ -1,5 +1,4 @@
-import 'package:car_rental_project/authentication/Screens/sign_up.dart';
-import 'package:car_rental_project/authentication/Screens/sign_in.dart';
+
 import 'package:flutter/material.dart';
 
 class GetStart extends StatelessWidget {
@@ -63,10 +62,10 @@ class GetStart extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SingUp()),
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => SingUp()),
+                  // );
                 },
                 child: const Text(
                   "Get started",
@@ -89,10 +88,10 @@ class GetStart extends StatelessWidget {
                   ),
                 ),
                 onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => SignIn()),
-                  );
+                  // Navigator.push(
+                  //   context,
+                  //   MaterialPageRoute(builder: (context) => SignIn()),
+                  // );
                 },
                 child: const Text(
                   "Already have an account",
