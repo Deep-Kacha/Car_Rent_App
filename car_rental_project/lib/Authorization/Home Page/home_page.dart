@@ -1,7 +1,6 @@
-import 'package:car_rental_project/Home%20Page/Booked_Car.dart';
-import 'package:car_rental_project/Home%20Page/Favorite.dart';
 import 'package:flutter/material.dart';
-import 'package:car_rental_project/Home%20Page/Menu.dart';
+import 'car_model.dart';
+import 'car_data.dart';
 
 class HomePage extends StatefulWidget {
   @override
@@ -12,9 +11,23 @@ class _HomePageState extends State<HomePage> {
   int selectedIndex = 0;
   String selectedCategory = "All";
   String searchQuery = "";
-
-  /// Store favorite car names
   Set<String> favoriteCars = {};
+
+  final List<String> categories = ["All", "Cars", "SUVs", "XUVs", "Vans"];
+
+  List<Car> get filteredCars {
+    final carsByCategory = selectedCategory == "All"
+        ? cars
+        : cars.where((car) => car.category == selectedCategory).toList();
+
+    if (searchQuery.isEmpty) return carsByCategory;
+
+    return carsByCategory
+        .where(
+          (car) => car.name.toLowerCase().contains(searchQuery.toLowerCase()),
+        )
+        .toList();
+  }
 
   Widget buildNavItem(IconData icon, String label, int index) {
     bool isSelected = selectedIndex == index;
@@ -42,138 +55,8 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  final List<String> categories = ["All", "Cars", "SUVs", "XUVs", "Vans"];
-
-  final List<Map<String, String>> cars = [
-    {
-      "name": "Brezza 2020",
-      "image": "assets/images/1car.jpg",
-      "details": "143 Trips",
-      "category": "Cars",
-      "price": "₹2000/day",
-      // <<<<<<< HEAD
-      "address": "Race Course • 9 Km",
-      // =======
-      "location": "Race Course, Rajkot",
-      // >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
-    },
-    {
-      "name": "Mahindra Scorpio 2014",
-      "image": "assets/images/2car.jpg",
-      "details": "114 Trips",
-      "category": "XUVs",
-      "price": "₹2550/day",
-      // <<<<<<< HEAD
-      "address": "Ramnath para",
-      // =======
-      "location": "Ring Road, Ahmedabad",
-      // >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
-    },
-    {
-      "name": "Maruti Suzuki Ertiga",
-      "image": "assets/images/4car.jpg",
-      "details": "12 Trips",
-      "category": "Vans",
-      "price": "₹3000/day",
-      // <<<<<<< HEAD
-      "address": "Sahakar road",
-      // =======
-      "location": "Nanpura, Surat",
-      // >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
-    },
-    {
-      "name": "Hyundai Creta 2021",
-      "image": "assets/images/creta.jpg",
-      "details": "95 Trips",
-      "category": "SUVs",
-      "price": "₹2800/day",
-      // <<<<<<< HEAD
-      "address": "Satellite chowk",
-    },
-    {
-      "name": "Kia seltos 2020",
-      "image": "assets/images/8car.jpg",
-      "details": "13 Trips",
-      "category": "SUVs",
-      "price": "₹2100/day",
-      "address": "Bhaktinagar circle",
-    },
-    {
-      "name": "Tata Nexon EV 2023",
-      "image": "assets/images/5car.jpg",
-      "details": "15 Trips",
-      "category": "SUVs",
-      "price": "₹3000/day",
-      "address": "University road ",
-    },
-    {
-      "name": "Inova Crysta 2021",
-      "image": "assets/images/7car.jpg",
-      "details": "75 Trips",
-      "category": "XUVs",
-      "price": "₹2500/day",
-      "address": "morbi road ",
-    },
-    {
-      "name": "VollksWagen Polo tdi 2021",
-      "image": "assets/images/10car.jpg",
-      "details": "50 Trips",
-      "category": "Cars",
-      "price": "₹2700/day",
-      "address": "Bhavnath Park",
-    },
-    {
-      "name": "Ford Ecosport 2016",
-      "image": "assets/images/9car.jpg",
-      "details": "90 Trips",
-      "category": "SUVs",
-      "price": "₹2300/day",
-      "address": "Kotecha Chowk",
-      // =======
-      //       "location": "Location : Gota Road, Ahmedabad",
-      // >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
-    },
-  ];
-  List<Map<String, String>> bookedCars = [];
-
-  /// Getter for filtered cars (Category + Search)
-  List<Map<String, String>> get filteredCars {
-    final carsByCategory = selectedCategory == "All"
-        ? cars
-        : cars.where((car) => car["category"] == selectedCategory).toList();
-
-    if (searchQuery.isEmpty) return carsByCategory;
-
-    return carsByCategory
-        .where(
-          (car) =>
-              car["name"]!.toLowerCase().contains(searchQuery.toLowerCase()),
-        )
-        .toList();
-  }
-
   @override
   Widget build(BuildContext context) {
-    final Map<int, Widget> pages = {
-      0: SizedBox(), // Home
-      2: BookedCar(bookedCars: bookedCars),
-      3: FavoritePage(
-        favoriteCars: cars
-            .where((car) => favoriteCars.contains(car["name"]))
-            .toList(),
-        onToggleFavorite: (String carName) {
-          setState(() {
-            if (favoriteCars.contains(carName)) {
-              favoriteCars.remove(carName);
-            } else {
-              favoriteCars.add(carName);
-            }
-          });
-        },
-      ),
-      4: MenuPage(),
-    };
-
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -183,7 +66,7 @@ class _HomePageState extends State<HomePage> {
                 children: [
                   /// Profile + Search
                   Padding(
-                    padding: const EdgeInsets.fromLTRB(16, 16, 16, 8),
+                    padding: const EdgeInsets.all(16),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
@@ -257,12 +140,10 @@ class _HomePageState extends State<HomePage> {
                           },
                           child: Container(
                             margin: EdgeInsets.only(right: 20),
-                            padding: isSelected
-                                ? EdgeInsets.symmetric(
-                                    horizontal: 30,
-                                    vertical: 8,
-                                  )
-                                : EdgeInsets.zero,
+                            padding: EdgeInsets.symmetric(
+                              horizontal: isSelected ? 30 : 16,
+                              vertical: 8,
+                            ),
                             decoration: isSelected
                                 ? BoxDecoration(
                                     color: Colors.orange,
@@ -303,7 +184,7 @@ class _HomePageState extends State<HomePage> {
                             itemBuilder: (context, index) {
                               final car = filteredCars[index];
                               final isFavorite = favoriteCars.contains(
-                                car["name"],
+                                car.name,
                               );
 
                               return Container(
@@ -323,12 +204,11 @@ class _HomePageState extends State<HomePage> {
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
                                     ClipRRect(
-                                      borderRadius: BorderRadius.only(
-                                        topLeft: Radius.circular(15),
-                                        topRight: Radius.circular(15),
+                                      borderRadius: BorderRadius.vertical(
+                                        top: Radius.circular(15),
                                       ),
                                       child: Image.asset(
-                                        car["image"]!,
+                                        car.image,
                                         height: 180,
                                         width: double.infinity,
                                         fit: BoxFit.cover,
@@ -338,9 +218,8 @@ class _HomePageState extends State<HomePage> {
                                       width: double.infinity,
                                       decoration: BoxDecoration(
                                         color: Color(0xFF3E2723),
-                                        borderRadius: BorderRadius.only(
-                                          bottomLeft: Radius.circular(15),
-                                          bottomRight: Radius.circular(15),
+                                        borderRadius: BorderRadius.vertical(
+                                          bottom: Radius.circular(15),
                                         ),
                                       ),
                                       padding: EdgeInsets.all(12),
@@ -354,7 +233,7 @@ class _HomePageState extends State<HomePage> {
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
                                               Text(
-                                                car["name"]!,
+                                                car.name,
                                                 style: TextStyle(
                                                   fontSize: 16,
                                                   fontWeight: FontWeight.bold,
@@ -366,11 +245,11 @@ class _HomePageState extends State<HomePage> {
                                                   setState(() {
                                                     if (isFavorite) {
                                                       favoriteCars.remove(
-                                                        car["name"],
+                                                        car.name,
                                                       );
                                                     } else {
                                                       favoriteCars.add(
-                                                        car["name"]!,
+                                                        car.name,
                                                       );
                                                     }
                                                   });
@@ -387,7 +266,7 @@ class _HomePageState extends State<HomePage> {
                                           SizedBox(height: 4),
 
                                           Text(
-                                            car["details"] ?? "",
+                                            car.details,
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 12,
@@ -399,26 +278,15 @@ class _HomePageState extends State<HomePage> {
                                             mainAxisAlignment:
                                                 MainAxisAlignment.spaceBetween,
                                             children: [
-                                              // <<<<<<< HEAD
                                               Expanded(
                                                 child: Text(
-                                                  car["address"] ?? "",
+                                                  car.address,
                                                   style: TextStyle(
                                                     color: Colors.white,
                                                     fontSize: 12,
                                                   ),
                                                 ),
                                               ),
-
-                                              // =======
-                                              //                                               Text(
-                                              //                                                 car["location"] ?? "",
-                                              //                                                 style: TextStyle(
-                                              //                                                   color: Colors.white,
-                                              //                                                   fontSize: 12,
-                                              // // >>>>>>> 48ce218afaebcc15c3ad9fcd7d7ee1d08cf01048
-                                              //                                                 ),
-                                              //                                               ),
                                               ElevatedButton(
                                                 style: ElevatedButton.styleFrom(
                                                   backgroundColor:
@@ -435,16 +303,10 @@ class _HomePageState extends State<HomePage> {
                                                   ),
                                                 ),
                                                 onPressed: () {
-                                                  // Your action here
-                                                  // Navigator.push(
-                                                  //   context,
-                                                  //   MaterialPageRoute(
-                                                  //     builder: (context) =>
-
-                                                  //   ),
+                                                  // Book action
                                                 },
                                                 child: Text(
-                                                  car["price"]!,
+                                                  car.price,
                                                   style: TextStyle(
                                                     color: Colors.white,
                                                     fontWeight: FontWeight.bold,
@@ -465,7 +327,7 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               )
-            : pages[selectedIndex] ?? Center(child: Text("Page not found")),
+            : Center(child: Text("Other pages here")),
       ),
 
       /// Bottom Nav
@@ -473,10 +335,7 @@ class _HomePageState extends State<HomePage> {
         height: 70,
         decoration: BoxDecoration(
           color: Colors.white,
-          borderRadius: BorderRadius.only(
-            topLeft: Radius.circular(20),
-            topRight: Radius.circular(20),
-          ),
+          borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           boxShadow: [
             BoxShadow(
               color: Colors.black12,
@@ -490,9 +349,9 @@ class _HomePageState extends State<HomePage> {
           mainAxisAlignment: MainAxisAlignment.spaceAround,
           children: [
             buildNavItem(Icons.home, "Home", 0),
-            buildNavItem(Icons.directions_car, "Booked Car", 2),
-            buildNavItem(Icons.favorite_border, "Favorite", 3),
-            buildNavItem(Icons.menu, "Menu", 4),
+            buildNavItem(Icons.directions_car, "Booked", 1),
+            buildNavItem(Icons.favorite_border, "Favorite", 2),
+            buildNavItem(Icons.menu, "Menu", 3),
           ],
         ),
       ),

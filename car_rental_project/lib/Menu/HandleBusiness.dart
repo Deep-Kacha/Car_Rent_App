@@ -1,4 +1,4 @@
-import 'package:car_rental_project/Home%20Page/home_page.dart';
+import 'package:car_rental_project/Authorization/Home%20Page/home_page.dart';
 import 'package:flutter/material.dart';
 
 class HandleBusinessPage extends StatelessWidget {
