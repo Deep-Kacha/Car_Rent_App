@@ -1,7 +1,14 @@
 import 'package:flutter/material.dart';
 
-class AccountPage extends StatelessWidget {
+class AccountPage extends StatefulWidget {
   const AccountPage({super.key});
+
+  @override
+  State<AccountPage> createState() => _AccountPageState();
+}
+
+class _AccountPageState extends State<AccountPage> {
+  bool _obscurePassword = true; // password visibility toggle
 
   @override
   Widget build(BuildContext context) {
@@ -45,7 +52,7 @@ class AccountPage extends StatelessWidget {
             const Text("Password"),
             const SizedBox(height: 8),
             TextField(
-              obscureText: true,
+              obscureText: _obscurePassword,
               decoration: InputDecoration(
                 hintText: "********",
                 filled: true,
@@ -53,6 +60,16 @@ class AccountPage extends StatelessWidget {
                 border: OutlineInputBorder(
                   borderRadius: BorderRadius.circular(8),
                   borderSide: BorderSide.none,
+                ),
+                suffixIcon: IconButton(
+                  icon: Icon(
+                    _obscurePassword ? Icons.visibility_off : Icons.visibility,
+                  ),
+                  onPressed: () {
+                    setState(() {
+                      _obscurePassword = !_obscurePassword;
+                    });
+                  },
                 ),
               ),
             ),
