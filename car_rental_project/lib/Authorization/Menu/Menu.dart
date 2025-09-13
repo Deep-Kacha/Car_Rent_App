@@ -1,9 +1,3 @@
-import 'package:car_rental_project/Menu/Account.dart';
-import 'package:car_rental_project/Menu/ChangePassword.dart';
-import 'package:car_rental_project/Menu/EditProfile.dart';
-import 'package:car_rental_project/Menu/HandleBusiness.dart';
-import 'package:car_rental_project/Menu/ViewProfile.dart';
-import 'package:car_rental_project/Splash/GetStart.dart';
 import 'package:flutter/material.dart';
 
 class MenuPage extends StatelessWidget {
@@ -12,31 +6,30 @@ class MenuPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // outer bg
+      backgroundColor: Colors.white, // Full white background
       body: SafeArea(
         child: Container(
           width: double.infinity,
           height: double.infinity,
-          decoration: const BoxDecoration(color: Colors.white),
           padding: const EdgeInsets.all(20),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start, // align left
+            crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
 
-              // Title
-              Text(
+              /// Title
+              const Text(
                 "Menu",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
               ),
 
               const SizedBox(height: 20),
 
-              // Profile info (row: avatar + name)
+              /// Profile (row: avatar + name)
               Row(
                 children: const [
                   CircleAvatar(
-                    radius: 23,
+                    radius: 25,
                     backgroundImage: NetworkImage(
                       "https://i.pravatar.cc/150?img=3",
                     ),
@@ -45,7 +38,7 @@ class MenuPage extends StatelessWidget {
                   Text(
                     "Ethan John",
                     style: TextStyle(
-                      fontSize: 26,
+                      fontSize: 22,
                       fontWeight: FontWeight.w500,
                       color: Colors.black,
                     ),
@@ -55,67 +48,29 @@ class MenuPage extends StatelessWidget {
 
               const SizedBox(height: 20),
 
-              // Divider under profile
-              Divider(color: Colors.grey.shade300, thickness: 1),
+              /// Divider
+              Divider(color: Colors.grey, thickness: 1),
 
               const SizedBox(height: 20),
 
-              // Menu items
+              /// Menu Items
               Expanded(
                 child: ListView(
                   children: [
-                    _buildMenuItem(Icons.person_outline, "Account", () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const AccountPage(),
-                        ),
-                      );
-                    }),
-                    _buildMenuItem(Icons.badge_outlined, "View Profile", () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ViewProfilePage(),
-                        ),
-                      );
-                    }),
-                    _buildMenuItem(Icons.edit, "Edit Profile", () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const EditProfilePage(),
-                        ),
-                      );
-                    }),
-                    _buildMenuItem(Icons.lock_outline, "Change Password", () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ChangePasswordPage(),
-                        ),
-                      );
-                    }),
+                    _buildMenuItem(Icons.person_outline, "Account", () {}),
+                    _buildMenuItem(Icons.badge_outlined, "View Profile", () {}),
+                    _buildMenuItem(Icons.edit, "Edit Profile", () {}),
+                    _buildMenuItem(
+                      Icons.lock_outline,
+                      "Change Password",
+                      () {},
+                    ),
                     _buildMenuItem(
                       Icons.business_center,
                       "Handle Business",
-                      () {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const HandleBusinessPage(),
-                          ),
-                        );
-                      },
+                      () {},
                     ),
-                    _buildMenuItem(Icons.logout, "Log Out", () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const GetStart(),
-                        ),
-                      );
-                    }),
+                    _buildMenuItem(Icons.logout, "Log Out", () {}),
                   ],
                 ),
               ),
@@ -126,7 +81,7 @@ class MenuPage extends StatelessWidget {
     );
   }
 
-  // Reusable widget for menu items
+  /// Menu Item UI
   static Widget _buildMenuItem(
     IconData icon,
     String title,
