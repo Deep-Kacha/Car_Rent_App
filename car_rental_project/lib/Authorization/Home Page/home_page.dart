@@ -1,3 +1,5 @@
+import 'package:car_rental_project/Authorization/Favorite_car/Favorite.dart';
+import 'package:car_rental_project/Authorization/Menu/Menu.dart';
 import 'package:flutter/material.dart';
 import 'car_model.dart';
 import 'car_data.dart';
@@ -14,6 +16,15 @@ class _HomePageState extends State<HomePage> {
   Set<String> favoriteCars = {};
 
   final List<String> categories = ["All", "Cars", "SUVs", "XUVs", "Vans"];
+  void onToggleFavorite(Car car) {
+    setState(() {
+      if (favoriteCars.contains(car.name)) {
+        favoriteCars.remove(car.name);
+      } else {
+        favoriteCars.add(car.name);
+      }
+    });
+  }
 
   List<Car> get filteredCars {
     final carsByCategory = selectedCategory == "All"
@@ -314,63 +325,20 @@ class _HomePageState extends State<HomePage> {
 
   /// ✅ Favorites Page
   Widget buildFavoritesPage() {
+    // get Car objects whose names are in favoriteCars
     final favoriteList = cars
         .where((car) => favoriteCars.contains(car.name))
         .toList();
 
-    if (favoriteList.isEmpty) {
-      return Center(
-        child: Text(
-          "No favorite cars yet ❤️",
-          style: TextStyle(color: Colors.grey, fontSize: 16),
-        ),
-      );
-    }
-
-    return ListView.builder(
-      padding: EdgeInsets.all(16),
-      itemCount: favoriteList.length,
-      itemBuilder: (context, index) {
-        final car = favoriteList[index];
-        return Container(
-          margin: EdgeInsets.only(bottom: 16),
-          decoration: BoxDecoration(
-            color: Colors.white,
-            borderRadius: BorderRadius.circular(15),
-            boxShadow: [
-              BoxShadow(
-                color: Colors.black.withOpacity(0.1),
-                blurRadius: 5,
-                offset: Offset(0, 3),
-              ),
-            ],
-          ),
-          child: ListTile(
-            leading: ClipRRect(
-              borderRadius: BorderRadius.circular(8),
-              child: Image.asset(
-                car.image,
-                width: 60,
-                height: 60,
-                fit: BoxFit.cover,
-              ),
-            ),
-            title: Text(
-              car.name,
-              style: TextStyle(fontWeight: FontWeight.bold),
-            ),
-            subtitle: Text("${car.details} • ${car.address}"),
-            trailing: Text(
-              car.price,
-              style: TextStyle(
-                color: Colors.orange,
-                fontWeight: FontWeight.bold,
-              ),
-            ),
-          ),
-        );
-      },
+    return FavoritePage(
+      favoriteCars: favoriteList,
+      onToggleFavorite: onToggleFavorite,
     );
+  }
+
+  /// ✅ Menu Page
+  Widget buildMenuPage() {
+    return MenuPage();
   }
 
   @override
@@ -380,9 +348,11 @@ class _HomePageState extends State<HomePage> {
       body: SafeArea(
         child: selectedIndex == 0
             ? buildHomePage()
+            : selectedIndex == 1
+            ? Center(child: Text("Booked Page")) // You can design this later
             : selectedIndex == 2
             ? buildFavoritesPage()
-            : Center(child: Text("Other pages here")),
+            : buildMenuPage(),
       ),
 
       /// Bottom Nav
