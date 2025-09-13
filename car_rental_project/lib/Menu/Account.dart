@@ -8,7 +8,7 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
-  bool _obscurePassword = true; // password visibility toggle
+  bool _obscurePassword = true; // Initially hide password
 
   @override
   Widget build(BuildContext context) {
@@ -34,9 +34,11 @@ class _AccountPageState extends State<AccountPage> {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
+            // Email
             const Text("Email"),
             const SizedBox(height: 8),
             TextField(
+              readOnly: true, // Make read-only (like screenshot)
               decoration: InputDecoration(
                 hintText: "example@gmail.com",
                 filled: true,
@@ -49,10 +51,12 @@ class _AccountPageState extends State<AccountPage> {
             ),
             const SizedBox(height: 20),
 
+            // Password
             const Text("Password"),
             const SizedBox(height: 8),
             TextField(
               obscureText: _obscurePassword,
+              readOnly: true, // read-only like screenshot
               decoration: InputDecoration(
                 hintText: "********",
                 filled: true,
@@ -75,9 +79,11 @@ class _AccountPageState extends State<AccountPage> {
             ),
             const SizedBox(height: 20),
 
+            // Phone Number
             const Text("Phone number"),
             const SizedBox(height: 8),
             TextField(
+              readOnly: true,
               decoration: InputDecoration(
                 hintText: "(415) 555-0132",
                 filled: true,
@@ -90,6 +96,7 @@ class _AccountPageState extends State<AccountPage> {
             ),
             const SizedBox(height: 20),
 
+            // Google
             const Text("Google"),
             const SizedBox(height: 8),
             const Text("Not connected", style: TextStyle(color: Colors.grey)),
