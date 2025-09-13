@@ -1,4 +1,4 @@
-import 'package:car_rental_project/Authorization/Menu.dart';
+import 'package:car_rental_project/Authorization/Menu/Menu.dart';
 import 'package:flutter/material.dart';
 
 class EditProfilePage extends StatefulWidget {
