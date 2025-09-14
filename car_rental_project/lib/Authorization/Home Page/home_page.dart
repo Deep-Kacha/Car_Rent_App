@@ -1,3 +1,4 @@
+import 'package:car_rental_project/Authorization/Booking/Book_car.dart';
 import 'package:car_rental_project/Authorization/Favorite_car/Favorite.dart';
 import 'package:car_rental_project/Authorization/Menu/Menu.dart';
 import 'package:flutter/material.dart';
@@ -289,7 +290,13 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       onPressed: () {
-                                        // Book action
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                BookingPage(car: car),
+                                          ),
+                                        );
                                       },
                                       child: Text(
                                         car.price,

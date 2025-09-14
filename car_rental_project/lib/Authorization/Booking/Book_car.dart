@@ -1,0 +1,377 @@
+import 'package:car_rental_project/Authorization/Home%20Page/car_model.dart';
+import 'package:flutter/material.dart';
+
+class BookingPage extends StatefulWidget {
+  final Car car;
+
+  const BookingPage({super.key, required this.car});
+
+  @override
+  State<BookingPage> createState() => _BookingPageState();
+}
+
+class _BookingPageState extends State<BookingPage> {
+  DateTime? startDate;
+  DateTime? endDate;
+
+  Future<void> pickDate({required bool isStart}) async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: DateTime.now(),
+      firstDate: DateTime(2020),
+      lastDate: DateTime(2030),
+    );
+
+    if (picked != null) {
+      setState(() {
+        if (isStart) {
+          startDate = picked;
+        } else {
+          endDate = picked;
+        }
+      });
+    }
+  }
+
+  String formatDate(DateTime? date) {
+    if (date == null) return "Select Date";
+    return "${date.day}/${date.month}/${date.year}";
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    final car = widget.car;
+
+    return Scaffold(
+      backgroundColor: Colors.white,
+      appBar: AppBar(
+        backgroundColor: Colors.white,
+        elevation: 0,
+        title: const Text(
+          "Booking",
+          style: TextStyle(color: Colors.black, fontSize: 24),
+        ),
+        centerTitle: true,
+        leading: IconButton(
+          icon: const Icon(Icons.arrow_back, color: Colors.black),
+          onPressed: () => Navigator.pop(context),
+        ),
+      ),
+      body: Center(
+        child: Padding(
+          padding: const EdgeInsets.all(8.0),
+          child: Container(
+            width: double.infinity,
+            decoration: BoxDecoration(
+              color: Colors.white,
+              borderRadius: BorderRadius.circular(20),
+            ),
+            child: SingleChildScrollView(
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  // Car Image
+                  ClipRRect(
+                    borderRadius: const BorderRadius.all(Radius.circular(20)),
+                    child: Image.asset(
+                      car.image,
+                      height: 250,
+                      width: double.infinity,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+
+                  // Car Name
+                  Padding(
+                    padding: const EdgeInsets.all(12),
+                    child: Text(
+                      car.name,
+                      style: const TextStyle(
+                        fontSize: 20,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  const Divider(),
+                  // Trip Dates (with picker)
+                  Padding(
+                    padding: const EdgeInsets.all(8),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Text(
+                          "Trip Dates",
+                          style: TextStyle(
+                            fontSize: 15,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        SizedBox(height: 6),
+                        Row(
+                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                          children: [
+                            Expanded(
+                              child: buildDateColumn(
+                                "Starting Date",
+                                startDate,
+                                () {
+                                  pickDate(isStart: true);
+                                },
+                              ),
+                            ),
+                            const SizedBox(width: 16), // gap between the two
+                            Expanded(
+                              child: buildDateColumn(
+                                "Ending Date",
+                                endDate,
+                                () {
+                                  pickDate(isStart: false);
+                                },
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Pickup & Return Location
+                  const Divider(),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
+                    child: Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        const Text(
+                          "Pickup & Return Location",
+                          style: TextStyle(
+                            fontSize: 15,
+                            color: Colors.black,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                        const SizedBox(height: 15),
+                        Row(
+                          children: [
+                            const Icon(
+                              Icons.location_on_outlined,
+                              color: Colors.grey,
+                              size: 18,
+                            ),
+                            const SizedBox(width: 6),
+                            Text(
+                              car.address,
+                              style: const TextStyle(
+                                fontSize: 18,
+                                color: Colors.grey,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ],
+                    ),
+                  ),
+
+                  const Divider(),
+
+                  // Car Features
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Text(
+                      "Car Basics & Features",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: 12),
+                    child: Wrap(
+                      spacing: 20,
+                      runSpacing: 10,
+                      children: car.features
+                          .map((f) => FeatureItem(text: f))
+                          .toList(),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Description
+                  const Divider(),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Text(
+                      "Description",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      "This car is well maintained and perfect for family or solo trips. "
+                      "Equipped with essential features for comfort and safety.",
+                      style: TextStyle(fontSize: 13, color: Colors.grey),
+                    ),
+                  ),
+                  const SizedBox(height: 10),
+
+                  // Warning
+                  const Divider(),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                    child: Text(
+                      "Warning",
+                      style: TextStyle(
+                        fontSize: 15,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  ),
+                  const Padding(
+                    padding: EdgeInsets.symmetric(horizontal: 12),
+                    child: Text(
+                      "Do Payment During Pick-Uping A Car",
+                      style: TextStyle(fontSize: 13, color: Colors.grey),
+                    ),
+                  ),
+                  const SizedBox(height: 20),
+
+                  // Price Button
+                  Container(
+                    width: double.infinity,
+                    margin: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 12,
+                    ),
+                    child: ElevatedButton(
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.brown,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(20),
+                        ),
+                        padding: const EdgeInsets.symmetric(vertical: 14),
+                      ),
+                      onPressed: () {},
+                      child: Text(
+                        "Total ${car.price}",
+                        style: const TextStyle(
+                          fontSize: 16,
+                          fontWeight: FontWeight.w600,
+                        ),
+                      ),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+          ),
+        ),
+      ),
+    );
+  }
+
+  // Trip Date Picker Widget
+  Widget buildDateColumn(String label, DateTime? date, VoidCallback onTap) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(label, style: const TextStyle(fontSize: 13, color: Colors.black)),
+        const SizedBox(height: 6),
+        InkWell(
+          onTap: onTap,
+          child: Container(
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+            decoration: BoxDecoration(
+              color: Colors.grey.shade200, // light grey bg
+              borderRadius: BorderRadius.circular(12),
+            ),
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                Text(
+                  date != null
+                      ? "${date.day}/${date.month}/${date.year}"
+                      : "Select Date",
+                  style: const TextStyle(
+                    fontSize: 14,
+                    color: Colors.grey,
+                    fontWeight: FontWeight.w500,
+                  ),
+                ),
+                const Icon(
+                  Icons.calendar_today_outlined,
+                  size: 18,
+                  color: Colors.grey,
+                ),
+              ],
+            ),
+          ),
+        ),
+      ],
+    );
+  }
+}
+
+// Feature Item (same as your code)
+class FeatureItem extends StatelessWidget {
+  final String text;
+  const FeatureItem({super.key, required this.text});
+
+  IconData _getIconForFeature(String feature) {
+    switch (feature.toLowerCase()) {
+      case "petrol":
+        return Icons.local_gas_station;
+      case "diesel":
+        return Icons.ev_station;
+      case "electric":
+        return Icons.electric_car;
+      case "manual":
+        return Icons.settings;
+      case "automatic":
+        return Icons.autorenew;
+      case "5 seater":
+        return Icons.event_seat;
+      case "7 seater":
+        return Icons.airline_seat_recline_extra;
+      case "air conditioning":
+        return Icons.ac_unit;
+      case "rear ac vents":
+        return Icons.air;
+      case "rear camera":
+        return Icons.videocam;
+      case "alloy wheels":
+        return Icons.album;
+      case "fast charging":
+        return Icons.bolt;
+      case "dual zone ac":
+        return Icons.ac_unit_outlined;
+      case "fog lamps":
+        return Icons.lightbulb;
+      case "abs":
+        return Icons.security;
+      default:
+        return Icons.check_circle_outline;
+    }
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      mainAxisSize: MainAxisSize.min,
+      children: [
+        Icon(_getIconForFeature(text), size: 18, color: Colors.brown),
+        const SizedBox(width: 6),
+        Text(text, style: const TextStyle(fontSize: 13)),
+      ],
+    );
+  }
+}
