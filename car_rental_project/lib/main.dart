@@ -1,5 +1,5 @@
 import 'package:car_rental_project/Authorization/Home%20Page/home_page.dart';
-import 'package:car_rental_project/Menu/Account.dart';
+// import 'package:car_rental_project/Menu/Account.dart';
 
 import 'package:flutter/material.dart';
 
@@ -18,7 +18,8 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
       ),
-      home: AccountPage(),
+      home: HomePage(),
+      // AccountPage(),
       // SignIn(),
       // SplashScreen(),
     );

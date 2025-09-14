@@ -119,14 +119,6 @@ class FavoritePage extends StatelessWidget {
                                       ],
                                     ),
                                     SizedBox(height: 4),
-                                    Text(
-                                      car.details,
-                                      style: TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 12,
-                                      ),
-                                    ),
-                                    SizedBox(height: 4),
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,
