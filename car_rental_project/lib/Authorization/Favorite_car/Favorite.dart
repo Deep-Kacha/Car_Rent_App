@@ -1,3 +1,4 @@
+import 'package:car_rental_project/Authorization/Booking/Book_car.dart';
 import 'package:car_rental_project/Authorization/Home%20Page/car_model.dart';
 import 'package:flutter/material.dart';
 
@@ -141,7 +142,13 @@ class FavoritePage extends StatelessWidget {
                                             ),
                                           ),
                                           onPressed: () {
-                                            // Book action
+                                            Navigator.push(
+                                              context,
+                                              MaterialPageRoute(
+                                                builder: (context) =>
+                                                    BookingPage(car: car),
+                                              ),
+                                            );
                                           },
                                           child: Text(
                                             car.price,
