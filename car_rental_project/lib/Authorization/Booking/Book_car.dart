@@ -102,7 +102,7 @@ class _BookingPageState extends State<BookingPage> {
                         Text(
                           "Trip Dates",
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 20,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -149,7 +149,7 @@ class _BookingPageState extends State<BookingPage> {
                         const Text(
                           "Pickup & Return Location",
                           style: TextStyle(
-                            fontSize: 15,
+                            fontSize: 20,
                             color: Colors.black,
                             fontWeight: FontWeight.w500,
                           ),
@@ -180,26 +180,51 @@ class _BookingPageState extends State<BookingPage> {
                   const Divider(),
 
                   // Car Features
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 12,
+                      vertical: 6,
+                    ),
                     child: Text(
                       "Car Basics & Features",
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 20,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
+
                   Padding(
                     padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: Wrap(
-                      spacing: 20,
-                      runSpacing: 10,
-                      children: car.features
-                          .map((f) => FeatureItem(text: f))
-                          .toList(),
+                    child: GridView.count(
+                      shrinkWrap: true,
+                      physics: NeverScrollableScrollPhysics(),
+                      crossAxisCount: 2, // 2 items per row
+                      mainAxisSpacing: 10,
+                      crossAxisSpacing: 20,
+                      childAspectRatio: 4, // controls width/height ratio
+                      children: car.features.map((f) {
+                        return Row(
+                          children: [
+                            Icon(
+                              Icons.circle,
+                              size: 16,
+                              color: Colors.grey,
+                            ), // small dot
+                            SizedBox(width: 6),
+                            Text(
+                              f,
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.black54,
+                              ),
+                            ),
+                          ],
+                        );
+                      }).toList(),
                     ),
                   ),
+
                   const SizedBox(height: 10),
 
                   // Description
@@ -209,17 +234,17 @@ class _BookingPageState extends State<BookingPage> {
                     child: Text(
                       "Description",
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 20,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
                   ),
-                  const Padding(
+                  Padding(
                     padding: EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
-                      "This car is well maintained and perfect for family or solo trips. "
-                      "Equipped with essential features for comfort and safety.",
-                      style: TextStyle(fontSize: 13, color: Colors.grey),
+                      car.description ??
+                          "No description available", // ✅ dynamic from model
+                      style: const TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                   ),
                   const SizedBox(height: 10),
@@ -231,7 +256,7 @@ class _BookingPageState extends State<BookingPage> {
                     child: Text(
                       "Warning",
                       style: TextStyle(
-                        fontSize: 15,
+                        fontSize: 20,
                         fontWeight: FontWeight.w500,
                       ),
                     ),
@@ -240,7 +265,7 @@ class _BookingPageState extends State<BookingPage> {
                     padding: EdgeInsets.symmetric(horizontal: 12),
                     child: Text(
                       "Do Payment During Pick-Uping A Car",
-                      style: TextStyle(fontSize: 13, color: Colors.grey),
+                      style: TextStyle(fontSize: 14, color: Colors.grey),
                     ),
                   ),
                   const SizedBox(height: 20),
@@ -254,17 +279,23 @@ class _BookingPageState extends State<BookingPage> {
                     ),
                     child: ElevatedButton(
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.brown,
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(20),
-                        ),
-                        padding: const EdgeInsets.symmetric(vertical: 14),
+                        backgroundColor: const Color(
+                          0xFF3B221D,
+                        ), // ✅ chocolate brown
+                        shape:
+                            const StadiumBorder(), // ✅ pill shape (like your image)
+                        padding: const EdgeInsets.symmetric(
+                          vertical: 16,
+                        ), // a bit more height
+                        elevation:
+                            0, // ✅ flat look (optional, matches screenshot)
                       ),
                       onPressed: () {},
                       child: Text(
                         "Total ${car.price}",
                         style: const TextStyle(
                           fontSize: 16,
+                          color: Colors.white,
                           fontWeight: FontWeight.w600,
                         ),
                       ),
