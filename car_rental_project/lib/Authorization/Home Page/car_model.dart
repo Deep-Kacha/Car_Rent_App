@@ -1,17 +1,19 @@
 class Car {
   final String name;
   final String image;
-  final String details;
+  final String? description; // ✅ new field
   final String category;
   final String price;
   final String address;
+  final List<String> features;
 
   Car({
     required this.name,
     required this.image,
-    required this.details,
+    required this.description, // ✅ required
     required this.category,
     required this.price,
     required this.address,
+    required this.features,
   });
 }

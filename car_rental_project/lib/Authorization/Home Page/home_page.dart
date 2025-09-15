@@ -1,3 +1,4 @@
+import 'package:car_rental_project/Authorization/Booking/Book_car.dart';
 import 'package:car_rental_project/Authorization/Favorite_car/Favorite.dart';
 import 'package:car_rental_project/Authorization/Menu/Menu.dart';
 import 'package:flutter/material.dart';
@@ -260,15 +261,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ],
                                 ),
-                                SizedBox(height: 4),
 
-                                Text(
-                                  car.details,
-                                  style: TextStyle(
-                                    color: Colors.white,
-                                    fontSize: 12,
-                                  ),
-                                ),
                                 SizedBox(height: 4),
                                 Row(
                                   mainAxisAlignment:
@@ -279,7 +272,7 @@ class _HomePageState extends State<HomePage> {
                                         car.address,
                                         style: TextStyle(
                                           color: Colors.white,
-                                          fontSize: 12,
+                                          fontSize: 15,
                                         ),
                                       ),
                                     ),
@@ -297,7 +290,13 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       onPressed: () {
-                                        // Book action
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) =>
+                                                BookingPage(car: car),
+                                          ),
+                                        );
                                       },
                                       child: Text(
                                         car.price,
