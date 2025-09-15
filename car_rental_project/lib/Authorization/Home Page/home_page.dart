@@ -1,4 +1,5 @@
 import 'package:car_rental_project/Authorization/Booking/Book_car.dart';
+import 'package:car_rental_project/Authorization/Booking/Booked_Car.dart';
 import 'package:car_rental_project/Authorization/Favorite_car/Favorite.dart';
 import 'package:car_rental_project/Authorization/Menu/Menu.dart';
 import 'package:flutter/material.dart';
@@ -6,6 +7,9 @@ import 'car_model.dart';
 import 'car_data.dart';
 
 class HomePage extends StatefulWidget {
+  static List<Car> bookedCars = [];
+  static List<Map<String, dynamic>> bookedCarsMaps = [];
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -338,6 +342,10 @@ class _HomePageState extends State<HomePage> {
     return MenuPage();
   }
 
+  Widget buildBookedPage() {
+    return BookedCar(bookedCars: HomePage.bookedCars, bookedCarsMaps: []);
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -346,7 +354,7 @@ class _HomePageState extends State<HomePage> {
         child: selectedIndex == 0
             ? buildHomePage()
             : selectedIndex == 1
-            ? Center(child: Text("Booked Page")) // You can design this later
+            ? buildBookedPage()
             : selectedIndex == 2
             ? buildFavoritesPage()
             : buildMenuPage(),
