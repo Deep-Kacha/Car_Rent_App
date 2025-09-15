@@ -8,6 +8,8 @@ class EditProfilePage extends StatefulWidget {
 }
 
 class _EditProfilePageState extends State<EditProfilePage> {
+  final _formKey = GlobalKey<FormState>();
+
   // Controllers for text fields
   final TextEditingController nameController = TextEditingController(
     text: "Ethan John",
@@ -35,147 +37,190 @@ class _EditProfilePageState extends State<EditProfilePage> {
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              // Back button + Title
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  const Expanded(
-                    child: Center(
-                      child: Text(
-                        "Edit Profile",
-                        style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w500,
+          child: Form(
+            key: _formKey,
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                // Back button + Title
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    const Expanded(
+                      child: Center(
+                        child: Text(
+                          "Edit Profile",
+                          style: TextStyle(
+                            fontSize: 28,
+                            fontWeight: FontWeight.w500,
+                          ),
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 48),
-                ],
-              ),
+                    const SizedBox(width: 48),
+                  ],
+                ),
 
-              const SizedBox(height: 20),
+                const SizedBox(height: 20),
 
-              // Profile picture upload
-              Stack(
-                alignment: Alignment.center,
-                children: [
-                  CircleAvatar(
-                    radius: 50,
-                    backgroundColor: const Color(0xFFF5F5F5),
-                    child: ClipOval(
-                      child: Image.asset(
-                        "assets/images/profile.jpg", // make sure this path exists
-                        fit: BoxFit.cover,
-                        width: 100,
-                        height: 100,
+                // Profile picture upload
+                Stack(
+                  alignment: Alignment.center,
+                  children: [
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundColor: const Color(0xFFF5F5F5),
+                      child: ClipOval(
+                        child: Image.asset(
+                          "assets/images/profile.jpg",
+                          fit: BoxFit.cover,
+                          width: 100,
+                          height: 100,
+                        ),
                       ),
                     ),
-                  ),
-                  Positioned(
-                    bottom: 0,
-                    right: 0,
-                    child: CircleAvatar(
-                      radius: 16,
+                    Positioned(
+                      bottom: 0,
+                      right: 0,
+                      child: CircleAvatar(
+                        radius: 16,
+                        backgroundColor: const Color.fromARGB(255, 63, 34, 26),
+                        child: const Icon(
+                          Icons.cloud_upload,
+                          color: Colors.white,
+                          size: 18,
+                        ),
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 30),
+
+                // Full Name
+                _buildValidatedField("Full Name", nameController, (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Name cannot be empty";
+                  }
+                  return null;
+                }),
+
+                // Email
+                _buildValidatedField("Email", emailController, (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Email cannot be empty";
+                  }
+                  if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+                    return "Enter a valid email";
+                  }
+                  return null;
+                }),
+
+                // Phone
+                _buildValidatedField("Phone", phoneController, (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Phone number cannot be empty";
+                  }
+                  if (!RegExp(r'^\+?[0-9 ]{10,15}$').hasMatch(value)) {
+                    return "Enter a valid phone number";
+                  }
+                  return null;
+                }),
+
+                // Address
+                _buildValidatedField("Address", addressController, (value) {
+                  if (value == null || value.isEmpty) {
+                    return "Address cannot be empty";
+                  }
+                  return null;
+                }),
+
+                // DOB & Gender
+                Row(
+                  children: [
+                    Expanded(
+                      child: _buildValidatedField(
+                        "Date of Birth",
+                        dobController,
+                        (value) =>
+                            value == null || value.isEmpty ? "Enter DOB" : null,
+                      ),
+                    ),
+                    const SizedBox(width: 12),
+                    Expanded(
+                      child: _buildValidatedField(
+                        "Gender",
+                        genderController,
+                        (value) => value == null || value.isEmpty
+                            ? "Enter gender"
+                            : null,
+                      ),
+                    ),
+                  ],
+                ),
+
+                const SizedBox(height: 30),
+
+                // Save Changes Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      if (_formKey.currentState!.validate()) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Changes saved successfully!"),
+                          ),
+                        );
+                      }
+                    },
+                    style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 63, 34, 26),
-                      child: const Icon(
-                        Icons.cloud_upload,
-                        color: Colors.white,
-                        size: 18,
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                  ),
-                ],
-              ),
-
-              const SizedBox(height: 30),
-
-              // Full Name
-              _buildTextField("Full Name", nameController),
-
-              // Email
-              _buildTextField("Email", emailController),
-
-              // Phone
-              _buildTextField("Phone", phoneController),
-
-              // Address
-              _buildTextField("Address", addressController),
-
-              // DOB & Gender
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildTextField("Date of Birth", dobController),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(child: _buildTextField("Gender", genderController)),
-                ],
-              ),
-
-              const SizedBox(height: 30),
-
-              // Save Changes Button
-              SizedBox(
-                width: double.infinity,
-                child: ElevatedButton(
-                  onPressed: () {
-                    // TODO: Save profile changes logic
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text("Changes saved successfully!"),
-                      ),
-                    );
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(255, 63, 34, 26),
-                    padding: const EdgeInsets.symmetric(vertical: 16),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
+                    child: const Text(
+                      "Save Changes",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
-                  ),
-                  child: const Text(
-                    "Save Changes",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
       ),
     );
   }
 
-  // Reusable input field
-  Widget _buildTextField(String label, TextEditingController controller) {
+  // Reusable validated input field
+  Widget _buildValidatedField(
+    String label,
+    TextEditingController controller,
+    String? Function(String?) validator,
+  ) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
-          const SizedBox(height: 6),
-          TextField(
-            controller: controller,
-            decoration: InputDecoration(
-              filled: true,
-              fillColor: const Color(0xFFF5F5F5),
-              border: OutlineInputBorder(
-                borderRadius: BorderRadius.circular(10),
-                borderSide: BorderSide.none,
-              ),
-            ),
+      child: TextFormField(
+        controller: controller,
+        decoration: InputDecoration(
+          labelText: label,
+          filled: true,
+          fillColor: const Color(0xFFF5F5F5),
+          border: OutlineInputBorder(
+            borderRadius: BorderRadius.circular(10),
+            borderSide: BorderSide.none,
           ),
-        ],
+        ),
+        validator: validator,
       ),
     );
   }
