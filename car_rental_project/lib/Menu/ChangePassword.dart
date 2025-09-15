@@ -4,7 +4,7 @@ class ChangePasswordPage extends StatefulWidget {
   const ChangePasswordPage({Key? key}) : super(key: key);
 
   @override
-  _ChangePasswordPageState createState() => _ChangePasswordPageState();
+  State<ChangePasswordPage> createState() => _ChangePasswordPageState();
 }
 
 class _ChangePasswordPageState extends State<ChangePasswordPage> {
@@ -13,59 +13,30 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
-  bool _isObscureOld = true;
-  bool _isObscureNew = true;
-  bool _isObscureConfirm = true;
+  bool oldPasswordVisible = false;
+  bool newPasswordVisible = false;
+  bool confirmPasswordVisible = false;
 
-  // Real-time validation messages
-  String? _oldPasswordError;
-  String? _newPasswordError;
-  String? _confirmPasswordError;
+  String? newPasswordError;
+  String? confirmPasswordError;
 
-  void _validateOldPassword(String value) {
-    setState(() {
-      if (value.isEmpty) {
-        _oldPasswordError = "Please enter your old password";
-      } else {
-        _oldPasswordError = null;
-      }
-    });
-  }
-
-  void _validateNewPassword(String value) {
-    setState(() {
-      if (value.isEmpty) {
-        _newPasswordError = "Please enter a new password";
-      } else if (value.length < 6) {
-        _newPasswordError = "Password must be at least 6 characters";
-      } else {
-        _newPasswordError = null;
-      }
-    });
-  }
-
-  void _validateConfirmPassword(String value) {
-    setState(() {
-      if (value != newPasswordController.text) {
-        _confirmPasswordError = "Passwords do not match";
-      } else {
-        _confirmPasswordError = null;
-      }
-    });
-  }
-
-  void _submitForm() {
-    _validateOldPassword(oldPasswordController.text);
-    _validateNewPassword(newPasswordController.text);
-    _validateConfirmPassword(confirmPasswordController.text);
-
-    if (_oldPasswordError == null &&
-        _newPasswordError == null &&
-        _confirmPasswordError == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Password changed successfully!")),
-      );
+  // Password validation (same style as SignUp)
+  String? _validatePassword(String value) {
+    if (value.isEmpty) return "Password is required";
+    if (value.length < 6) {
+      return "Password must be at least 6 characters";
     }
+    if (!RegExp(r'^(?=.*[A-Z])(?=.*[0-9])').hasMatch(value)) {
+      return "Must contain at least 1 uppercase & 1 number";
+    }
+    return null;
+  }
+
+  String? _validateConfirmPassword(String value) {
+    if (value != newPasswordController.text) {
+      return "Passwords do not match";
+    }
+    return null;
   }
 
   @override
@@ -73,140 +44,191 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 10),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Back Button
-              IconButton(
-                icon: const Icon(Icons.arrow_back, color: Colors.black),
-                onPressed: () {
-                  Navigator.pop(context);
-                },
-              ),
-              const SizedBox(height: 10),
-
-              // Title
-              Center(
-                child: Column(
-                  children: const [
-                    Text(
-                      "Change Password",
-                      style: TextStyle(
-                        fontSize: 22,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.black,
+        child: SingleChildScrollView(
+          padding: const EdgeInsets.all(20),
+          child: Form(
+            autovalidateMode: AutovalidateMode.onUserInteraction,
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.center,
+              children: [
+                /// Back button + Title
+                Row(
+                  children: [
+                    IconButton(
+                      icon: const Icon(Icons.arrow_back),
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
+                    const Expanded(
+                      child: Center(
+                        child: Text(
+                          "Change Password",
+                          style: TextStyle(
+                            fontSize: 20,
+                            fontWeight: FontWeight.bold,
+                          ),
+                        ),
                       ),
                     ),
-                    SizedBox(height: 5),
-                    Text(
-                      "Enter your new password below.",
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
+                    const SizedBox(width: 48),
                   ],
                 ),
-              ),
-              const SizedBox(height: 30),
 
-              // Old Password
-              TextField(
-                controller: oldPasswordController,
-                obscureText: _isObscureOld,
-                onChanged: _validateOldPassword,
-                decoration: InputDecoration(
-                  labelText: "Old Password",
-                  errorText: _oldPasswordError,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
+                const SizedBox(height: 20),
+
+                const Text(
+                  "Enter your new password below",
+                  style: TextStyle(color: Colors.grey, fontSize: 14),
+                ),
+
+                const SizedBox(height: 30),
+
+                // Illustration
+                Center(
+                  child: Image.asset(
+                    "assets/images/ChangePassword.jpg",
+                    height: 180,
                   ),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _isObscureOld ? Icons.visibility_off : Icons.visibility,
-                    ),
+                ),
+
+                const SizedBox(height: 30),
+
+                // Old Password
+                _buildPasswordField(
+                  label: "Old Password",
+                  controller: oldPasswordController,
+                  isVisible: oldPasswordVisible,
+                  toggleVisibility: () {
+                    setState(() {
+                      oldPasswordVisible = !oldPasswordVisible;
+                    });
+                  },
+                ),
+
+                // New Password
+                _buildPasswordField(
+                  label: "New Password",
+                  controller: newPasswordController,
+                  isVisible: newPasswordVisible,
+                  toggleVisibility: () {
+                    setState(() {
+                      newPasswordVisible = !newPasswordVisible;
+                    });
+                  },
+                  validator: _validatePassword,
+                  onChanged: (val) {
+                    setState(() {
+                      newPasswordError = _validatePassword(val);
+                    });
+                  },
+                  errorText: newPasswordError,
+                ),
+
+                // Confirm Password
+                _buildPasswordField(
+                  label: "Confirm Password",
+                  controller: confirmPasswordController,
+                  isVisible: confirmPasswordVisible,
+                  toggleVisibility: () {
+                    setState(() {
+                      confirmPasswordVisible = !confirmPasswordVisible;
+                    });
+                  },
+                  validator: _validateConfirmPassword,
+                  onChanged: (val) {
+                    setState(() {
+                      confirmPasswordError = _validateConfirmPassword(val);
+                    });
+                  },
+                  errorText: confirmPasswordError,
+                ),
+
+                const SizedBox(height: 30),
+
+                // Confirm Button
+                SizedBox(
+                  width: double.infinity,
+                  child: ElevatedButton(
                     onPressed: () {
-                      setState(() {
-                        _isObscureOld = !_isObscureOld;
-                      });
+                      if (newPasswordError == null &&
+                          confirmPasswordError == null &&
+                          newPasswordController.text.isNotEmpty) {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Password changed successfully!"),
+                          ),
+                        );
+                        Navigator.pop(context);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text("Please fix the errors first!"),
+                          ),
+                        );
+                      }
                     },
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // New Password
-              TextField(
-                controller: newPasswordController,
-                obscureText: _isObscureNew,
-                onChanged: _validateNewPassword,
-                decoration: InputDecoration(
-                  labelText: "New Password",
-                  errorText: _newPasswordError,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _isObscureNew ? Icons.visibility_off : Icons.visibility,
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color.fromARGB(255, 63, 34, 26),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(30),
+                      ),
                     ),
-                    onPressed: () {
-                      setState(() {
-                        _isObscureNew = !_isObscureNew;
-                      });
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(height: 20),
-
-              // Confirm Password
-              TextField(
-                controller: confirmPasswordController,
-                obscureText: _isObscureConfirm,
-                onChanged: _validateConfirmPassword,
-                decoration: InputDecoration(
-                  labelText: "Confirm Password",
-                  errorText: _confirmPasswordError,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                  ),
-                  suffixIcon: IconButton(
-                    icon: Icon(
-                      _isObscureConfirm
-                          ? Icons.visibility_off
-                          : Icons.visibility,
-                    ),
-                    onPressed: () {
-                      setState(() {
-                        _isObscureConfirm = !_isObscureConfirm;
-                      });
-                    },
-                  ),
-                ),
-              ),
-              const SizedBox(height: 30),
-
-              // Confirm Button
-              SizedBox(
-                width: double.infinity,
-                height: 50,
-                child: ElevatedButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: Colors.brown[700],
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(25),
+                    child: const Text(
+                      "Confirm Password",
+                      style: TextStyle(fontSize: 16, color: Colors.white),
                     ),
                   ),
-                  onPressed: _submitForm,
-                  child: const Text(
-                    "Confirm Password",
-                    style: TextStyle(fontSize: 16, color: Colors.white),
-                  ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
+      ),
+    );
+  }
+
+  /// Reusable password field with eye icon + validation
+  Widget _buildPasswordField({
+    required String label,
+    required TextEditingController controller,
+    required bool isVisible,
+    required VoidCallback toggleVisibility,
+    String? Function(String)? validator,
+    Function(String)? onChanged,
+    String? errorText,
+  }) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+          const SizedBox(height: 6),
+          TextFormField(
+            controller: controller,
+            obscureText: !isVisible,
+            onChanged: onChanged,
+            validator: (value) => validator?.call(value ?? ""),
+            decoration: InputDecoration(
+              filled: true,
+              fillColor: const Color(0xFFF5F5F5),
+              errorText: errorText,
+              border: OutlineInputBorder(
+                borderRadius: BorderRadius.circular(10),
+                borderSide: BorderSide.none,
+              ),
+              suffixIcon: IconButton(
+                icon: Icon(
+                  isVisible ? Icons.visibility : Icons.visibility_off,
+                  color: Colors.grey,
+                ),
+                onPressed: toggleVisibility,
+              ),
+            ),
+          ),
+        ],
       ),
     );
   }

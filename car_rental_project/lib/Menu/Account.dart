@@ -28,12 +28,7 @@ class _AccountPageState extends State<AccountPage> {
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MenuPage(),
-                        ),
-                      );
+                      Navigator.pop(context);
                     },
                   ),
                   const SizedBox(width: 8),
