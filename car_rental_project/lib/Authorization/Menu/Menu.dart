@@ -1,3 +1,4 @@
+import 'package:car_rental_project/Authorization/Menu/Menus%20Files/Account.dart';
 import 'package:flutter/material.dart';
 
 class MenuPage extends StatelessWidget {
@@ -57,7 +58,14 @@ class MenuPage extends StatelessWidget {
               Expanded(
                 child: ListView(
                   children: [
-                    _buildMenuItem(Icons.person_outline, "Account", () {}),
+                    _buildMenuItem(Icons.person_outline, "Account", () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AccountPage(),
+                        ),
+                      );
+                    }),
                     _buildMenuItem(Icons.badge_outlined, "View Profile", () {}),
                     _buildMenuItem(Icons.edit, "Edit Profile", () {}),
                     _buildMenuItem(
@@ -103,4 +111,5 @@ class MenuPage extends StatelessWidget {
       ),
     );
   }
+  
 }
