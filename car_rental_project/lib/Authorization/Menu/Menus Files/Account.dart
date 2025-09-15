@@ -1,10 +1,4 @@
-// <<<<<<< Updated upstream
 import 'package:flutter/material.dart';
-// import 'package:car_rental_project/Home Page/Menu.dart';
-// =======
-import 'package:car_rental_project/Authorization/Menu/Menu.dart';
-
-// >>>>>>> Stashed changes
 
 class AccountPage extends StatefulWidget {
   const AccountPage({Key? key}) : super(key: key);
@@ -33,18 +27,13 @@ class _AccountPageState extends State<AccountPage> {
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
-                      Navigator.pop(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MenuPage(),
-                        ),
-                      );
+                      Navigator.pop(context);
                     },
                   ),
                   const SizedBox(width: 8),
                   const Text(
                     "Account",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),
