@@ -1,3 +1,4 @@
+import 'package:car_rental_project/Authorization/Menu/Menu.dart';
 import 'package:flutter/material.dart';
 
 class ViewProfilePage extends StatelessWidget {
@@ -9,42 +10,55 @@ class ViewProfilePage extends StatelessWidget {
       backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
-          padding: const EdgeInsets.all(16.0),
+          padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Back button
-              Align(
-                alignment: Alignment.topLeft,
-                child: IconButton(
-                  icon: const Icon(Icons.arrow_back, color: Colors.black),
-                  onPressed: () {
-                    Navigator.pop(context);
-                  },
-                ),
-              ),
-
-              // Profile Image
-              CircleAvatar(
-                radius: 45,
-                backgroundImage: AssetImage(
-                  "assets/profile.jpg",
-                ), // replace with NetworkImage if needed
-              ),
-              const SizedBox(height: 10),
-
-              // Name
-              const Text(
-                "Ethan John",
-                style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+              // Back Button & Title
+              Row(
+                children: [
+                  IconButton(
+                    icon: const Icon(Icons.arrow_back),
+                    onPressed: () {
+                      Navigator.pushReplacement(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MenuPage(),
+                        ),
+                      );
+                    },
+                  ),
+                  const SizedBox(width: 48), // To balance the row
+                ],
               ),
 
               const SizedBox(height: 20),
 
-              // Divider
-              const Divider(thickness: 1, color: Colors.grey),
+              // Profile Picture
+              const CircleAvatar(
+                radius: 50,
+                backgroundImage: AssetImage("assets/images/profile.jpg"),
+              ),
+              const SizedBox(height: 12),
 
-              // Verified Info
+              // Name & Join Date
+              const Text(
+                "Ethan John",
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
+              ),
+              const SizedBox(height: 4),
+
+              // Description
+              const Text(
+                "Profile with personal info and connected social media appear more trustworthy.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 16, color: Colors.grey),
+              ),
+
+              const SizedBox(height: 20),
+              const Divider(),
+
+              // Section Title
               const Align(
                 alignment: Alignment.centerLeft,
                 child: Text(
@@ -52,119 +66,86 @@ class ViewProfilePage extends StatelessWidget {
                   style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                 ),
               ),
-              const SizedBox(height: 15),
+              const SizedBox(height: 16),
 
-              // Email Address row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text(
-                    "Email address",
-                    style: TextStyle(fontSize: 15, color: Colors.black87),
-                  ),
-                  Icon(Icons.settings, color: Colors.grey),
-                ],
-              ),
-              const SizedBox(height: 15),
-
-              // Google Row
-              Row(
-                mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                children: const [
-                  Text("Google", style: TextStyle(fontSize: 15)),
-                  Text(
-                    "Connect",
-                    style: TextStyle(
-                      fontSize: 15,
-                      color: Colors.brown,
-                      fontWeight: FontWeight.w600,
-                    ),
-                  ),
-                ],
-              ),
-              const SizedBox(height: 20),
-
-              // Phone Field
-              TextField(
-                enabled: false,
-                decoration: InputDecoration(
-                  labelText: "Phone",
-                  filled: true,
-                  fillColor: Colors.grey.shade100,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  hintText: "+91 98765 43210",
+              // Email row
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text("Email address"),
+                trailing: IconButton(
+                  icon: const Icon(Icons.settings, color: Colors.grey),
+                  onPressed: () {},
                 ),
               ),
-              const SizedBox(height: 15),
 
-              // Address Field
-              TextField(
-                enabled: false,
-                decoration: InputDecoration(
-                  labelText: "Address",
-                  filled: true,
-                  fillColor: Colors.grey.shade100,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
-                    borderSide: BorderSide.none,
-                  ),
-                  hintText: "Surat, Gujarat, India",
+              // Google row
+              ListTile(
+                contentPadding: EdgeInsets.zero,
+                title: const Text("Google"),
+                trailing: TextButton(
+                  onPressed: () {},
+                  child: const Text("Connect"),
                 ),
               ),
-              const SizedBox(height: 15),
 
-              // Date of Birth & Gender Row
+              // Phone
+              _buildInfoField("Phone", "+91 41555 50132"),
+
+              // Address
+              _buildInfoField("Address", "Rajkot, Gujarat, India"),
+
+              // DOB & Gender
               Row(
                 children: [
                   Expanded(
-                    child: TextField(
-                      enabled: false,
-                      decoration: InputDecoration(
-                        labelText: "Date of Birth",
-                        filled: true,
-                        fillColor: Colors.grey.shade100,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        hintText: "20/05/2004",
-                      ),
-                    ),
+                    child: _buildInfoField("Date of Birth", "20/05/2004"),
                   ),
-                  const SizedBox(width: 10),
-                  Expanded(
-                    child: TextField(
-                      enabled: false,
-                      decoration: InputDecoration(
-                        labelText: "Gender",
-                        filled: true,
-                        fillColor: Colors.grey.shade100,
-                        border: OutlineInputBorder(
-                          borderRadius: BorderRadius.circular(12),
-                          borderSide: BorderSide.none,
-                        ),
-                        hintText: "Male",
-                      ),
-                    ),
-                  ),
+                  const SizedBox(width: 12),
+                  Expanded(child: _buildInfoField("Gender", "Male")),
                 ],
               ),
-              const SizedBox(height: 30),
             ],
           ),
         ),
       ),
 
-      // Floating Edit Button
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          // Navigate to Edit Profile Page
-        },
-        backgroundColor: Colors.brown,
-        child: const Icon(Icons.edit, color: Colors.white),
+      // Floating Action Button
+      // floatingActionButton: FloatingActionButton(
+      //   backgroundColor: const Color.fromARGB(255, 63, 34, 26),
+      //   shape: const CircleBorder(),
+      //   onPressed: () {
+      //     Navigator.push(
+      //       context,
+      //       MaterialPageRoute(
+      //         builder: (context) =>
+      //             const EditProfilePage(), // Change to EditProfilePage when implemented
+      //       ),
+      //     );
+      //   },
+      //   child: const Icon(Icons.edit, color: Colors.white),
+      // ),
+    );
+  }
+
+  // Helper for read-only info fields
+  Widget _buildInfoField(String label, String value) {
+    return Padding(
+      padding: const EdgeInsets.only(bottom: 16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          Text(label, style: const TextStyle(fontSize: 14, color: Colors.grey)),
+          const SizedBox(height: 6),
+          Container(
+            width: double.infinity,
+            padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+            decoration: BoxDecoration(
+              color: const Color(0xFFF5F5F5),
+              borderRadius: BorderRadius.circular(10),
+            ),
+            child: Text(value, style: const TextStyle(fontSize: 16)),
+          ),
+        ],
       ),
     );
   }
