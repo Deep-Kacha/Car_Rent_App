@@ -1,4 +1,6 @@
+// import 'package:car_rental_project/Authorization/Booking/Booked_Car.dart';
 import 'package:car_rental_project/Authorization/Home%20Page/car_model.dart';
+import 'package:car_rental_project/Authorization/Home%20Page/home_page.dart';
 import 'package:flutter/material.dart';
 
 class BookingPage extends StatefulWidget {
@@ -290,7 +292,32 @@ class _BookingPageState extends State<BookingPage> {
                         elevation:
                             0, // ✅ flat look (optional, matches screenshot)
                       ),
-                      onPressed: () {},
+                      onPressed: () {
+                        if (startDate != null && endDate != null) {
+                          // Create a temporary map to store the car + dates
+                          final bookedCarInfo = {
+                            'car': widget.car,
+                            'startDate':
+                                "${startDate!.day}/${startDate!.month}/${startDate!.year}",
+                            'endDate':
+                                "${endDate!.day}/${endDate!.month}/${endDate!.year}",
+                          };
+
+                          // Add this map to HomePage.bookedCars
+                          HomePage.bookedCarsMaps.add(bookedCarInfo);
+
+                          Navigator.pop(context, 1); // go back to booked tab
+                        } else {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "Please select both start and end dates",
+                              ),
+                            ),
+                          );
+                        }
+                      },
+
                       child: Text(
                         "Total ${car.price}",
                         style: const TextStyle(
@@ -347,61 +374,6 @@ class _BookingPageState extends State<BookingPage> {
             ),
           ),
         ),
-      ],
-    );
-  }
-}
-
-// Feature Item (same as your code)
-class FeatureItem extends StatelessWidget {
-  final String text;
-  const FeatureItem({super.key, required this.text});
-
-  IconData _getIconForFeature(String feature) {
-    switch (feature.toLowerCase()) {
-      case "petrol":
-        return Icons.local_gas_station;
-      case "diesel":
-        return Icons.ev_station;
-      case "electric":
-        return Icons.electric_car;
-      case "manual":
-        return Icons.settings;
-      case "automatic":
-        return Icons.autorenew;
-      case "5 seater":
-        return Icons.event_seat;
-      case "7 seater":
-        return Icons.airline_seat_recline_extra;
-      case "air conditioning":
-        return Icons.ac_unit;
-      case "rear ac vents":
-        return Icons.air;
-      case "rear camera":
-        return Icons.videocam;
-      case "alloy wheels":
-        return Icons.album;
-      case "fast charging":
-        return Icons.bolt;
-      case "dual zone ac":
-        return Icons.ac_unit_outlined;
-      case "fog lamps":
-        return Icons.lightbulb;
-      case "abs":
-        return Icons.security;
-      default:
-        return Icons.check_circle_outline;
-    }
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Row(
-      mainAxisSize: MainAxisSize.min,
-      children: [
-        Icon(_getIconForFeature(text), size: 18, color: Colors.brown),
-        const SizedBox(width: 6),
-        Text(text, style: const TextStyle(fontSize: 13)),
       ],
     );
   }
