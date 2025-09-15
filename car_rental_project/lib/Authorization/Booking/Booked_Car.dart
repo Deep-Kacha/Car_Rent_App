@@ -17,7 +17,7 @@ class BookedCar extends StatelessWidget {
             children: [
               Text(
                 "Booked Car",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w500),
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
               ),
 
               const SizedBox(height: 20),
