@@ -1,5 +1,4 @@
-import 'package:car_rental_project/authentication/Screens/ConfirmPassword.dart';
-import 'package:car_rental_project/authentication/Screens/ForgatPassword.dart';
+
 import 'package:flutter/material.dart';
 
 class VerifyCodePage extends StatefulWidget {
@@ -28,10 +27,10 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
     if (_formKey.currentState!.validate()) {
       String otp = _otpControllers.map((e) => e.text).join();
       if (otp.length == 4) {
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => const ConfirmPasswordPage()),
-        );
+        // Navigator.pushReplacement(
+        //   context,
+        //   MaterialPageRoute(builder: (context) => const ConfirmPasswordPage()),
+        // );
       }
     }
   }
@@ -54,12 +53,12 @@ class _VerifyCodePageState extends State<VerifyCodePage> {
                   child: IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ForgotPasswordPage(),
-                        ),
-                      );
+                      // Navigator.pushReplacement(
+                      //   context,
+                      //   MaterialPageRoute(
+                      //     builder: (context) => const ForgotPasswordPage(),
+                      //   ),
+                      // );
                     },
                   ),
                 ),
