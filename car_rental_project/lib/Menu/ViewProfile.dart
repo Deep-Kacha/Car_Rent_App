@@ -1,4 +1,5 @@
 import 'package:car_rental_project/Authorization/Menu/Menu.dart';
+import 'package:car_rental_project/Menu/EditProfile.dart';
 import 'package:flutter/material.dart';
 
 class ViewProfilePage extends StatelessWidget {
@@ -27,6 +28,17 @@ class ViewProfilePage extends StatelessWidget {
                         ),
                       );
                     },
+                  ),
+                  const Expanded(
+                    child: Center(
+                      child: Text(
+                        "Profile",
+                        style: TextStyle(
+                          fontSize: 28,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ),
                   ),
                   const SizedBox(width: 48), // To balance the row
                 ],
@@ -110,20 +122,17 @@ class ViewProfilePage extends StatelessWidget {
       ),
 
       // Floating Action Button
-      // floatingActionButton: FloatingActionButton(
-      //   backgroundColor: const Color.fromARGB(255, 63, 34, 26),
-      //   shape: const CircleBorder(),
-      //   onPressed: () {
-      //     Navigator.push(
-      //       context,
-      //       MaterialPageRoute(
-      //         builder: (context) =>
-      //             const EditProfilePage(), // Change to EditProfilePage when implemented
-      //       ),
-      //     );
-      //   },
-      //   child: const Icon(Icons.edit, color: Colors.white),
-      // ),
+      floatingActionButton: FloatingActionButton(
+        backgroundColor: const Color.fromARGB(255, 63, 34, 26),
+        shape: const CircleBorder(),
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(builder: (context) => const EditProfilePage()),
+          );
+        },
+        child: const Icon(Icons.edit, color: Colors.white),
+      ),
     );
   }
 
