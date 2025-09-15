@@ -39,13 +39,6 @@ class ViewProfilePage extends StatelessWidget {
                 style: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
               ),
 
-              const SizedBox(height: 5),
-              const Text(
-                "Profile with personal info and connected social\nmedia appear more trustworthy.",
-                textAlign: TextAlign.center,
-                style: TextStyle(color: Colors.grey, fontSize: 13),
-              ),
-
               const SizedBox(height: 20),
 
               // Divider
