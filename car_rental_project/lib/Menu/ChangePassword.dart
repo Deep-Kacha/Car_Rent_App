@@ -65,8 +65,8 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
                         child: Text(
                           "Change Password",
                           style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.bold,
+                            fontSize: 28,
+                            fontWeight: FontWeight.w500,
                           ),
                         ),
                       ),

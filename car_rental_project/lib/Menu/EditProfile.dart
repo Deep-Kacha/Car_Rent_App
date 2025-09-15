@@ -1,4 +1,3 @@
-import 'package:car_rental_project/Authorization/Menu/Menu.dart';
 import 'package:flutter/material.dart';
 
 class EditProfilePage extends StatefulWidget {
@@ -45,12 +44,7 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
-                      Navigator.pushReplacement(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MenuPage(),
-                        ),
-                      );
+                      Navigator.pop(context);
                     },
                   ),
                   const Expanded(
@@ -58,8 +52,8 @@ class _EditProfilePageState extends State<EditProfilePage> {
                       child: Text(
                         "Edit Profile",
                         style: TextStyle(
-                          fontSize: 20,
-                          fontWeight: FontWeight.bold,
+                          fontSize: 28,
+                          fontWeight: FontWeight.w500,
                         ),
                       ),
                     ),
