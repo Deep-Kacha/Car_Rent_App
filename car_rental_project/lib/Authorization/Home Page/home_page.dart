@@ -80,16 +80,14 @@ class _HomePageState extends State<HomePage> {
               Row(
                 children: [
                   CircleAvatar(
-                    radius: 21,
-                    backgroundImage: NetworkImage(
-                      "https://i.pravatar.cc/150?img=3",
-                    ),
+                    radius: 22,
+                    backgroundImage: AssetImage("assets/images/profile.jpg"),
                   ),
                   SizedBox(width: 15),
                   Text(
                     "Ethan John",
                     style: TextStyle(
-                      fontSize: 25,
+                      fontSize: 26,
                       fontWeight: FontWeight.w500,
                       color: Colors.black,
                     ),

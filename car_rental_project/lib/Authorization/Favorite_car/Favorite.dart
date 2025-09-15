@@ -33,8 +33,8 @@ class FavoritePage extends StatelessWidget {
                     Text(
                       "Favorites",
                       style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.bold,
+                        fontSize: 28,
+                        fontWeight: FontWeight.w500,
                         color: Colors.black,
                       ),
                     ),

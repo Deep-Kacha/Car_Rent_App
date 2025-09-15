@@ -1,11 +1,5 @@
-<<<<<<< Updated upstream
 import 'package:flutter/material.dart';
-import 'package:car_rental_project/Home Page/Menu.dart';
-=======
 import 'package:car_rental_project/Authorization/Menu/Menu.dart';
-import 'package:flutter/material.dart';
-
->>>>>>> Stashed changes
 
 class AccountPage extends StatefulWidget {
   const AccountPage({Key? key}) : super(key: key);
@@ -45,7 +39,7 @@ class _AccountPageState extends State<AccountPage> {
                   const SizedBox(width: 8),
                   const Text(
                     "Account",
-                    style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+                    style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
                   ),
                 ],
               ),

@@ -1,3 +1,4 @@
+import 'package:car_rental_project/Menu/Account.dart';
 import 'package:flutter/material.dart';
 
 class MenuPage extends StatelessWidget {
@@ -20,7 +21,7 @@ class MenuPage extends StatelessWidget {
               /// Title
               const Text(
                 "Menu",
-                style: TextStyle(fontSize: 30, fontWeight: FontWeight.w600),
+                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
               ),
 
               const SizedBox(height: 20),
@@ -30,9 +31,7 @@ class MenuPage extends StatelessWidget {
                 children: const [
                   CircleAvatar(
                     radius: 25,
-                    backgroundImage: NetworkImage(
-                      "https://i.pravatar.cc/150?img=3",
-                    ),
+                    backgroundImage: AssetImage("assets/images/profile.jpg"),
                   ),
                   SizedBox(width: 15),
                   Text(
@@ -57,7 +56,14 @@ class MenuPage extends StatelessWidget {
               Expanded(
                 child: ListView(
                   children: [
-                    _buildMenuItem(Icons.person_outline, "Account", () {}),
+                    _buildMenuItem(Icons.person_outline, "Account", () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const AccountPage(),
+                        ),
+                      );
+                    }),
                     _buildMenuItem(Icons.badge_outlined, "View Profile", () {}),
                     _buildMenuItem(Icons.edit, "Edit Profile", () {}),
                     _buildMenuItem(
