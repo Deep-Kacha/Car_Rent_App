@@ -7,7 +7,6 @@ import 'car_model.dart';
 import 'car_data.dart';
 
 class HomePage extends StatefulWidget {
-  static List<Car> bookedCars = [];
   static List<Map<String, dynamic>> bookedCarsMaps = [];
 
   @override
@@ -21,6 +20,7 @@ class _HomePageState extends State<HomePage> {
   Set<String> favoriteCars = {};
 
   final List<String> categories = ["All", "Cars", "SUVs", "XUVs", "Vans"];
+
   void onToggleFavorite(Car car) {
     setState(() {
       if (favoriteCars.contains(car.name)) {
@@ -45,33 +45,6 @@ class _HomePageState extends State<HomePage> {
         .toList();
   }
 
-  Widget buildNavItem(IconData icon, String label, int index) {
-    bool isSelected = selectedIndex == index;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedIndex = index;
-        });
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 25, color: isSelected ? Colors.black : Colors.grey),
-          SizedBox(height: 6),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? Colors.black : Colors.grey,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// ✅ Home Page
   Widget buildHomePage() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -83,7 +56,7 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-                children: [
+                children: const [
                   CircleAvatar(
                     radius: 22,
                     backgroundImage: AssetImage("assets/images/profile.jpg"),
@@ -107,7 +80,7 @@ class _HomePageState extends State<HomePage> {
                   filled: true,
                   fillColor: Color(0xFFF5F5F5),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
                     borderSide: BorderSide.none,
                   ),
                 ),
@@ -124,7 +97,7 @@ class _HomePageState extends State<HomePage> {
         /// Categories
         Padding(
           padding: const EdgeInsets.all(16),
-          child: Text(
+          child: const Text(
             "Categories",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
@@ -133,7 +106,7 @@ class _HomePageState extends State<HomePage> {
           height: 40,
           child: ListView.builder(
             scrollDirection: Axis.horizontal,
-            padding: EdgeInsets.symmetric(horizontal: 16),
+            padding: const EdgeInsets.symmetric(horizontal: 16),
             itemCount: categories.length,
             itemBuilder: (context, index) {
               final category = categories[index];
@@ -146,7 +119,7 @@ class _HomePageState extends State<HomePage> {
                   });
                 },
                 child: Container(
-                  margin: EdgeInsets.only(right: 20),
+                  margin: const EdgeInsets.only(right: 20),
                   padding: EdgeInsets.symmetric(
                     horizontal: isSelected ? 30 : 16,
                     vertical: 8,
@@ -174,26 +147,26 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
 
-        SizedBox(height: 10),
+        const SizedBox(height: 10),
 
         /// Cars List
         Expanded(
           child: filteredCars.isEmpty
-              ? Center(
+              ? const Center(
                   child: Text(
                     "No cars available in this category",
                     style: TextStyle(color: Colors.grey),
                   ),
                 )
               : ListView.builder(
-                  padding: EdgeInsets.symmetric(horizontal: 16),
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
                   itemCount: filteredCars.length,
                   itemBuilder: (context, index) {
                     final car = filteredCars[index];
                     final isFavorite = favoriteCars.contains(car.name);
 
                     return Container(
-                      margin: EdgeInsets.only(bottom: 16),
+                      margin: const EdgeInsets.only(bottom: 16),
                       decoration: BoxDecoration(
                         color: Colors.white,
                         borderRadius: BorderRadius.circular(15),
@@ -201,7 +174,7 @@ class _HomePageState extends State<HomePage> {
                           BoxShadow(
                             color: Colors.black.withOpacity(0.1),
                             blurRadius: 5,
-                            offset: Offset(0, 3),
+                            offset: const Offset(0, 3),
                           ),
                         ],
                       ),
@@ -209,7 +182,7 @@ class _HomePageState extends State<HomePage> {
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
                           ClipRRect(
-                            borderRadius: BorderRadius.vertical(
+                            borderRadius: const BorderRadius.vertical(
                               top: Radius.circular(15),
                             ),
                             child: Image.asset(
@@ -221,13 +194,13 @@ class _HomePageState extends State<HomePage> {
                           ),
                           Container(
                             width: double.infinity,
-                            decoration: BoxDecoration(
+                            decoration: const BoxDecoration(
                               color: Color(0xFF3E2723),
                               borderRadius: BorderRadius.vertical(
                                 bottom: Radius.circular(15),
                               ),
                             ),
-                            padding: EdgeInsets.all(12),
+                            padding: const EdgeInsets.all(12),
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
@@ -238,7 +211,7 @@ class _HomePageState extends State<HomePage> {
                                   children: [
                                     Text(
                                       car.name,
-                                      style: TextStyle(
+                                      style: const TextStyle(
                                         fontSize: 16,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
@@ -264,7 +237,7 @@ class _HomePageState extends State<HomePage> {
                                   ],
                                 ),
 
-                                SizedBox(height: 4),
+                                const SizedBox(height: 4),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -272,7 +245,7 @@ class _HomePageState extends State<HomePage> {
                                     Expanded(
                                       child: Text(
                                         car.address,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 15,
                                         ),
@@ -286,23 +259,26 @@ class _HomePageState extends State<HomePage> {
                                             8,
                                           ),
                                         ),
-                                        padding: EdgeInsets.symmetric(
+                                        padding: const EdgeInsets.symmetric(
                                           horizontal: 14,
                                           vertical: 6,
                                         ),
                                       ),
-                                      onPressed: () {
-                                        Navigator.push(
+                                      onPressed: () async {
+                                        await Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 BookingPage(car: car),
                                           ),
                                         );
+                                        setState(
+                                          () {},
+                                        ); // refresh after booking
                                       },
                                       child: Text(
                                         car.price,
-                                        style: TextStyle(
+                                        style: const TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
                                           fontSize: 14,
@@ -324,9 +300,7 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /// ✅ Favorites Page
   Widget buildFavoritesPage() {
-    // get Car objects whose names are in favoriteCars
     final favoriteList = cars
         .where((car) => favoriteCars.contains(car.name))
         .toList();
@@ -337,13 +311,10 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /// ✅ Menu Page
-  Widget buildMenuPage() {
-    return MenuPage();
-  }
+  Widget buildMenuPage() => MenuPage();
 
   Widget buildBookedPage() {
-    return BookedCar(bookedCars: HomePage.bookedCars, bookedCarsMaps: []);
+    return BookedCar(bookedCars: HomePage.bookedCarsMaps);
   }
 
   @override
@@ -359,11 +330,9 @@ class _HomePageState extends State<HomePage> {
             ? buildFavoritesPage()
             : buildMenuPage(),
       ),
-
-      /// Bottom Nav
       bottomNavigationBar: Container(
         height: 70,
-        decoration: BoxDecoration(
+        decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
           boxShadow: [
@@ -374,14 +343,30 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        padding: EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            buildNavItem(Icons.home, "Home", 0),
-            buildNavItem(Icons.directions_car, "Booked", 1),
-            buildNavItem(Icons.favorite_border, "Favorite", 2),
-            buildNavItem(Icons.menu, "Menu", 3),
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: BottomNavigationBar(
+          currentIndex: selectedIndex,
+          onTap: (index) {
+            setState(() {
+              selectedIndex = index;
+            });
+          },
+          selectedItemColor: Colors.black,
+          unselectedItemColor: Colors.grey,
+          showSelectedLabels: true,
+          showUnselectedLabels: false,
+          type: BottomNavigationBarType.fixed,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.directions_car),
+              label: "Booking",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.favorite_border),
+              label: "Favorite",
+            ),
+            BottomNavigationBarItem(icon: Icon(Icons.menu), label: "Menu"),
           ],
         ),
       ),

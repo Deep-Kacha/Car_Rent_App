@@ -1,4 +1,3 @@
-// import 'package:car_rental_project/Authorization/Booking/Booked_Car.dart';
 import 'package:car_rental_project/Authorization/Home%20Page/car_model.dart';
 import 'package:car_rental_project/Authorization/Home%20Page/home_page.dart';
 import 'package:flutter/material.dart';
@@ -35,11 +34,6 @@ class _BookingPageState extends State<BookingPage> {
     }
   }
 
-  String formatDate(DateTime? date) {
-    if (date == null) return "Select Date";
-    return "${date.day}/${date.month}/${date.year}";
-  }
-
   @override
   Widget build(BuildContext context) {
     final car = widget.car;
@@ -51,7 +45,11 @@ class _BookingPageState extends State<BookingPage> {
         elevation: 0,
         title: const Text(
           "Booking",
-          style: TextStyle(color: Colors.black, fontSize: 24),
+          style: TextStyle(
+            color: Colors.black,
+            fontSize: 26,
+            fontWeight: FontWeight.w500,
+          ),
         ),
         centerTitle: true,
         leading: IconButton(
@@ -62,274 +60,202 @@ class _BookingPageState extends State<BookingPage> {
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(8.0),
-          child: Container(
-            width: double.infinity,
-            decoration: BoxDecoration(
-              color: Colors.white,
-              borderRadius: BorderRadius.circular(20),
-            ),
-            child: SingleChildScrollView(
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  // Car Image
-                  ClipRRect(
-                    borderRadius: const BorderRadius.all(Radius.circular(20)),
-                    child: Image.asset(
-                      car.image,
-                      height: 250,
-                      width: double.infinity,
-                      fit: BoxFit.cover,
+          child: SingleChildScrollView(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                /// Car Image
+                ClipRRect(
+                  borderRadius: const BorderRadius.all(Radius.circular(20)),
+                  child: Image.asset(
+                    car.image,
+                    height: 250,
+                    width: double.infinity,
+                    fit: BoxFit.cover,
+                  ),
+                ),
+
+                /// Car Name
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Text(
+                    car.name,
+                    style: const TextStyle(
+                      fontSize: 20,
+                      fontWeight: FontWeight.w600,
                     ),
                   ),
+                ),
+                const Divider(),
 
-                  // Car Name
-                  Padding(
-                    padding: const EdgeInsets.all(12),
+                /// Trip Dates
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                    children: [
+                      Expanded(
+                        child: buildDateColumn("Starting Date", startDate, () {
+                          pickDate(isStart: true);
+                        }),
+                      ),
+                      const SizedBox(width: 16),
+                      Expanded(
+                        child: buildDateColumn("Ending Date", endDate, () {
+                          pickDate(isStart: false);
+                        }),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(),
+
+                /// Location
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.location_on_outlined,
+                        color: Colors.grey,
+                        size: 18,
+                      ),
+                      const SizedBox(width: 6),
+                      Text(
+                        car.address,
+                        style: const TextStyle(
+                          fontSize: 18,
+                          color: Colors.grey,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(),
+
+                /// Features
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Text(
+                    "Car Features",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey.shade800,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Wrap(
+                    spacing: 10,
+                    runSpacing: 8,
+                    children: car.features
+                        .map(
+                          (f) => Chip(
+                            label: Text(f),
+                            backgroundColor: Colors.grey.shade200,
+                          ),
+                        )
+                        .toList(),
+                  ),
+                ),
+                const Divider(),
+
+                /// Description
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Text(
+                    "Description",
+                    style: TextStyle(
+                      fontSize: 18,
+                      fontWeight: FontWeight.w600,
+                      color: Colors.grey.shade800,
+                    ),
+                  ),
+                ),
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 12),
+                  child: Text(
+                    car.description ?? '',
+                    style: const TextStyle(fontSize: 15, color: Colors.black87),
+                  ),
+                ),
+                const Divider(),
+
+                /// Warning Section
+                Padding(
+                  padding: const EdgeInsets.all(12),
+                  child: Row(
+                    children: const [
+                      Icon(
+                        Icons.warning_amber_rounded,
+                        color: Colors.orange,
+                        size: 20,
+                      ),
+                      SizedBox(width: 6),
+                      Expanded(
+                        child: Text(
+                          "Payment will be required at the time of car pick-up.",
+                          style: TextStyle(
+                            fontSize: 14,
+                            color: Colors.orange,
+                            fontWeight: FontWeight.w600,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+                const Divider(),
+
+                /// Book Button
+                Container(
+                  width: double.infinity,
+                  margin: const EdgeInsets.all(12),
+                  child: ElevatedButton(
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: const Color(0xFF3B221D),
+                      shape: const StadiumBorder(),
+                      padding: const EdgeInsets.symmetric(vertical: 16),
+                      elevation: 0,
+                    ),
+                    onPressed: () {
+                      if (startDate != null && endDate != null) {
+                        // Store as a map
+                        final bookedCarInfo = {
+                          'car': widget.car,
+                          'startDate':
+                              "${startDate!.day}/${startDate!.month}/${startDate!.year}",
+                          'endDate':
+                              "${endDate!.day}/${endDate!.month}/${endDate!.year}",
+                        };
+
+                        HomePage.bookedCarsMaps.add(bookedCarInfo);
+
+                        Navigator.pop(context, 1);
+                      } else {
+                        ScaffoldMessenger.of(context).showSnackBar(
+                          const SnackBar(
+                            content: Text(
+                              "Please select both start and end dates",
+                            ),
+                          ),
+                        );
+                      }
+                    },
                     child: Text(
-                      car.name,
+                      "Total ${car.price}",
                       style: const TextStyle(
-                        fontSize: 20,
+                        fontSize: 16,
+                        color: Colors.white,
                         fontWeight: FontWeight.w600,
                       ),
                     ),
                   ),
-                  const Divider(),
-                  // Trip Dates (with picker)
-                  Padding(
-                    padding: const EdgeInsets.all(8),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        Text(
-                          "Trip Dates",
-                          style: TextStyle(
-                            fontSize: 20,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        SizedBox(height: 6),
-                        Row(
-                          mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                          children: [
-                            Expanded(
-                              child: buildDateColumn(
-                                "Starting Date",
-                                startDate,
-                                () {
-                                  pickDate(isStart: true);
-                                },
-                              ),
-                            ),
-                            const SizedBox(width: 16), // gap between the two
-                            Expanded(
-                              child: buildDateColumn(
-                                "Ending Date",
-                                endDate,
-                                () {
-                                  pickDate(isStart: false);
-                                },
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Pickup & Return Location
-                  const Divider(),
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        const Text(
-                          "Pickup & Return Location",
-                          style: TextStyle(
-                            fontSize: 20,
-                            color: Colors.black,
-                            fontWeight: FontWeight.w500,
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        Row(
-                          children: [
-                            const Icon(
-                              Icons.location_on_outlined,
-                              color: Colors.grey,
-                              size: 18,
-                            ),
-                            const SizedBox(width: 6),
-                            Text(
-                              car.address,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                color: Colors.grey,
-                                fontWeight: FontWeight.w500,
-                              ),
-                            ),
-                          ],
-                        ),
-                      ],
-                    ),
-                  ),
-
-                  const Divider(),
-
-                  // Car Features
-                  Padding(
-                    padding: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 6,
-                    ),
-                    child: Text(
-                      "Car Basics & Features",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-
-                  Padding(
-                    padding: const EdgeInsets.symmetric(horizontal: 12),
-                    child: GridView.count(
-                      shrinkWrap: true,
-                      physics: NeverScrollableScrollPhysics(),
-                      crossAxisCount: 2, // 2 items per row
-                      mainAxisSpacing: 10,
-                      crossAxisSpacing: 20,
-                      childAspectRatio: 4, // controls width/height ratio
-                      children: car.features.map((f) {
-                        return Row(
-                          children: [
-                            Icon(
-                              Icons.circle,
-                              size: 16,
-                              color: Colors.grey,
-                            ), // small dot
-                            SizedBox(width: 6),
-                            Text(
-                              f,
-                              style: TextStyle(
-                                fontSize: 16,
-                                color: Colors.black54,
-                              ),
-                            ),
-                          ],
-                        );
-                      }).toList(),
-                    ),
-                  ),
-
-                  const SizedBox(height: 10),
-
-                  // Description
-                  const Divider(),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    child: Text(
-                      "Description",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text(
-                      car.description ??
-                          "No description available", // ✅ dynamic from model
-                      style: const TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                  ),
-                  const SizedBox(height: 10),
-
-                  // Warning
-                  const Divider(),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12, vertical: 6),
-                    child: Text(
-                      "Warning",
-                      style: TextStyle(
-                        fontSize: 20,
-                        fontWeight: FontWeight.w500,
-                      ),
-                    ),
-                  ),
-                  const Padding(
-                    padding: EdgeInsets.symmetric(horizontal: 12),
-                    child: Text(
-                      "Do Payment During Pick-Uping A Car",
-                      style: TextStyle(fontSize: 14, color: Colors.grey),
-                    ),
-                  ),
-                  const SizedBox(height: 20),
-
-                  // Price Button
-                  Container(
-                    width: double.infinity,
-                    margin: const EdgeInsets.symmetric(
-                      horizontal: 12,
-                      vertical: 12,
-                    ),
-                    child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(
-                          0xFF3B221D,
-                        ), // ✅ chocolate brown
-                        shape:
-                            const StadiumBorder(), // ✅ pill shape (like your image)
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                        ), // a bit more height
-                        elevation:
-                            0, // ✅ flat look (optional, matches screenshot)
-                      ),
-                      onPressed: () {
-                        if (startDate != null && endDate != null) {
-                          // Create a temporary map to store the car + dates
-                          final bookedCarInfo = {
-                            'car': widget.car,
-                            'startDate':
-                                "${startDate!.day}/${startDate!.month}/${startDate!.year}",
-                            'endDate':
-                                "${endDate!.day}/${endDate!.month}/${endDate!.year}",
-                          };
-
-                          // Add this map to HomePage.bookedCars
-                          HomePage.bookedCarsMaps.add(bookedCarInfo);
-
-                          Navigator.pop(context, 1); // go back to booked tab
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                "Please select both start and end dates",
-                              ),
-                            ),
-                          );
-                        }
-                      },
-
-                      child: Text(
-                        "Total ${car.price}",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
-                  ),
-                ],
-              ),
+                ),
+              ],
             ),
           ),
         ),
@@ -337,7 +263,6 @@ class _BookingPageState extends State<BookingPage> {
     );
   }
 
-  // Trip Date Picker Widget
   Widget buildDateColumn(String label, DateTime? date, VoidCallback onTap) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -349,7 +274,7 @@ class _BookingPageState extends State<BookingPage> {
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
             decoration: BoxDecoration(
-              color: Colors.grey.shade200, // light grey bg
+              color: Colors.grey.shade200,
               borderRadius: BorderRadius.circular(12),
             ),
             child: Row(

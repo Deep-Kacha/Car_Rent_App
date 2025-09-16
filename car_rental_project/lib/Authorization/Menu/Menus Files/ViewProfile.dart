@@ -1,5 +1,5 @@
 import 'package:car_rental_project/Authorization/Menu/Menu.dart';
-import 'package:car_rental_project/Menu/EditProfile.dart';
+import 'package:car_rental_project/Authorization/Menu/Menus%20Files/EditProfile.dart';
 import 'package:flutter/material.dart';
 
 class ViewProfilePage extends StatelessWidget {
