@@ -343,7 +343,16 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildBookedPage() {
-    return BookedCar(bookedCars: HomePage.bookedCars, bookedCarsMaps: []);
+    // Convert bookedCars (List<Car>) to List<Map<String, String>>
+    List<Map<String, String>> bookedCarsMaps = HomePage.bookedCars.map((car) => {
+      'name': car.name,
+      'image': car.image,
+      'address': car.address,
+      'price': car.price,
+      'category': car.category,
+    }).toList();
+
+    return BookedCar(bookedCars: bookedCarsMaps);
   }
 
   @override
