@@ -163,8 +163,9 @@ class _HomePageState extends State<HomePage> {
                     category,
                     style: TextStyle(
                       fontSize: 17,
-                      fontWeight:
-                          isSelected ? FontWeight.bold : FontWeight.normal,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
                       color: isSelected ? Colors.white : Colors.grey,
                     ),
                   ),
@@ -282,8 +283,9 @@ class _HomePageState extends State<HomePage> {
                                       style: ElevatedButton.styleFrom(
                                         backgroundColor: Colors.orange,
                                         shape: RoundedRectangleBorder(
-                                          borderRadius:
-                                              BorderRadius.circular(8),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
                                         ),
                                         padding: const EdgeInsets.symmetric(
                                           horizontal: 14,
@@ -325,8 +327,9 @@ class _HomePageState extends State<HomePage> {
 
   /// ✅ Favorites Page
   Widget buildFavoritesPage() {
-    final favoriteList =
-        cars.where((car) => favoriteCars.contains(car.name)).toList();
+    final favoriteList = cars
+        .where((car) => favoriteCars.contains(car.name))
+        .toList();
 
     return FavoritePage(
       favoriteCars: favoriteList,
@@ -341,7 +344,7 @@ class _HomePageState extends State<HomePage> {
 
   /// ✅ Booked Cars Page
   Widget buildBookedPage() {
-    return BookedCar(bookedCars: HomePage.bookedCars);
+    return Scaffold(body: Text("abc"));
   }
 
   @override
@@ -352,10 +355,10 @@ class _HomePageState extends State<HomePage> {
         child: selectedIndex == 0
             ? buildHomePage()
             : selectedIndex == 1
-                ? buildBookedPage()
-                : selectedIndex == 2
-                    ? buildFavoritesPage()
-                    : buildMenuPage(),
+            ? buildBookedPage()
+            : selectedIndex == 2
+            ? buildFavoritesPage()
+            : buildMenuPage(),
       ),
 
       /// Bottom Nav
