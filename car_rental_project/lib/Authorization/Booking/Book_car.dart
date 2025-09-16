@@ -5,8 +5,10 @@ import 'package:flutter/material.dart';
 
 class BookingPage extends StatefulWidget {
   final Car car;
+  // ✅ ADDED: Callback function to pass booked car data back
+  final Function(Map<String, dynamic> bookingDetails) onCarBooked;
 
-  const BookingPage({super.key, required this.car});
+  const BookingPage({super.key, required this.car, required this.onCarBooked});
 
   @override
   State<BookingPage> createState() => _BookingPageState();
@@ -280,53 +282,38 @@ class _BookingPageState extends State<BookingPage> {
                       vertical: 12,
                     ),
                     child: ElevatedButton(
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: const Color(
-                          0xFF3B221D,
-                        ), // ✅ chocolate brown
-                        shape:
-                            const StadiumBorder(), // ✅ pill shape (like your image)
-                        padding: const EdgeInsets.symmetric(
-                          vertical: 16,
-                        ), // a bit more height
-                        elevation:
-                            0, // ✅ flat look (optional, matches screenshot)
-                      ),
-                      onPressed: () {
-                        if (startDate != null && endDate != null) {
-                          // Create a temporary map to store the car + dates
-                          final bookedCarInfo = {
-                            'car': widget.car,
-                            'startDate':
-                                "${startDate!.day}/${startDate!.month}/${startDate!.year}",
-                            'endDate':
-                                "${endDate!.day}/${endDate!.month}/${endDate!.year}",
-                          };
+  style: ElevatedButton.styleFrom(
+    backgroundColor: Colors.orange,
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(8),
+    ),
+    padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
+  ),
+  onPressed: () {
+    Navigator.push(
+      context,
+      MaterialPageRoute(
+        builder: (context) => BookingPage(
+          car: car,
+          onCarBooked: (bookingDetails) {
+            setState(() {
+              HomePage.bookedCars.add(bookingDetails);
+            });
+          },
+        ),
+      ),
+    );
+  },
+  child: Text(
+    car.price,
+    style: TextStyle(
+      color: Colors.white,
+      fontWeight: FontWeight.bold,
+      fontSize: 14,
+    ),
+  ),
+)
 
-                          // Add this map to HomePage.bookedCars
-                          HomePage.bookedCarsMaps.add(bookedCarInfo);
-
-                          Navigator.pop(context, 1); // go back to booked tab
-                        } else {
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text(
-                                "Please select both start and end dates",
-                              ),
-                            ),
-                          );
-                        }
-                      },
-
-                      child: Text(
-                        "Total ${car.price}",
-                        style: const TextStyle(
-                          fontSize: 16,
-                          color: Colors.white,
-                          fontWeight: FontWeight.w600,
-                        ),
-                      ),
-                    ),
                   ),
                 ],
               ),

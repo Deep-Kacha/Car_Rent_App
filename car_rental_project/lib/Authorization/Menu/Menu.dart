@@ -1,7 +1,7 @@
-import 'package:car_rental_project/Menu/Account.dart';
-import 'package:car_rental_project/Menu/ChangePassword.dart';
-import 'package:car_rental_project/Menu/EditProfile.dart';
-import 'package:car_rental_project/Menu/ViewProfile.dart';
+import 'package:car_rental_project/Authorization/Menu/Menus%20Files/Account.dart';
+import 'package:car_rental_project/Authorization/Menu/Menus%20Files/ChangePassword.dart';
+import 'package:car_rental_project/Authorization/Menu/Menus%20Files/EditProfile.dart';
+import 'package:car_rental_project/Authorization/Menu/Menus%20Files/ViewProfile.dart';
 import 'package:flutter/material.dart';
 
 class MenuPage extends StatelessWidget {
