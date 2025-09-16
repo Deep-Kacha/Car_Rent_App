@@ -1,9 +1,34 @@
 import 'package:flutter/material.dart';
 
-class BookedCar extends StatelessWidget {
-  final List<Map<String, String>> bookedCars;
+class BookedCar extends StatefulWidget {
+  final List<Map<String, dynamic>> bookedCars;
 
   const BookedCar({Key? key, required this.bookedCars}) : super(key: key);
+
+  @override
+  State<BookedCar> createState() => _BookedCarState();
+}
+
+class _BookedCarState extends State<BookedCar> {
+  late List<Map<String, dynamic>> localBookedCars;
+
+  @override
+  void initState() {
+    super.initState();
+    // Make a copy of bookedCars so we can modify it
+    localBookedCars = List.from(widget.bookedCars);
+  }
+
+  void cancelBooking(int index) {
+    final car = localBookedCars[index]['car'];
+    setState(() {
+      localBookedCars.removeAt(index);
+    });
+
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text("${car.name} booking cancelled")));
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -15,28 +40,29 @@ class BookedCar extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Text(
+              const Text(
                 "Booked Car",
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
               ),
-
               const SizedBox(height: 20),
 
               /// List of booked cars
               Expanded(
-                child: bookedCars.isEmpty
-                    ? Center(
+                child: localBookedCars.isEmpty
+                    ? const Center(
                         child: Text(
                           "No Cars Booked Yet",
                           style: TextStyle(color: Colors.grey, fontSize: 16),
                         ),
                       )
                     : ListView.builder(
-                        itemCount: bookedCars.length,
+                        itemCount: localBookedCars.length,
                         itemBuilder: (context, index) {
-                          final car = bookedCars[index];
+                          final booking = localBookedCars[index];
+                          final car = booking['car'];
+
                           return Container(
-                            margin: EdgeInsets.only(bottom: 16),
+                            margin: const EdgeInsets.only(bottom: 16),
                             decoration: BoxDecoration(
                               color: Colors.white,
                               borderRadius: BorderRadius.circular(15),
@@ -44,7 +70,7 @@ class BookedCar extends StatelessWidget {
                                 BoxShadow(
                                   color: Colors.black.withOpacity(0.1),
                                   blurRadius: 5,
-                                  offset: Offset(0, 3),
+                                  offset: const Offset(0, 3),
                                 ),
                               ],
                             ),
@@ -52,12 +78,12 @@ class BookedCar extends StatelessWidget {
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 ClipRRect(
-                                  borderRadius: BorderRadius.only(
+                                  borderRadius: const BorderRadius.only(
                                     topLeft: Radius.circular(15),
                                     topRight: Radius.circular(15),
                                   ),
                                   child: Image.asset(
-                                    car["image"]!,
+                                    car.image,
                                     height: 180,
                                     width: double.infinity,
                                     fit: BoxFit.cover,
@@ -65,14 +91,14 @@ class BookedCar extends StatelessWidget {
                                 ),
                                 Container(
                                   width: double.infinity,
-                                  decoration: BoxDecoration(
+                                  decoration: const BoxDecoration(
                                     color: Color(0xFF3E2723),
                                     borderRadius: BorderRadius.only(
                                       bottomLeft: Radius.circular(15),
                                       bottomRight: Radius.circular(15),
                                     ),
                                   ),
-                                  padding: EdgeInsets.all(12),
+                                  padding: const EdgeInsets.all(12),
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
@@ -82,33 +108,11 @@ class BookedCar extends StatelessWidget {
                                             MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
-                                            car["name"]!,
-                                            style: TextStyle(
+                                            car.name,
+                                            style: const TextStyle(
                                               fontSize: 16,
                                               fontWeight: FontWeight.bold,
                                               color: Colors.white,
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      SizedBox(height: 4),
-                                      Text(
-                                        car["details"] ?? "",
-                                        style: TextStyle(
-                                          color: Colors.white,
-                                          fontSize: 12,
-                                        ),
-                                      ),
-                                      SizedBox(height: 4),
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            car["address"] ?? "",
-                                            style: TextStyle(
-                                              color: Colors.white,
-                                              fontSize: 12,
                                             ),
                                           ),
                                           ElevatedButton(
@@ -118,24 +122,16 @@ class BookedCar extends StatelessWidget {
                                                 borderRadius:
                                                     BorderRadius.circular(8),
                                               ),
-                                              padding: EdgeInsets.symmetric(
-                                                horizontal: 14,
-                                                vertical: 6,
-                                              ),
+                                              padding:
+                                                  const EdgeInsets.symmetric(
+                                                    horizontal: 14,
+                                                    vertical: 6,
+                                                  ),
                                             ),
                                             onPressed: () {
-                                              // Cancel booking action
-                                              ScaffoldMessenger.of(
-                                                context,
-                                              ).showSnackBar(
-                                                SnackBar(
-                                                  content: Text(
-                                                    "${car["name"]} booking cancelled",
-                                                  ),
-                                                ),
-                                              );
+                                              cancelBooking(index);
                                             },
-                                            child: Text(
+                                            child: const Text(
                                               "Cancel",
                                               style: TextStyle(
                                                 color: Colors.white,
@@ -145,6 +141,22 @@ class BookedCar extends StatelessWidget {
                                             ),
                                           ),
                                         ],
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        "Location: ${car.address}",
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 4),
+                                      Text(
+                                        "Dates: ${booking['startDate']} → ${booking['endDate']}",
+                                        style: const TextStyle(
+                                          color: Colors.white70,
+                                          fontSize: 12,
+                                        ),
                                       ),
                                     ],
                                   ),
@@ -162,3 +174,4 @@ class BookedCar extends StatelessWidget {
     );
   }
 }
+S
