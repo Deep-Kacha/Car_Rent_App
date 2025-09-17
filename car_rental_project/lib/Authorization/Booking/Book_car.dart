@@ -1,4 +1,4 @@
-// import 'package:car_rental_project/Authorization/Booking/Booked_Car.dart';
+import 'package:car_rental_project/Authorization/Booking/Booked_Car.dart';
 import 'package:car_rental_project/Authorization/Home%20Page/car_model.dart';
 import 'package:car_rental_project/Authorization/Home%20Page/home_page.dart';
 import 'package:flutter/material.dart';
@@ -282,38 +282,40 @@ class _BookingPageState extends State<BookingPage> {
                       vertical: 12,
                     ),
                     child: ElevatedButton(
-  style: ElevatedButton.styleFrom(
-    backgroundColor: Colors.orange,
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(8),
-    ),
-    padding: EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-  ),
-  onPressed: () {
-    Navigator.push(
-      context,
-      MaterialPageRoute(
-        builder: (context) => BookingPage(
-          car: car,
-          onCarBooked: (bookingDetails) {
-            setState(() {
-              HomePage.bookedCars.add(bookingDetails);
-            });
-          },
-        ),
-      ),
-    );
-  },
-  child: Text(
-    car.price,
-    style: TextStyle(
-      color: Colors.white,
-      fontWeight: FontWeight.bold,
-      fontSize: 14,
-    ),
-  ),
-)
-
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: Colors.orange,
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        padding: EdgeInsets.symmetric(
+                          horizontal: 14,
+                          vertical: 6,
+                        ),
+                      ),
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => BookingPage(
+                              car: car,
+                              onCarBooked: (bookingDetails) {
+                                setState(() {
+                                  HomePage.bookedCars.add(bookingDetails);
+                                });
+                              },
+                            ),
+                          ),
+                        );
+                      },
+                      child: Text(
+                        car.price,
+                        style: TextStyle(
+                          color: Colors.white,
+                          fontWeight: FontWeight.bold,
+                          fontSize: 14,
+                        ),
+                      ),
+                    ),
                   ),
                 ],
               ),

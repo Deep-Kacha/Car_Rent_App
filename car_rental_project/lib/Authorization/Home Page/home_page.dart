@@ -344,8 +344,11 @@ class _HomePageState extends State<HomePage> {
 
   /// ✅ Booked Cars Page
   Widget buildBookedPage() {
-    return Scaffold(body: Text("abc"));
-  }
+  return BookedCar(
+    bookedCars: HomePage.bookedCars,
+  );
+}
+
 
   @override
   Widget build(BuildContext context) {

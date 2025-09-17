@@ -4,12 +4,12 @@ import 'package:car_rental_project/Authorization/Home%20Page/car_model.dart';
 class BookedCar extends StatelessWidget {
   final List<Map<String, dynamic>> bookedCars;
 
-  const BookedCar({super.key, required this.bookedCars});
+  const BookedCar({Key? key, required this.bookedCars}) : super(key: key);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.black87, // dark background like your image
+      backgroundColor: Colors.black87,
       appBar: AppBar(
         backgroundColor: Colors.black87,
         elevation: 0,
@@ -36,67 +36,71 @@ class BookedCar extends StatelessWidget {
                 return Container(
                   margin: const EdgeInsets.only(bottom: 16),
                   decoration: BoxDecoration(
+                    borderRadius: BorderRadius.circular(12),
                     color: Colors.white,
-                    borderRadius: BorderRadius.circular(20),
                   ),
-                  child: Column(
+                  child: Row(
                     children: [
-                      // Car Image
+                      /// Car image
                       ClipRRect(
-                        borderRadius: const BorderRadius.vertical(
-                          top: Radius.circular(20),
+                        borderRadius: const BorderRadius.only(
+                          topLeft: Radius.circular(12),
+                          bottomLeft: Radius.circular(12),
                         ),
                         child: Image.asset(
                           car.image,
-                          height: 150,
-                          width: double.infinity,
+                          width: 120,
+                          height: 90,
                           fit: BoxFit.cover,
                         ),
                       ),
-                      // Car details
-                      Container(
-                        width: double.infinity,
-                        decoration: BoxDecoration(
-                          color: const Color(0xFF3E2723), // brown
-                          borderRadius: const BorderRadius.vertical(
-                            bottom: Radius.circular(20),
+
+                      /// Car details (brown background)
+                      Expanded(
+                        child: Container(
+                          padding: const EdgeInsets.all(10),
+                          decoration: const BoxDecoration(
+                            color: Color(0xFF3E2723), // Brown background
+                            borderRadius: BorderRadius.only(
+                              topRight: Radius.circular(12),
+                              bottomRight: Radius.circular(12),
+                            ),
                           ),
-                        ),
-                        padding: const EdgeInsets.all(12),
-                        child: Column(
-                          crossAxisAlignment: CrossAxisAlignment.start,
-                          children: [
-                            Text(
-                              car.name,
-                              style: const TextStyle(
-                                fontSize: 18,
-                                fontWeight: FontWeight.bold,
-                                color: Colors.white,
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(
+                                car.name,
+                                style: const TextStyle(
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            const SizedBox(height: 6),
-                            Text(
-                              "Start Date : ${booking['startDate']}",
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.white,
+                              const SizedBox(height: 4),
+                              Text(
+                                "Start Date : ${booking['startDate']}",
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            Text(
-                              "End Date : ${booking['endDate']}",
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.white,
+                              Text(
+                                "End Date : ${booking['endDate']}",
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                            Text(
-                              "Location : ${car.address}",
-                              style: const TextStyle(
-                                fontSize: 14,
-                                color: Colors.white,
+                              Text(
+                                "Location : ${car.address}",
+                                style: const TextStyle(
+                                  fontSize: 13,
+                                  color: Colors.white,
+                                ),
                               ),
-                            ),
-                          ],
+                            ],
+                          ),
                         ),
                       ),
                     ],
