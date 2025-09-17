@@ -9,6 +9,8 @@ import 'car_data.dart';
 class HomePage extends StatefulWidget {
   static List<Map<String, dynamic>> bookedCarsMaps = [];
 
+  static var bookedCars;
+
   @override
   _HomePageState createState() => _HomePageState();
 }
@@ -268,8 +270,14 @@ class _HomePageState extends State<HomePage> {
                                         await Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                BookingPage(car: car),
+                                            builder: (context) => BookingPage(
+                                              car: car,
+                                              onCarBooked:
+                                                  (
+                                                    Map<String, dynamic>
+                                                    bookingDetails,
+                                                  ) {},
+                                            ),
                                           ),
                                         );
                                         setState(
@@ -331,7 +339,6 @@ class _HomePageState extends State<HomePage> {
             : buildMenuPage(),
       ),
       bottomNavigationBar: Container(
-        height: 70,
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -343,7 +350,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-        padding: const EdgeInsets.symmetric(vertical: 4),
         child: BottomNavigationBar(
           currentIndex: selectedIndex,
           onTap: (index) {
