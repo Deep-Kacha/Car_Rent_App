@@ -1,18 +1,15 @@
-import 'package:car_rental_project/Authorization/Booking/book_car.dart';
-import 'package:car_rental_project/Authorization/Booking/booked_car.dart';
-import 'package:car_rental_project/Authorization/Favorite_car/favorite.dart';
-import 'package:car_rental_project/Authorization/Menu/menu.dart';
+import 'package:car_rental_project/Authorization/Booking/Book_car.dart';
+import 'package:car_rental_project/Authorization/Booking/Booked_Car.dart';
+import 'package:car_rental_project/Authorization/Favorite_car/Favorite.dart';
+import 'package:car_rental_project/Authorization/Menu/Menu.dart';
 import 'package:flutter/material.dart';
 import 'car_model.dart';
 import 'car_data.dart';
 
 class HomePage extends StatefulWidget {
-<<<<<<< HEAD
-  /// List to store all booked cars
-  static List<Map<String, dynamic>> bookedCars = [];
-=======
   static List<Map<String, dynamic>> bookedCarsMaps = [];
->>>>>>> 635ffeb6aac54d4a5e8ad655ce0e4f240b069e88
+
+  static var bookedCars;
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -50,36 +47,6 @@ class _HomePageState extends State<HomePage> {
         .toList();
   }
 
-<<<<<<< HEAD
-  Widget buildNavItem(IconData icon, String label, int index) {
-    bool isSelected = selectedIndex == index;
-    return GestureDetector(
-      onTap: () {
-        setState(() {
-          selectedIndex = index;
-        });
-      },
-      child: Column(
-        mainAxisSize: MainAxisSize.min,
-        children: [
-          Icon(icon, size: 25, color: isSelected ? Colors.black : Colors.grey),
-          const SizedBox(height: 6),
-          Text(
-            label,
-            style: TextStyle(
-              color: isSelected ? Colors.black : Colors.grey,
-              fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-              fontSize: 14,
-            ),
-          ),
-        ],
-      ),
-    );
-  }
-
-  /// ✅ Home Page
-=======
->>>>>>> 635ffeb6aac54d4a5e8ad655ce0e4f240b069e88
   Widget buildHomePage() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -91,18 +58,13 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
-<<<<<<< HEAD
-                children: [
-                  const CircleAvatar(
-=======
                 children: const [
                   CircleAvatar(
->>>>>>> 635ffeb6aac54d4a5e8ad655ce0e4f240b069e88
                     radius: 22,
                     backgroundImage: AssetImage("assets/images/profile.jpg"),
                   ),
-                  const SizedBox(width: 15),
-                  const Text(
+                  SizedBox(width: 15),
+                  Text(
                     "Ethan John",
                     style: TextStyle(
                       fontSize: 26,
@@ -112,13 +74,13 @@ class _HomePageState extends State<HomePage> {
                   ),
                 ],
               ),
-              const SizedBox(height: 15),
+              SizedBox(height: 15),
               TextField(
                 decoration: InputDecoration(
                   hintText: "Search cars near you...",
-                  prefixIcon: const Icon(Icons.search),
+                  prefixIcon: Icon(Icons.search),
                   filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
+                  fillColor: Color(0xFFF5F5F5),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.all(Radius.circular(12)),
                     borderSide: BorderSide.none,
@@ -308,8 +270,14 @@ class _HomePageState extends State<HomePage> {
                                         await Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) =>
-                                                BookingPage(car: car),
+                                            builder: (context) => BookingPage(
+                                              car: car,
+                                              onCarBooked:
+                                                  (
+                                                    Map<String, dynamic>
+                                                    bookingDetails,
+                                                  ) {},
+                                            ),
                                           ),
                                         );
                                         setState(
@@ -353,18 +321,9 @@ class _HomePageState extends State<HomePage> {
 
   Widget buildMenuPage() => MenuPage();
 
-  /// ✅ Booked Cars Page
   Widget buildBookedPage() {
-<<<<<<< HEAD
-  return BookedCar(
-    bookedCars: HomePage.bookedCars,
-  );
-}
-
-=======
     return BookedCar(bookedCars: HomePage.bookedCarsMaps);
   }
->>>>>>> 635ffeb6aac54d4a5e8ad655ce0e4f240b069e88
 
   @override
   Widget build(BuildContext context) {
@@ -380,7 +339,6 @@ class _HomePageState extends State<HomePage> {
             : buildMenuPage(),
       ),
       bottomNavigationBar: Container(
-        height: 70,
         decoration: const BoxDecoration(
           color: Colors.white,
           borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
@@ -392,17 +350,6 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
-<<<<<<< HEAD
-        padding: const EdgeInsets.symmetric(vertical: 8),
-        child: Row(
-          mainAxisAlignment: MainAxisAlignment.spaceAround,
-          children: [
-            buildNavItem(Icons.home, "Home", 0),
-            buildNavItem(Icons.directions_car, "Booked", 1),
-            buildNavItem(Icons.favorite_border, "Favorite", 2),
-            buildNavItem(Icons.menu, "Menu", 3),
-=======
-        padding: const EdgeInsets.symmetric(vertical: 4),
         child: BottomNavigationBar(
           currentIndex: selectedIndex,
           onTap: (index) {
@@ -426,7 +373,6 @@ class _HomePageState extends State<HomePage> {
               label: "Favorite",
             ),
             BottomNavigationBarItem(icon: Icon(Icons.menu), label: "Menu"),
->>>>>>> 635ffeb6aac54d4a5e8ad655ce0e4f240b069e88
           ],
         ),
       ),
