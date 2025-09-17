@@ -7,8 +7,12 @@ import 'car_model.dart';
 import 'car_data.dart';
 
 class HomePage extends StatefulWidget {
+<<<<<<< HEAD
   /// List to store all booked cars
   static List<Map<String, dynamic>> bookedCars = [];
+=======
+  static List<Map<String, dynamic>> bookedCarsMaps = [];
+>>>>>>> 635ffeb6aac54d4a5e8ad655ce0e4f240b069e88
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -46,6 +50,7 @@ class _HomePageState extends State<HomePage> {
         .toList();
   }
 
+<<<<<<< HEAD
   Widget buildNavItem(IconData icon, String label, int index) {
     bool isSelected = selectedIndex == index;
     return GestureDetector(
@@ -73,6 +78,8 @@ class _HomePageState extends State<HomePage> {
   }
 
   /// ✅ Home Page
+=======
+>>>>>>> 635ffeb6aac54d4a5e8ad655ce0e4f240b069e88
   Widget buildHomePage() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -84,8 +91,13 @@ class _HomePageState extends State<HomePage> {
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               Row(
+<<<<<<< HEAD
                 children: [
                   const CircleAvatar(
+=======
+                children: const [
+                  CircleAvatar(
+>>>>>>> 635ffeb6aac54d4a5e8ad655ce0e4f240b069e88
                     radius: 22,
                     backgroundImage: AssetImage("assets/images/profile.jpg"),
                   ),
@@ -108,7 +120,7 @@ class _HomePageState extends State<HomePage> {
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.all(Radius.circular(12)),
                     borderSide: BorderSide.none,
                   ),
                 ),
@@ -292,14 +304,17 @@ class _HomePageState extends State<HomePage> {
                                           vertical: 6,
                                         ),
                                       ),
-                                      onPressed: () {
-                                        Navigator.push(
+                                      onPressed: () async {
+                                        await Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (context) =>
                                                 BookingPage(car: car),
                                           ),
                                         );
+                                        setState(
+                                          () {},
+                                        ); // refresh after booking
                                       },
                                       child: Text(
                                         car.price,
@@ -325,7 +340,6 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /// ✅ Favorites Page
   Widget buildFavoritesPage() {
     final favoriteList = cars
         .where((car) => favoriteCars.contains(car.name))
@@ -337,18 +351,20 @@ class _HomePageState extends State<HomePage> {
     );
   }
 
-  /// ✅ Menu Page
-  Widget buildMenuPage() {
-    return MenuPage();
-  }
+  Widget buildMenuPage() => MenuPage();
 
   /// ✅ Booked Cars Page
   Widget buildBookedPage() {
+<<<<<<< HEAD
   return BookedCar(
     bookedCars: HomePage.bookedCars,
   );
 }
 
+=======
+    return BookedCar(bookedCars: HomePage.bookedCarsMaps);
+  }
+>>>>>>> 635ffeb6aac54d4a5e8ad655ce0e4f240b069e88
 
   @override
   Widget build(BuildContext context) {
@@ -363,8 +379,6 @@ class _HomePageState extends State<HomePage> {
             ? buildFavoritesPage()
             : buildMenuPage(),
       ),
-
-      /// Bottom Nav
       bottomNavigationBar: Container(
         height: 70,
         decoration: const BoxDecoration(
@@ -378,6 +392,7 @@ class _HomePageState extends State<HomePage> {
             ),
           ],
         ),
+<<<<<<< HEAD
         padding: const EdgeInsets.symmetric(vertical: 8),
         child: Row(
           mainAxisAlignment: MainAxisAlignment.spaceAround,
@@ -386,6 +401,32 @@ class _HomePageState extends State<HomePage> {
             buildNavItem(Icons.directions_car, "Booked", 1),
             buildNavItem(Icons.favorite_border, "Favorite", 2),
             buildNavItem(Icons.menu, "Menu", 3),
+=======
+        padding: const EdgeInsets.symmetric(vertical: 4),
+        child: BottomNavigationBar(
+          currentIndex: selectedIndex,
+          onTap: (index) {
+            setState(() {
+              selectedIndex = index;
+            });
+          },
+          selectedItemColor: Colors.black,
+          unselectedItemColor: Colors.grey,
+          showSelectedLabels: true,
+          showUnselectedLabels: false,
+          type: BottomNavigationBarType.fixed,
+          items: const [
+            BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.directions_car),
+              label: "Booking",
+            ),
+            BottomNavigationBarItem(
+              icon: Icon(Icons.favorite_border),
+              label: "Favorite",
+            ),
+            BottomNavigationBarItem(icon: Icon(Icons.menu), label: "Menu"),
+>>>>>>> 635ffeb6aac54d4a5e8ad655ce0e4f240b069e88
           ],
         ),
       ),
