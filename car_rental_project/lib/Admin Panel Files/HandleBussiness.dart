@@ -1,5 +1,10 @@
-import 'package:car_rental_project/AdminScreen/DashBoard.dart';
+import 'package:car_rental_project/Admin%20Panel%20Files/Add_Car.dart';
+import 'package:car_rental_project/Admin%20Panel%20Files/DashBoard.dart';
+import 'package:car_rental_project/Admin%20Panel%20Files/Manage_Booking.dart';
+import 'package:car_rental_project/Admin%20Panel%20Files/Manage_Cars.dart';
 import 'package:car_rental_project/Authorization/Home%20Page/home_page.dart';
+import 'package:car_rental_project/Authorization/Menu/Menus%20Files/ViewProfile.dart';
+import 'package:car_rental_project/Splash/GetStart.dart';
 import 'package:flutter/material.dart';
 
 class HandleBusinessPage extends StatelessWidget {
@@ -79,11 +84,42 @@ class HandleBusinessPage extends StatelessWidget {
                   ),
                 );
               }),
-              _buildMenuItem(Icons.directions_car, "Add Car", () {}),
-              _buildMenuItem(Icons.car_rental, "Manage Cars", () {}),
-              _buildMenuItem(Icons.book_online, "Manage Bookings", () {}),
-              _buildMenuItem(Icons.person, "Profile", () {}),
-              _buildMenuItem(Icons.logout, "Logout", () {}),
+              _buildMenuItem(Icons.directions_car, "Add Car", () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const AddCarPage()),
+                );
+              }),
+              _buildMenuItem(Icons.car_rental, "Manage Cars", () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ManageCarsPage(),
+                  ),
+                );
+              }),
+              _buildMenuItem(Icons.book_online, "Manage Bookings", () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ManageBookingsPage(),
+                  ),
+                );
+              }),
+              _buildMenuItem(Icons.person, "Profile", () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ViewProfilePage(),
+                  ),
+                );
+              }),
+              _buildMenuItem(Icons.logout, "Logout", () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => const GetStart()),
+                );
+              }),
 
               const Spacer(),
 
