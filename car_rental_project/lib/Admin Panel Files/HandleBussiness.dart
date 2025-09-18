@@ -1,3 +1,4 @@
+import 'package:car_rental_project/AdminScreen/DashBoard.dart';
 import 'package:car_rental_project/Authorization/Home%20Page/home_page.dart';
 import 'package:flutter/material.dart';
 
@@ -70,7 +71,14 @@ class HandleBusinessPage extends StatelessWidget {
               const SizedBox(height: 30),
 
               // Menu Items with icons
-              _buildMenuItem(Icons.dashboard, "Dashboard", () {}),
+              _buildMenuItem(Icons.dashboard, "Dashboard", () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const DashboardPage(),
+                  ),
+                );
+              }),
               _buildMenuItem(Icons.directions_car, "Add Car", () {}),
               _buildMenuItem(Icons.car_rental, "Manage Cars", () {}),
               _buildMenuItem(Icons.book_online, "Manage Bookings", () {}),
