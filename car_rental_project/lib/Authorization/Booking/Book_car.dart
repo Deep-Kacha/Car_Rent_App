@@ -4,8 +4,9 @@ import 'package:flutter/material.dart';
 
 class BookingPage extends StatefulWidget {
   final Car car;
+  final Function(Map<String, dynamic> bookingDetails) onCarBooked;
 
-  const BookingPage({super.key, required this.car});
+  const BookingPage({super.key, required this.car, required this.onCarBooked});
 
   @override
   State<BookingPage> createState() => _BookingPageState();
@@ -113,21 +114,36 @@ class _BookingPageState extends State<BookingPage> {
                 /// Location
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Row(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      const Icon(
-                        Icons.location_on_outlined,
-                        color: Colors.grey,
-                        size: 18,
-                      ),
-                      const SizedBox(width: 6),
+                      SizedBox(height: 12),
                       Text(
-                        car.address,
-                        style: const TextStyle(
+                        "Pickup & Return Location",
+                        style: TextStyle(
                           fontSize: 18,
-                          color: Colors.grey,
-                          fontWeight: FontWeight.w500,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade800,
                         ),
+                      ),
+                      SizedBox(height: 30),
+                      Row(
+                        children: [
+                          const Icon(
+                            Icons.location_on_outlined,
+                            color: Colors.grey,
+                            size: 18,
+                          ),
+                          const SizedBox(width: 6),
+                          Text(
+                            car.address,
+                            style: const TextStyle(
+                              fontSize: 18,
+                              color: Colors.grey,
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
@@ -136,31 +152,65 @@ class _BookingPageState extends State<BookingPage> {
 
                 /// Features
                 Padding(
-                  padding: const EdgeInsets.all(12),
-                  child: Text(
-                    "Car Features",
-                    style: TextStyle(
-                      fontSize: 18,
-                      fontWeight: FontWeight.w600,
-                      color: Colors.grey.shade800,
-                    ),
-                  ),
-                ),
-                Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
-                  child: Wrap(
-                    spacing: 10,
-                    runSpacing: 8,
-                    children: car.features
-                        .map(
-                          (f) => Chip(
-                            label: Text(f),
-                            backgroundColor: Colors.grey.shade200,
-                          ),
-                        )
-                        .toList(),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      SizedBox(height: 12),
+                      const Text(
+                        "Car Basics & Features",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w500,
+                        ),
+                      ),
+                      const SizedBox(height: 12),
+
+                      // Grid with exactly 2 columns
+                      GridView.builder(
+                        shrinkWrap: true,
+                        physics: const NeverScrollableScrollPhysics(),
+                        itemCount: car.features.length,
+                        gridDelegate:
+                            const SliverGridDelegateWithFixedCrossAxisCount(
+                              crossAxisCount: 2, // <- 2 items per row
+                              mainAxisSpacing: 12, // vertical gap
+                              crossAxisSpacing: 20, // horizontal gap
+                              childAspectRatio:
+                                  4, // width / height ratio (tweak if needed)
+                            ),
+                        itemBuilder: (context, index) {
+                          final f = car.features[index];
+                          return Row(
+                            crossAxisAlignment: CrossAxisAlignment.center,
+                            children: [
+                              Container(
+                                width: 7,
+                                height: 8,
+                                decoration: const BoxDecoration(
+                                  color: Colors.grey,
+                                  shape: BoxShape.circle,
+                                ),
+                              ),
+                              const SizedBox(width: 8),
+                              Expanded(
+                                child: Text(
+                                  f,
+                                  style: const TextStyle(
+                                    fontSize: 20,
+                                    color: Colors.grey,
+                                  ),
+                                  overflow: TextOverflow.ellipsis,
+                                ),
+                              ),
+                            ],
+                          );
+                        },
+                      ),
+                    ],
                   ),
                 ),
+
                 const Divider(),
 
                 /// Description
@@ -184,31 +234,39 @@ class _BookingPageState extends State<BookingPage> {
                 ),
                 const Divider(),
 
-                /// Warning Section
+                /// Warning
                 Padding(
                   padding: const EdgeInsets.all(12),
-                  child: Row(
-                    children: const [
-                      Icon(
-                        Icons.warning_amber_rounded,
-                        color: Colors.orange,
-                        size: 20,
-                      ),
-                      SizedBox(width: 6),
-                      Expanded(
-                        child: Text(
-                          "Payment will be required at the time of car pick-up.",
-                          style: TextStyle(
-                            fontSize: 14,
-                            color: Colors.orange,
-                            fontWeight: FontWeight.w600,
-                          ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(
+                        "Warning",
+                        style: TextStyle(
+                          fontSize: 18,
+                          fontWeight: FontWeight.w600,
+                          color: Colors.grey.shade800,
                         ),
+                      ),
+                      SizedBox(height: 12),
+                      Row(
+                        children: const [
+                          SizedBox(width: 6),
+                          Expanded(
+                            child: Text(
+                              "Payment will be required at the time of car pick-up.",
+                              style: TextStyle(
+                                fontSize: 14,
+                                color: Colors.orange,
+                                fontWeight: FontWeight.w600,
+                              ),
+                            ),
+                          ),
+                        ],
                       ),
                     ],
                   ),
                 ),
-                const Divider(),
 
                 /// Book Button
                 Container(
@@ -223,7 +281,6 @@ class _BookingPageState extends State<BookingPage> {
                     ),
                     onPressed: () {
                       if (startDate != null && endDate != null) {
-                        // Store as a map
                         final bookedCarInfo = {
                           'car': widget.car,
                           'startDate':
@@ -233,6 +290,8 @@ class _BookingPageState extends State<BookingPage> {
                         };
 
                         HomePage.bookedCarsMaps.add(bookedCarInfo);
+
+                        widget.onCarBooked(bookedCarInfo);
 
                         Navigator.pop(context, 1);
                       } else {

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:car_rental_project/Authorization/Home%20Page/car_model.dart';
 
 class BookedCar extends StatefulWidget {
   final List<Map<String, dynamic>> bookedCars;
@@ -59,100 +60,67 @@ class _BookedCarState extends State<BookedCar> {
                         itemCount: localBookedCars.length,
                         itemBuilder: (context, index) {
                           final booking = localBookedCars[index];
-                          final car = booking['car'];
+                          final car = booking['car'] as Car;
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 16),
+                            height: 120,
+                            width: double.infinity,
                             decoration: BoxDecoration(
-                              color: Colors.white,
-                              borderRadius: BorderRadius.circular(15),
-                              boxShadow: [
-                                BoxShadow(
-                                  color: Colors.black.withOpacity(0.1),
-                                  blurRadius: 5,
-                                  offset: const Offset(0, 3),
-                                ),
-                              ],
+                              color: const Color(
+                                0xFF3E2723,
+                              ), // brown background
+                              borderRadius: BorderRadius.circular(12),
                             ),
-                            child: Column(
+                            padding: const EdgeInsets.all(10),
+                            child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
+                                /// Car Image (left side)
                                 ClipRRect(
-                                  borderRadius: const BorderRadius.only(
-                                    topLeft: Radius.circular(15),
-                                    topRight: Radius.circular(15),
-                                  ),
+                                  borderRadius: BorderRadius.circular(10),
                                   child: Image.asset(
                                     car.image,
-                                    height: 180,
-                                    width: double.infinity,
+                                    width: 150,
+                                    height: 100,
                                     fit: BoxFit.cover,
                                   ),
                                 ),
-                                Container(
-                                  width: double.infinity,
-                                  decoration: const BoxDecoration(
-                                    color: Color(0xFF3E2723),
-                                    borderRadius: BorderRadius.only(
-                                      bottomLeft: Radius.circular(15),
-                                      bottomRight: Radius.circular(15),
-                                    ),
-                                  ),
-                                  padding: const EdgeInsets.all(12),
+
+                                const SizedBox(width: 12),
+
+                                /// Car Details (right side)
+                                Expanded(
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
+                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
-                                      Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.spaceBetween,
-                                        children: [
-                                          Text(
-                                            car.name,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.bold,
-                                              color: Colors.white,
-                                            ),
-                                          ),
-                                          ElevatedButton(
-                                            style: ElevatedButton.styleFrom(
-                                              backgroundColor: Colors.red,
-                                              shape: RoundedRectangleBorder(
-                                                borderRadius:
-                                                    BorderRadius.circular(8),
-                                              ),
-                                              padding:
-                                                  const EdgeInsets.symmetric(
-                                                    horizontal: 14,
-                                                    vertical: 6,
-                                                  ),
-                                            ),
-                                            onPressed: () {
-                                              cancelBooking(index);
-                                            },
-                                            child: const Text(
-                                              "Cancel",
-                                              style: TextStyle(
-                                                color: Colors.white,
-                                                fontWeight: FontWeight.bold,
-                                                fontSize: 14,
-                                              ),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                      const SizedBox(height: 4),
                                       Text(
-                                        "Location: ${car.address}",
+                                        car.name,
+                                        style: const TextStyle(
+                                          fontSize: 14,
+                                          fontWeight: FontWeight.bold,
+                                          color: Colors.white,
+                                        ),
+                                      ),
+                                      const SizedBox(height: 6),
+                                      Text(
+                                        "Start Date : ${booking['startDate']}",
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 12,
                                         ),
                                       ),
-                                      const SizedBox(height: 4),
                                       Text(
-                                        "Dates: ${booking['startDate']} → ${booking['endDate']}",
+                                        "End Date : ${booking['endDate']}",
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 12,
+                                        ),
+                                      ),
+                                      Text(
+                                        "Location : ${car.address}",
                                         style: const TextStyle(
                                           color: Colors.white70,
                                           fontSize: 12,

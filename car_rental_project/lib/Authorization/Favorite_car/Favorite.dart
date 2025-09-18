@@ -146,7 +146,7 @@ class FavoritePage extends StatelessWidget {
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
-                                                    BookingPage(car: car),
+                                                    BookingPage(car: car, onCarBooked: (Map<String, dynamic> bookingDetails) {  },),
                                               ),
                                             );
                                           },
