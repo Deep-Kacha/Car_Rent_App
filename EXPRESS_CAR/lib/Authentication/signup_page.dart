@@ -1,7 +1,7 @@
+import 'package:express_car/HomeDetails/Home_Page/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:express_car/UserPages/dashboard_page.dart';
 import 'package:flutter/gestures.dart';
 import 'TermsConditions.dart';
 import 'enter_otp.dart';
@@ -67,7 +67,7 @@ class _SignUpPageState extends State<SignUpPage> {
       );
       Navigator.pushAndRemoveUntil(
         context,
-        MaterialPageRoute(builder: (context) => DashboardPage()),
+        MaterialPageRoute(builder: (context) => HomePage()),
         (route) => false,
       );
     } catch (e) {

@@ -1,4 +1,4 @@
-import 'package:express_car/UserPages/dashboard_page.dart';
+import 'package:express_car/HomeDetails/Home_Page/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -39,7 +39,7 @@ class _SignInPageState extends State<SignInPage> {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => DashboardPage()),
+        MaterialPageRoute(builder: (context) => HomePage()),
       );
     } on FirebaseAuthException catch (e) {
       String message = 'Sign in failed: ';
@@ -85,7 +85,7 @@ class _SignInPageState extends State<SignInPage> {
       );
       Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => DashboardPage()),
+        MaterialPageRoute(builder: (context) => HomePage()),
       );
     } catch (e) {
       ScaffoldMessenger.of(

@@ -22,14 +22,14 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
     },
   ];
 
-  // ✅ Confirm booking
+  //  Confirm booking
   void _confirmBooking(int index) {
     setState(() {
       bookings[index]["status"] = "confirmed";
     });
   }
 
-  // ✅ Cancel booking (only if not confirmed)
+  //  Cancel booking (only if not confirmed)
   void _cancelBooking(int index) {
     if (bookings[index]["status"] == "confirmed") {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -43,7 +43,7 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
     });
   }
 
-  // ✅ Status badge widget
+  //  Status badge widget
   Widget _statusBadge(String status) {
     Color bgColor;
     Color textColor;
@@ -194,7 +194,7 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
 
                           // Confirm/Cancel buttons (only for pending)
                           if (status == "pending")
-                            Row(
+                            Column(
                               mainAxisSize: MainAxisSize.min,
                               children: [
                                 TextButton(

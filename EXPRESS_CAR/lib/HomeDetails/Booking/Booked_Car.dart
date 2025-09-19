@@ -64,7 +64,7 @@ class _BookedCarState extends State<BookedCar> {
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 16),
-                            height: 140,
+                            height: 150,
                             width: double.infinity,
                             decoration: BoxDecoration(
                               color: const Color(
@@ -81,8 +81,8 @@ class _BookedCarState extends State<BookedCar> {
                                   borderRadius: BorderRadius.circular(10),
                                   child: Image.asset(
                                     car.image,
-                                    width: 120,
-                                    height: 100,
+                                    width: 150,
+                                    height: 150,
                                     fit: BoxFit.cover,
                                   ),
                                 ),

@@ -1,3 +1,5 @@
+import 'package:express_car/HomeDetails/Menu/Menu.dart';
+
 import 'Add_Car.dart';
 import 'DashBoard.dart';
 import 'Manage_Booking.dart';
@@ -10,7 +12,6 @@ import 'package:flutter/material.dart';
 
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-
 
 class HandleBusinessPage extends StatelessWidget {
   const HandleBusinessPage({Key? key}) : super(key: key);
@@ -31,7 +32,12 @@ class HandleBusinessPage extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
-                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const MenuPage(),
+                        ),
+                      );
                     },
                   ),
                   const Expanded(
@@ -129,14 +135,14 @@ class HandleBusinessPage extends StatelessWidget {
                   ),
                 );
               }),
-              _buildMenuItem(Icons.logout, "Logout",  () async {
-              await FirebaseAuth.instance.signOut();
-              await GoogleSignIn().signOut();
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => GetStart()), 
-                (route) => false,
-              );
-            },),
+              _buildMenuItem(Icons.logout, "Logout", () async {
+                await FirebaseAuth.instance.signOut();
+                await GoogleSignIn().signOut();
+                Navigator.of(context).pushAndRemoveUntil(
+                  MaterialPageRoute(builder: (context) => GetStart()),
+                  (route) => false,
+                );
+              }),
 
               const Spacer(),
 

@@ -1,5 +1,5 @@
+import 'package:express_car/HomeDetails/Home_Page/home_page.dart';
 import 'package:express_car/Splash/GetStart.dart';
-import 'package:express_car/UserPages/dashboard_page.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
@@ -14,15 +14,13 @@ class AuthWrapper extends StatelessWidget {
         // While waiting for connection, show a loading indicator
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Scaffold(
-            body: Center(
-              child: CircularProgressIndicator(),
-            ),
+            body: Center(child: CircularProgressIndicator()),
           );
         }
 
         // If user is logged in, show Dashboard
         if (snapshot.hasData) {
-          return DashboardPage();
+          return HomePage();
         }
 
         // If user is not logged in, show Get Started page

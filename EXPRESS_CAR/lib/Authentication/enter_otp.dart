@@ -1,7 +1,7 @@
+import 'package:express_car/HomeDetails/Home_Page/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:pinput/pinput.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:express_car/UserPages/dashboard_page.dart';
 
 class VerifyCodeScreen extends StatefulWidget {
   final String email;
@@ -221,7 +221,7 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
           _showSnackBar('Registration successful!');
           Navigator.pushAndRemoveUntil(
             context,
-            MaterialPageRoute(builder: (context) => DashboardPage()),
+            MaterialPageRoute(builder: (context) => HomePage()),
             (route) => false,
           );
         }
