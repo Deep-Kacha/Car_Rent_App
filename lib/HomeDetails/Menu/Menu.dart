@@ -5,6 +5,8 @@ import 'package:express_car/HomeDetails/Menu/Menus_Files/EditProfile.dart';
 import 'package:express_car/HomeDetails/Menu/Menus_Files/ViewProfile.dart';
 import 'package:express_car/Splash/GetStart.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({Key? key}) : super(key: key);
@@ -116,14 +118,14 @@ class MenuPage extends StatelessWidget {
                         );
                       },
                     ),
-                    _buildMenuItem(Icons.logout, "Log Out", () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const GetStart(),
-                        ),
-                      );
-                    }),
+                    _buildMenuItem(Icons.logout, "Log Out", () async {
+              await FirebaseAuth.instance.signOut();
+              await GoogleSignIn().signOut();
+              Navigator.of(context).pushAndRemoveUntil(
+                MaterialPageRoute(builder: (context) => GetStart()), // Replace with your sign in page widget
+                (route) => false,
+              );
+            },),
                   ],
                 ),
               ),
