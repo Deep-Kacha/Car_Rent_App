@@ -1,9 +1,9 @@
 import 'dart:io';
 import 'package:car_rental_project/Admin%20Panel%20Files/Done.dart';
 import 'package:car_rental_project/Admin%20Panel%20Files/HandleBussiness.dart';
-import 'package:car_rental_project/Authorization/Menu/Menu.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:multi_select_flutter/multi_select_flutter.dart';
 
 class AddCarPage extends StatefulWidget {
   const AddCarPage({Key? key}) : super(key: key);
@@ -18,13 +18,142 @@ class _AddCarPageState extends State<AddCarPage> {
   final TextEditingController carNameController = TextEditingController();
   final TextEditingController modelController = TextEditingController();
   final TextEditingController numberPlateController = TextEditingController();
-  final TextEditingController featureController = TextEditingController();
   final TextEditingController yearController = TextEditingController();
   final TextEditingController priceController = TextEditingController();
   final TextEditingController descriptionController = TextEditingController();
 
   File? _carImage;
   final ImagePicker _picker = ImagePicker();
+
+  // Selected features
+  List<String> _selectedFeatures = [];
+
+  // Car features list
+  final List<String> carFeatures = [
+    "Petrol engine",
+    "Diesel engine",
+    "CNG engine",
+    "Hybrid engine",
+    "Electric motor",
+    "Manual gearbox",
+    "Automatic gearbox",
+    "AMT gearbox",
+    "CVT gearbox",
+    "DCT gearbox",
+    "Power steering",
+    "Power windows",
+    "Central locking",
+    "Adjustable seats",
+    "Air conditioning",
+    "Heater",
+    "Odometer",
+    "Speedometer",
+    "Tachometer",
+    "Fuel gauge",
+    "Seat belts",
+    "Halogen lamps",
+    "Spare wheel",
+    "Toolkit",
+    "Keyless entry",
+    "Push start",
+    "Remote start",
+    "Cruise control",
+    "Tilt steering",
+    "Telescopic steering",
+    "Height seat",
+    "Rear vents",
+    "USB ports",
+    "Cup holders",
+    "Armrests",
+    "Storage box",
+    "Cooled glovebox",
+    "Auto climate",
+    "Ventilated seats",
+    "Heated seats",
+    "Rear armrest",
+    "Split seats",
+    "Power tailgate",
+    "ABS",
+    "EBD",
+    "ESP",
+    "Hill assist",
+    "Hill descent",
+    "Airbags",
+    "Pretensioners",
+    "ISOFIX",
+    "Parking sensors",
+    "Rear camera",
+    "360 camera",
+    "Blind spot",
+    "Lane warning",
+    "Adaptive cruise",
+    "Brake assist",
+    "TPMS",
+    "Immobilizer",
+    "Anti-theft",
+    "Auto-dimming IRVM",
+    "Touchscreen",
+    "Android Auto",
+    "Apple CarPlay",
+    "Navigation",
+    "Bluetooth",
+    "FM radio",
+    "USB/AUX",
+    "Premium audio",
+    "Steering controls",
+    "Voice assist",
+    "Wi-Fi hotspot",
+    "Internet",
+    "Rear screens",
+    "Alloy wheels",
+    "LED lamps",
+    "DRLs",
+    "Fog lamps",
+    "Projectors",
+    "Matrix lights",
+    "Auto headlamps",
+    "Rain wipers",
+    "Electric ORVMs",
+    "Heated mirrors",
+    "Sunroof",
+    "Panoramic roof",
+    "Roof rails",
+    "Shark antenna",
+    "Spoiler",
+    "Chrome trim",
+    "Black pack",
+    "Digital cluster",
+    "Head-up display",
+    "Drive modes",
+    "Paddle shifters",
+    "Auto parking",
+    "Collision avoid",
+    "Sign detect",
+    "Connected car",
+    "OTA updates",
+    "Leather seats",
+    "Ambient lights",
+    "Massage seats",
+    "Gesture control",
+    "4-zone AC",
+    "Soft doors",
+    "Window blinds",
+    "Air purifier",
+    "Fragrance",
+    "Mini fridge",
+    "Soundproof glass",
+    "Lounge seats",
+    "Turbo engine",
+    "AWD",
+    "4x4 drive",
+    "Launch control",
+    "Sport exhaust",
+    "Air suspension",
+    "Diff lock",
+    "Tow hook",
+    "Trailer assist",
+    "Drive-by-wire",
+  ];
 
   // Pick image from gallery
   Future<void> _pickImage() async {
@@ -34,10 +163,6 @@ class _AddCarPageState extends State<AddCarPage> {
         setState(() {
           _carImage = File(pickedFile.path);
         });
-      } else {
-        ScaffoldMessenger.of(
-          context,
-        ).showSnackBar(const SnackBar(content: Text("No image selected.")));
       }
     } catch (e) {
       ScaffoldMessenger.of(
@@ -48,20 +173,28 @@ class _AddCarPageState extends State<AddCarPage> {
 
   // Save Car
   void _saveCar() {
-    if (_formKey.currentState!.validate() && _carImage != null) {
+    if (_formKey.currentState!.validate() &&
+        _carImage != null &&
+        _selectedFeatures.isNotEmpty) {
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(const SnackBar(content: Text("Car saved successfully!")));
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => const FinalDonePage()),
+      );
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(
-          content: Text("Please fill all fields and upload an image."),
+          content: Text(
+            "Please fill all fields, select features, and upload image.",
+          ),
         ),
       );
     }
   }
 
-  // Reusable Text Field with real-time validation
+  // Text field
   Widget _buildTextField(
     String label,
     TextEditingController controller,
@@ -74,8 +207,7 @@ class _AddCarPageState extends State<AddCarPage> {
         controller: controller,
         maxLines: maxLines,
         validator: validator,
-        autovalidateMode:
-            AutovalidateMode.onUserInteraction, // ✅ Real-time validation
+        autovalidateMode: AutovalidateMode.onUserInteraction,
         decoration: InputDecoration(
           hintText: label,
           filled: true,
@@ -91,6 +223,10 @@ class _AddCarPageState extends State<AddCarPage> {
 
   @override
   Widget build(BuildContext context) {
+    final featureItems = carFeatures
+        .map((f) => MultiSelectItem<String>(f, f))
+        .toList();
+
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
@@ -101,14 +237,12 @@ class _AddCarPageState extends State<AddCarPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Back + Title + Menu
+                // Header
                 Row(
                   children: [
                     IconButton(
                       icon: const Icon(Icons.arrow_back),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+                      onPressed: () => Navigator.pop(context),
                     ),
                     const Expanded(
                       child: Center(
@@ -134,15 +268,9 @@ class _AddCarPageState extends State<AddCarPage> {
                     ),
                   ],
                 ),
-
-                const SizedBox(height: 10),
-                const Text(
-                  "Fill car details below",
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
                 const SizedBox(height: 20),
 
-                // Upload Car Photo
+                // Upload Car Image
                 GestureDetector(
                   onTap: _pickImage,
                   child: Container(
@@ -160,45 +288,51 @@ class _AddCarPageState extends State<AddCarPage> {
                           : null,
                     ),
                     child: _carImage == null
-                        ? Row(
-                            mainAxisAlignment: MainAxisAlignment.center,
-                            children: const [
-                              Icon(Icons.camera_alt, color: Colors.grey),
-                              SizedBox(width: 10),
-                              Text("Upload car photo"),
-                            ],
-                          )
+                        ? const Center(child: Text("Upload car photo"))
                         : null,
                   ),
                 ),
-
                 const SizedBox(height: 20),
 
-                // Input Fields with validation
-                _buildTextField("Car Name", carNameController, (value) {
-                  if (value!.isEmpty) return "Car name is required";
-                  return null;
-                }),
-                _buildTextField("Model", modelController, (value) {
-                  if (value!.isEmpty) return "Model is required";
-                  return null;
-                }),
-                _buildTextField("Car Number Plate", numberPlateController, (
-                  value,
-                ) {
-                  if (value!.isEmpty) return "Number plate is required";
-                  return null;
-                }),
-                _buildTextField("Car Feature", featureController, (value) {
-                  if (value!.isEmpty) return "Feature is required";
-                  return null;
-                }),
+                // Input Fields
+                _buildTextField(
+                  "Car Name",
+                  carNameController,
+                  (value) => value!.isEmpty ? "Car name required" : null,
+                ),
+                _buildTextField(
+                  "Model",
+                  modelController,
+                  (value) => value!.isEmpty ? "Model required" : null,
+                ),
+                _buildTextField(
+                  "Car Number Plate",
+                  numberPlateController,
+                  (value) => value!.isEmpty ? "Plate required" : null,
+                ),
+
+                // Multi-select Dropdown
+                Container(
+                  margin: const EdgeInsets.only(bottom: 14),
+                  child: MultiSelectDialogField(
+                    items: featureItems,
+                    title: const Text("Car Features"),
+                    searchable: true,
+                    buttonText: const Text("Select Features"),
+                    onConfirm: (values) {
+                      setState(() {
+                        _selectedFeatures = values.cast<String>();
+                      });
+                    },
+                    chipDisplay: MultiSelectChipDisplay(),
+                  ),
+                ),
 
                 Row(
                   children: [
                     Expanded(
                       child: _buildTextField("Year", yearController, (value) {
-                        if (value!.isEmpty) return "Year is required";
+                        if (value!.isEmpty) return "Year required";
                         if (!RegExp(r'^\d{4}$').hasMatch(value)) {
                           return "Enter valid year";
                         }
@@ -210,9 +344,9 @@ class _AddCarPageState extends State<AddCarPage> {
                       child: _buildTextField("Price / day", priceController, (
                         value,
                       ) {
-                        if (value!.isEmpty) return "Price is required";
+                        if (value!.isEmpty) return "Price required";
                         if (double.tryParse(value) == null) {
-                          return "Enter valid number";
+                          return "Enter number";
                         }
                         return null;
                       }),
@@ -220,41 +354,20 @@ class _AddCarPageState extends State<AddCarPage> {
                   ],
                 ),
 
-                _buildTextField("Description", descriptionController, (value) {
-                  if (value!.isEmpty) return "Description is required";
-                  return null;
-                }, maxLines: 3),
+                _buildTextField(
+                  "Description",
+                  descriptionController,
+                  (value) => value!.isEmpty ? "Description required" : null,
+                  maxLines: 3,
+                ),
 
                 const Spacer(),
 
-                // Save Car Button
+                // Save button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: () {
-                      if (_formKey.currentState!.validate() &&
-                          _carImage != null) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Car saved successfully!"),
-                          ),
-                        );
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const FinalDonePage(),
-                          ),
-                        );
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text(
-                              "Please fill all fields and upload an image.",
-                            ),
-                          ),
-                        );
-                      }
-                    },
+                    onPressed: _saveCar,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 63, 34, 26),
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -264,7 +377,7 @@ class _AddCarPageState extends State<AddCarPage> {
                     ),
                     child: const Text(
                       "Save Car",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
+                      style: TextStyle(color: Colors.white),
                     ),
                   ),
                 ),
