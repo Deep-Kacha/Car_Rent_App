@@ -1,0 +1,98 @@
+{
+  "project_info": {
+    "project_number": "136403017507",
+    "project_id": "carrentingapp18",
+    "storage_bucket": "carrentingapp18.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:136403017507:android:98a24c0a92cab6679eb696",
+        "android_client_info": {
+          "package_name": "com.example.car_rental_project"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "136403017507-qh07tvg7o43bf32cm4g57j47bsmvj80o.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.car_rental_project",
+            "certificate_hash": "56022ad9ac3b91cb79624c205b93647bd8e7852e"
+          }
+        },
+        {
+          "client_id": "136403017507-21u4op4t2rogj5cvf22msv7f87c4ilm6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJMdbONw2VTG1Xm0ZAkMGWlpuN-AG_XWs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "136403017507-21u4op4t2rogj5cvf22msv7f87c4ilm6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "136403017507-1l2r26q6rs85adbp364j3c6jctaq0cp2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.carRentalProject"
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:136403017507:android:176c1d4aae806ed89eb696",
+        "android_client_info": {
+          "package_name": "com.example.express_car"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "136403017507-l2bu7plrsc4s1pc017qqgvl0ok695c4h.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.express_car",
+            "certificate_hash": "56022ad9ac3b91cb79624c205b93647bd8e7852e"
+          }
+        },
+        {
+          "client_id": "136403017507-21u4op4t2rogj5cvf22msv7f87c4ilm6.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyDJMdbONw2VTG1Xm0ZAkMGWlpuN-AG_XWs"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "136403017507-21u4op4t2rogj5cvf22msv7f87c4ilm6.apps.googleusercontent.com",
+              "client_type": 3
+            },
+            {
+              "client_id": "136403017507-1l2r26q6rs85adbp364j3c6jctaq0cp2.apps.googleusercontent.com",
+              "client_type": 2,
+              "ios_info": {
+                "bundle_id": "com.example.carRentalProject"
+              }
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}
