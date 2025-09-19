@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import '../Authentication/signin_page.dart'; // Import your sign in page
+import '../HomeDetails/Home_Page/home_page.dart';
 
 class DashboardPage extends StatelessWidget {
   @override
@@ -42,6 +43,16 @@ class DashboardPage extends StatelessWidget {
             Text(
               user?.email ?? 'No email found',
               style: TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+            ),
+            const SizedBox(height: 40),
+            ElevatedButton(
+              onPressed: () {
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(builder: (context) => HomePage()),
+                );
+              },
+              child: const Text('Go to Home'),
             ),
           ],
         ),
