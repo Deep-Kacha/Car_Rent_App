@@ -4,6 +4,7 @@ import 'package:car_rental_project/Authorization/Menu/Menus%20Files/ChangePasswo
 import 'package:car_rental_project/Authorization/Menu/Menus%20Files/EditProfile.dart';
 
 import 'package:car_rental_project/Authorization/Menu/Menus%20Files/ViewProfile.dart';
+import 'package:car_rental_project/Splash/GetStart.dart';
 import 'package:flutter/material.dart';
 
 class MenuPage extends StatelessWidget {
@@ -32,22 +33,33 @@ class MenuPage extends StatelessWidget {
               const SizedBox(height: 20),
 
               /// Profile (row: avatar + name)
-              Row(
-                children: const [
-                  CircleAvatar(
-                    radius: 25,
-                    backgroundImage: AssetImage("assets/images/profile.jpg"),
-                  ),
-                  SizedBox(width: 15),
-                  Text(
-                    "Ethan John",
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
+              /// Profile (row: avatar + name)
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                      builder: (context) => const ViewProfilePage(),
                     ),
-                  ),
-                ],
+                  );
+                },
+                child: Row(
+                  children: const [
+                    CircleAvatar(
+                      radius: 25,
+                      backgroundImage: AssetImage("assets/images/profile.jpg"),
+                    ),
+                    SizedBox(width: 15),
+                    Text(
+                      "Ethan John",
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
               ),
 
               const SizedBox(height: 20),
@@ -105,7 +117,14 @@ class MenuPage extends StatelessWidget {
                         );
                       },
                     ),
-                    _buildMenuItem(Icons.logout, "Log Out", () {}),
+                    _buildMenuItem(Icons.logout, "Log Out", () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const GetStart(),
+                        ),
+                      );
+                    }),
                   ],
                 ),
               ),

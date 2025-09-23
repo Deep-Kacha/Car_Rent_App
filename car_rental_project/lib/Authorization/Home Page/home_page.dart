@@ -2,6 +2,7 @@ import 'package:car_rental_project/Authorization/Booking/Book_car.dart';
 import 'package:car_rental_project/Authorization/Booking/Booked_Car.dart';
 import 'package:car_rental_project/Authorization/Favorite_car/Favorite.dart';
 import 'package:car_rental_project/Authorization/Menu/Menu.dart';
+import 'package:car_rental_project/Authorization/Menu/Menus%20Files/ViewProfile.dart';
 import 'package:flutter/material.dart';
 import 'car_model.dart';
 import 'car_data.dart';
@@ -57,24 +58,32 @@ class _HomePageState extends State<HomePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              Row(
-                children: const [
-                  CircleAvatar(
-                    radius: 22,
-                    backgroundImage: AssetImage("assets/images/profile.jpg"),
-                  ),
-                  SizedBox(width: 15),
-                  Text(
-                    "Ethan John",
-                    style: TextStyle(
-                      fontSize: 26,
-                      fontWeight: FontWeight.w500,
-                      color: Colors.black,
+              GestureDetector(
+                onTap: () {
+                  Navigator.push(
+                    context,
+                    MaterialPageRoute(builder: (context) => ViewProfilePage()),
+                  );
+                },
+                child: Row(
+                  children: const [
+                    CircleAvatar(
+                      radius: 22,
+                      backgroundImage: AssetImage("assets/images/profile.jpg"),
                     ),
-                  ),
-                ],
+                    SizedBox(width: 15),
+                    Text(
+                      "Ethan John",
+                      style: TextStyle(
+                        fontSize: 26,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.black,
+                      ),
+                    ),
+                  ],
+                ),
               ),
-              SizedBox(height: 15),
+              const SizedBox(height: 15),
               TextField(
                 decoration: InputDecoration(
                   hintText: "Search cars near you...",

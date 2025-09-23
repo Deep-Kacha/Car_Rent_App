@@ -28,8 +28,29 @@ class _BookingPageState extends State<BookingPage> {
       setState(() {
         if (isStart) {
           startDate = picked;
+
+          // Reset endDate if it's before the new startDate
+          if (endDate != null && endDate!.isBefore(startDate!)) {
+            endDate = null;
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("End date reset because it's before Start date"),
+                backgroundColor: Colors.red,
+              ),
+            );
+          }
         } else {
-          endDate = picked;
+          // ✅ Validate End Date
+          if (startDate != null && picked.isBefore(startDate!)) {
+            ScaffoldMessenger.of(context).showSnackBar(
+              const SnackBar(
+                content: Text("End date cannot be before Start date"),
+                backgroundColor: Colors.red,
+              ),
+            );
+          } else {
+            endDate = picked;
+          }
         }
       });
     }
@@ -117,7 +138,7 @@ class _BookingPageState extends State<BookingPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Text(
                         "Pickup & Return Location",
                         style: TextStyle(
@@ -126,7 +147,7 @@ class _BookingPageState extends State<BookingPage> {
                           color: Colors.grey.shade800,
                         ),
                       ),
-                      SizedBox(height: 30),
+                      const SizedBox(height: 30),
                       Row(
                         children: [
                           const Icon(
@@ -156,7 +177,7 @@ class _BookingPageState extends State<BookingPage> {
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
                     children: [
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       const Text(
                         "Car Basics & Features",
                         style: TextStyle(
@@ -173,11 +194,10 @@ class _BookingPageState extends State<BookingPage> {
                         itemCount: car.features.length,
                         gridDelegate:
                             const SliverGridDelegateWithFixedCrossAxisCount(
-                              crossAxisCount: 2, // <- 2 items per row
-                              mainAxisSpacing: 12, // vertical gap
-                              crossAxisSpacing: 20, // horizontal gap
-                              childAspectRatio:
-                                  4, // width / height ratio (tweak if needed)
+                              crossAxisCount: 2,
+                              mainAxisSpacing: 12,
+                              crossAxisSpacing: 20,
+                              childAspectRatio: 4,
                             ),
                         itemBuilder: (context, index) {
                           final f = car.features[index];
@@ -210,7 +230,6 @@ class _BookingPageState extends State<BookingPage> {
                     ],
                   ),
                 ),
-
                 const Divider(),
 
                 /// Description
@@ -248,7 +267,7 @@ class _BookingPageState extends State<BookingPage> {
                           color: Colors.grey.shade800,
                         ),
                       ),
-                      SizedBox(height: 12),
+                      const SizedBox(height: 12),
                       Row(
                         children: const [
                           SizedBox(width: 6),
@@ -300,6 +319,7 @@ class _BookingPageState extends State<BookingPage> {
                             content: Text(
                               "Please select both start and end dates",
                             ),
+                            backgroundColor: Colors.red,
                           ),
                         );
                       }

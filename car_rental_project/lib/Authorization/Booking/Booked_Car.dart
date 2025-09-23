@@ -16,7 +16,7 @@ class _BookedCarState extends State<BookedCar> {
   @override
   void initState() {
     super.initState();
-    // Make a copy of bookedCars so we can modify it
+    // Copy bookedCars so we can modify it locally
     localBookedCars = List.from(widget.bookedCars);
   }
 
@@ -64,12 +64,12 @@ class _BookedCarState extends State<BookedCar> {
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 16),
-                            height: 120,
+                            height: 140,
                             width: double.infinity,
                             decoration: BoxDecoration(
                               color: const Color(
                                 0xFF3E2723,
-                              ), // brown background
+                              ), // Brown background
                               borderRadius: BorderRadius.circular(12),
                             ),
                             padding: const EdgeInsets.all(10),
@@ -81,7 +81,7 @@ class _BookedCarState extends State<BookedCar> {
                                   borderRadius: BorderRadius.circular(10),
                                   child: Image.asset(
                                     car.image,
-                                    width: 150,
+                                    width: 120,
                                     height: 100,
                                     fit: BoxFit.cover,
                                   ),
@@ -89,12 +89,11 @@ class _BookedCarState extends State<BookedCar> {
 
                                 const SizedBox(width: 12),
 
-                                /// Car Details (right side)
+                                /// Car Details + Cancel Button
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
                                         CrossAxisAlignment.start,
-                                    mainAxisAlignment: MainAxisAlignment.center,
                                     children: [
                                       Text(
                                         car.name,
@@ -124,6 +123,31 @@ class _BookedCarState extends State<BookedCar> {
                                         style: const TextStyle(
                                           color: Colors.white70,
                                           fontSize: 12,
+                                        ),
+                                      ),
+                                      const Spacer(),
+
+                                      /// Cancel Button
+                                      Align(
+                                        alignment: Alignment.bottomRight,
+                                        child: ElevatedButton(
+                                          style: ElevatedButton.styleFrom(
+                                            backgroundColor: Colors.red,
+                                            foregroundColor: Colors.white,
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 16,
+                                              vertical: 8,
+                                            ),
+                                            shape: RoundedRectangleBorder(
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                          onPressed: () => cancelBooking(index),
+                                          child: const Text(
+                                            "Cancel",
+                                            style: TextStyle(fontSize: 12),
+                                          ),
                                         ),
                                       ),
                                     ],

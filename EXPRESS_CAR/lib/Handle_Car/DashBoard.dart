@@ -1,3 +1,5 @@
+import 'HandleBussiness.dart';
+import 'Manage_Booking.dart';
 import 'package:flutter/material.dart';
 
 class DashboardPage extends StatelessWidget {
@@ -19,13 +21,28 @@ class DashboardPage extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.pop(context),
+                    onPressed: () => Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const HandleBusinessPage(),
+                      ),
+                    ),
                   ),
                   const Text(
                     "Dashboard",
                     style: TextStyle(fontSize: 26, fontWeight: FontWeight.w500),
                   ),
-                  IconButton(icon: const Icon(Icons.menu), onPressed: () {}),
+                  IconButton(
+                    icon: const Icon(Icons.menu),
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => const HandleBusinessPage(),
+                        ),
+                      );
+                    },
+                  ),
                 ],
               ),
 
@@ -139,7 +156,12 @@ class DashboardPage extends StatelessWidget {
                     ),
                   ),
                   onPressed: () {
-                    // Navigate to booking list
+                    Navigator.push(
+                      context,
+                      MaterialPageRoute(
+                        builder: (context) => const ManageBookingsPage(),
+                      ),
+                    );
                   },
                   child: const Text(
                     "View All Bookings",
