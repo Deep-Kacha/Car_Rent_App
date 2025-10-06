@@ -15,7 +15,6 @@ class ViewProfilePage extends StatelessWidget {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.center,
             children: [
-              // Back Button & Title
               Row(
                 children: [
                   IconButton(
@@ -35,20 +34,18 @@ class ViewProfilePage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48), // To balance the row
+                  const SizedBox(width: 48),
                 ],
               ),
 
               const SizedBox(height: 20),
 
-              // Profile Picture
               const CircleAvatar(
                 radius: 50,
                 backgroundImage: AssetImage("assets/images/profile.jpg"),
               ),
               const SizedBox(height: 12),
 
-              // Name & Join Date
               const Text(
                 "Ethan John",
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
@@ -116,7 +113,6 @@ class ViewProfilePage extends StatelessWidget {
         ),
       ),
 
-      // Floating Action Button
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color.fromARGB(255, 63, 34, 26),
         shape: const CircleBorder(),
@@ -131,7 +127,6 @@ class ViewProfilePage extends StatelessWidget {
     );
   }
 
-  // Helper for read-only info fields
   Widget _buildInfoField(String label, String value) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),

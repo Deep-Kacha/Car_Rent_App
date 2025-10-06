@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import '../Authentication/signin_page.dart'; // Import your sign in page
+import '../Authentication/signin_page.dart'; 
 import '../HomeDetails/Home_Page/home_page.dart';
 
 class DashboardPage extends StatelessWidget {
@@ -19,7 +19,7 @@ class DashboardPage extends StatelessWidget {
               await FirebaseAuth.instance.signOut();
               await GoogleSignIn().signOut();
               Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => SignInPage()), // Replace with your sign in page widget
+                MaterialPageRoute(builder: (context) => SignInPage()),
                 (route) => false,
               );
             },

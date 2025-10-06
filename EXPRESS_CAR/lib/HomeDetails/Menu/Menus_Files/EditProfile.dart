@@ -42,7 +42,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                // Back button + Title
                 Row(
                   children: [
                     IconButton(
@@ -68,7 +67,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                 const SizedBox(height: 20),
 
-                // Profile picture upload
                 Stack(
                   alignment: Alignment.center,
                   children: [
@@ -102,7 +100,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                 const SizedBox(height: 30),
 
-                // Full Name
                 _buildValidatedField("Full Name", nameController, (value) {
                   if (value == null || value.isEmpty) {
                     return "Name cannot be empty";
@@ -110,7 +107,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   return null;
                 }),
 
-                // Email
                 _buildValidatedField("Email", emailController, (value) {
                   if (value == null || value.isEmpty) {
                     return "Email cannot be empty";
@@ -121,7 +117,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   return null;
                 }),
 
-                // Phone
                 _buildValidatedField("Phone", phoneController, (value) {
                   if (value == null || value.isEmpty) {
                     return "Phone number cannot be empty";
@@ -132,7 +127,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   return null;
                 }),
 
-                // Address
                 _buildValidatedField("Address", addressController, (value) {
                   if (value == null || value.isEmpty) {
                     return "Address cannot be empty";
@@ -140,7 +134,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
                   return null;
                 }),
 
-                // DOB & Gender
                 Row(
                   children: [
                     Expanded(
@@ -166,7 +159,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
 
                 const SizedBox(height: 30),
 
-                // Save Changes Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -200,7 +192,6 @@ class _EditProfilePageState extends State<EditProfilePage> {
     );
   }
 
-  // Reusable validated input field
   Widget _buildValidatedField(
     String label,
     TextEditingController controller,
