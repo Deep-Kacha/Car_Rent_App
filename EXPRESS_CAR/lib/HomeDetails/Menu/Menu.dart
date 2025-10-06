@@ -119,13 +119,15 @@ class MenuPage extends StatelessWidget {
                       },
                     ),
                     _buildMenuItem(Icons.logout, "Log Out", () async {
-              await FirebaseAuth.instance.signOut();
-              await GoogleSignIn().signOut();
-              Navigator.of(context).pushAndRemoveUntil(
-                MaterialPageRoute(builder: (context) => GetStart()), // Replace with your sign in page widget
-                (route) => false,
-              );
-            },),
+                      await FirebaseAuth.instance.signOut();
+                      await GoogleSignIn().signOut();
+                      Navigator.of(context).pushAndRemoveUntil(
+                        MaterialPageRoute(
+                          builder: (context) => GetStart(),
+                        ), // Replace with your sign in page widget
+                        (route) => false,
+                      );
+                    }),
                   ],
                 ),
               ),

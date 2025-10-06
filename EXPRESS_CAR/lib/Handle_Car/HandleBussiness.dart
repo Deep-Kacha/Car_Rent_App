@@ -32,12 +32,7 @@ class HandleBusinessPage extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const MenuPage(),
-                        ),
-                      );
+                      Navigator.pop(context);
                     },
                   ),
                   const Expanded(
