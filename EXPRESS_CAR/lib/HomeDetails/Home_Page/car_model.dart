@@ -1,7 +1,7 @@
 class Car {
   final String name;
   final String image;
-  final String? description; // ✅ new field
+  final String? description; 
   final String category;
   final String price;
   final String address;
@@ -10,7 +10,7 @@ class Car {
   Car({
     required this.name,
     required this.image,
-    required this.description, // ✅ required
+    required this.description, 
     required this.category,
     required this.price,
     required this.address,

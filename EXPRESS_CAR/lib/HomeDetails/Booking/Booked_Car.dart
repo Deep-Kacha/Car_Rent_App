@@ -16,7 +16,6 @@ class _BookedCarState extends State<BookedCar> {
   @override
   void initState() {
     super.initState();
-    // Copy bookedCars so we can modify it locally
     localBookedCars = List.from(widget.bookedCars);
   }
 
@@ -69,14 +68,13 @@ class _BookedCarState extends State<BookedCar> {
                             decoration: BoxDecoration(
                               color: const Color(
                                 0xFF3E2723,
-                              ), // Brown background
+                              ), 
                               borderRadius: BorderRadius.circular(12),
                             ),
                             padding: const EdgeInsets.all(10),
                             child: Row(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                /// Car Image (left side)
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
                                   child: Image.asset(
@@ -88,8 +86,7 @@ class _BookedCarState extends State<BookedCar> {
                                 ),
 
                                 const SizedBox(width: 12),
-
-                                /// Car Details + Cancel Button
+                                
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:

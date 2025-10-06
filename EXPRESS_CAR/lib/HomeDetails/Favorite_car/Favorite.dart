@@ -98,7 +98,6 @@ class FavoritePage extends StatelessWidget {
                                 child: Column(
                                   crossAxisAlignment: CrossAxisAlignment.start,
                                   children: [
-                                    /// Car Name + Favorite
                                     Row(
                                       mainAxisAlignment:
                                           MainAxisAlignment.spaceBetween,

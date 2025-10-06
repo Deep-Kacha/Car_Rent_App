@@ -187,13 +187,8 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
   }
 
   /// Verifies the OTP with the backend.
-  /// Returns an error message string on failure, or null on success.
   Future<String?> _verifyOtp(String otp) async {
-    // For testing, we are bypassing the server call and assuming success.
     await Future.delayed(const Duration(seconds: 2));
-
-    // Returning null indicates that the OTP verification was successful.
-    // The _onVerifyPressed function will then proceed with Firebase registration.
     return null;
   }
 

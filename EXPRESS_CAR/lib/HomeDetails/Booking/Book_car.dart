@@ -40,7 +40,7 @@ class _BookingPageState extends State<BookingPage> {
             );
           }
         } else {
-          // ✅ Validate End Date
+          // Validate End Date
           if (startDate != null && picked.isBefore(startDate!)) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -186,8 +186,6 @@ class _BookingPageState extends State<BookingPage> {
                         ),
                       ),
                       const SizedBox(height: 12),
-
-                      // Grid with exactly 2 columns
                       GridView.builder(
                         shrinkWrap: true,
                         physics: const NeverScrollableScrollPhysics(),
@@ -231,8 +229,6 @@ class _BookingPageState extends State<BookingPage> {
                   ),
                 ),
                 const Divider(),
-
-                /// Description
                 Padding(
                   padding: const EdgeInsets.all(12),
                   child: Text(

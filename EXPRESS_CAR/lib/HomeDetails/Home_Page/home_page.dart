@@ -53,7 +53,6 @@ class _HomePageState extends State<HomePage> {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        /// Profile + Search
         Padding(
           padding: const EdgeInsets.all(16),
           child: Column(
@@ -106,7 +105,6 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
 
-        /// Categories
         Padding(
           padding: const EdgeInsets.all(16),
           child: const Text(
@@ -216,7 +214,6 @@ class _HomePageState extends State<HomePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                /// Car Name + Favorite
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -292,7 +289,7 @@ class _HomePageState extends State<HomePage> {
                                         );
                                         setState(
                                           () {},
-                                        ); // refresh after booking
+                                        );
                                       },
                                       child: Text(
                                         car.price,

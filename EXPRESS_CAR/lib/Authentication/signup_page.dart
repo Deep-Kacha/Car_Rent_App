@@ -38,9 +38,6 @@ class _SignUpPageState extends State<SignUpPage> {
       return;
     }
 
-    final email = _emailController.text.trim();
-    final password = _passwordController.text.trim();
-
     Navigator.push(
       context,
       MaterialPageRoute(builder: (context) => CompleteProfilePage()),
