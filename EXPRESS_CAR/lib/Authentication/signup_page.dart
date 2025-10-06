@@ -1,10 +1,10 @@
+import 'package:express_car/Authentication/CompleteProfile.dart';
 import 'package:express_car/HomeDetails/Home_Page/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 import 'package:flutter/gestures.dart';
 import 'TermsConditions.dart';
-import 'enter_otp.dart';
 import 'signin_page.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -43,10 +43,7 @@ class _SignUpPageState extends State<SignUpPage> {
 
     Navigator.push(
       context,
-      MaterialPageRoute(
-        builder: (context) =>
-            VerifyCodeScreen(email: email, password: password),
-      ),
+      MaterialPageRoute(builder: (context) => CompleteProfilePage()),
     );
   }
 
@@ -235,15 +232,28 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                         ),
                         child: _isSubmitting
-                            ? SizedBox(
-                                width: 18,
-                                height: 18,
-                                child: CircularProgressIndicator(
-                                  strokeWidth: 2,
-                                  color: Colors.white,
-                                ),
+                            ? Row(
+                                mainAxisAlignment: MainAxisAlignment.center,
+                                children: const [
+                                  SizedBox(
+                                    width: 20,
+                                    height: 20,
+                                    child: CircularProgressIndicator(
+                                      strokeWidth: 2.5,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                  SizedBox(width: 12),
+                                  Text(
+                                    "Signing up...",
+                                    style: TextStyle(
+                                      fontSize: 16,
+                                      color: Colors.white,
+                                    ),
+                                  ),
+                                ],
                               )
-                            : Text(
+                            : const Text(
                                 "Sign up",
                                 style: TextStyle(
                                   fontSize: 16,
