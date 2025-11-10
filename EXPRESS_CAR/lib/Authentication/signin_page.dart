@@ -70,7 +70,11 @@ class _SignInPageState extends State<SignInPage> {
 
   Future<void> _signInWithGoogle() async {
     try {
-      final GoogleSignIn googleSignIn = GoogleSignIn();
+      // For web, you need to provide the client ID.
+      // Replace 'YOUR_WEB_CLIENT_ID...' with your actual web client ID from Firebase/Google Cloud.
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        //clientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
+      );
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) return;
       final GoogleSignInAuthentication googleAuth =
@@ -97,7 +101,7 @@ class _SignInPageState extends State<SignInPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, 
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),

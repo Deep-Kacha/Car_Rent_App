@@ -46,7 +46,11 @@ class _SignUpPageState extends State<SignUpPage> {
 
   Future<void> _signInWithGoogle() async {
     try {
-      final GoogleSignIn googleSignIn = GoogleSignIn();
+      // For web, you need to provide the client ID.
+      // Replace 'YOUR_WEB_CLIENT_ID...' with your actual web client ID from Firebase/Google Cloud.
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        //clientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
+      );
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) return;
       final GoogleSignInAuthentication googleAuth =
