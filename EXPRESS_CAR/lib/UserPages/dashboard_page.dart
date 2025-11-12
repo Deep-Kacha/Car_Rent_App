@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import '../Authentication/signin_page.dart';
+import '../Authentication/signin_page.dart'; 
 import '../HomeDetails/Home_Page/home_page.dart';
 
 class DashboardPage extends StatelessWidget {
@@ -17,10 +17,7 @@ class DashboardPage extends StatelessWidget {
             tooltip: 'Log Out',
             onPressed: () async {
               await FirebaseAuth.instance.signOut();
-              // Use the same client ID for consistency, especially on web.
-              await GoogleSignIn(
-                //clientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
-              ).signOut();
+              await GoogleSignIn().signOut();
               Navigator.of(context).pushAndRemoveUntil(
                 MaterialPageRoute(builder: (context) => SignInPage()),
                 (route) => false,
@@ -38,7 +35,10 @@ class DashboardPage extends StatelessWidget {
               style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
             ),
             SizedBox(height: 20),
-            Text('Logged in as:', style: TextStyle(fontSize: 16)),
+            Text(
+              'Logged in as:',
+              style: TextStyle(fontSize: 16),
+            ),
             SizedBox(height: 8),
             Text(
               user?.email ?? 'No email found',

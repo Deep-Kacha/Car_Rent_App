@@ -1,9 +1,12 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:express_car/HomeDetails/Home_Page/home_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'enter_email.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import '../firebase_options.dart';
 import 'signup_page.dart';
+import 'enter_email.dart';
 
 class SignInPage extends StatefulWidget {
   @override
@@ -20,6 +23,23 @@ class _SignInPageState extends State<SignInPage> {
   final Color _primaryBrown = const Color(0xFF3E2723);
 
   @override
+  void initState() {
+    super.initState();
+    _checkAutoLogin();
+  }
+
+  Future<void> _checkAutoLogin() async {
+    await Future.delayed(const Duration(milliseconds: 500));
+    final user = FirebaseAuth.instance.currentUser;
+    if (user != null && user.emailVerified) {
+      Navigator.pushReplacement(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+      );
+    }
+  }
+
+  @override
   void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
@@ -29,72 +49,120 @@ class _SignInPageState extends State<SignInPage> {
   Future<void> _signIn() async {
     if (!_formKey.currentState!.validate()) return;
     setState(() => _isSubmitting = true);
+
     try {
-      await FirebaseAuth.instance.signInWithEmailAndPassword(
-        email: _emailController.text.trim(),
-        password: _passwordController.text.trim(),
-      );
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Signed in as ${_emailController.text}')),
-      );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
-    } on FirebaseAuthException catch (e) {
-      String message = 'Sign in failed: ';
-      if (e.code == 'user-not-found') {
-        final methods = await FirebaseAuth.instance.fetchSignInMethodsForEmail(
-          _emailController.text.trim(),
-        );
-        if (methods.contains('google.com')) {
-          message =
-              'This account was created using Google sign-in. Please use "Sign in with Google".';
+      final userCredential = await FirebaseAuth.instance
+          .signInWithEmailAndPassword(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
+
+      final user = userCredential.user;
+
+      if (user != null) {
+        if (user.emailVerified) {
+          ScaffoldMessenger.of(
+            context,
+          ).showSnackBar(const SnackBar(content: Text('Login successful!')));
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
         } else {
-          message += 'No user found for that email.';
+          await user.sendEmailVerification();
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text(
+                'Please verify your email before logging in. Verification link sent again.',
+              ),
+            ),
+          );
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
         }
-      } else if (e.code == 'wrong-password') {
-        message += 'Wrong password.';
-      } else if (e.code == 'invalid-email') {
-        message += 'Invalid email.';
-      } else {
-        message += e.message ?? 'Unknown error.';
+      }
+    } on FirebaseAuthException catch (e) {
+      String message;
+      switch (e.code) {
+        case 'user-not-found':
+          message = 'No account found with this email.';
+          break;
+        case 'wrong-password':
+          message = 'Incorrect password. Try again.';
+          break;
+        case 'invalid-email':
+          message = 'Please enter a valid email.';
+          break;
+        default:
+          message = 'Login failed: ${e.message}';
       }
       ScaffoldMessenger.of(
         context,
       ).showSnackBar(SnackBar(content: Text(message)));
     } finally {
-      setState(() => _isSubmitting = false);
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
   Future<void> _signInWithGoogle() async {
+    setState(() => _isSubmitting = true);
     try {
-      // For web, you need to provide the client ID.
-      // Replace 'YOUR_WEB_CLIENT_ID...' with your actual web client ID from Firebase/Google Cloud.
       final GoogleSignIn googleSignIn = GoogleSignIn(
-        //clientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
+        clientId: kIsWeb
+            ? DefaultFirebaseOptions.currentPlatform.iosClientId
+            : null,
       );
+
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-      if (googleUser == null) return;
+      if (googleUser == null) {
+        setState(() => _isSubmitting = false);
+        return;
+      }
+
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
+      final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      await FirebaseAuth.instance.signInWithCredential(credential);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Signed in as ${googleUser.email}')),
+
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(
+        credential,
       );
-      Navigator.pushReplacement(
-        context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-      );
+      final user = userCredential.user;
+
+      if (user != null) {
+        final docRef = FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid);
+        final doc = await docRef.get();
+        if (!doc.exists) {
+          await docRef.set({
+            'email': user.email,
+            'displayName': user.displayName ?? '',
+            'photoURL': user.photoURL ?? '',
+            'createdAt': FieldValue.serverTimestamp(),
+          });
+        }
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Signed in as ${user.email ?? ''}')),
+        );
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => HomePage()),
+        );
+      }
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Google sign-in failed: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Google sign-in failed. Please try again.'),
+        ),
+      );
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
@@ -108,18 +176,15 @@ class _SignInPageState extends State<SignInPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Back button
               Align(
                 alignment: Alignment.centerLeft,
                 child: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.black87),
+                  icon: const Icon(Icons.arrow_back, color: Colors.black87),
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
               const SizedBox(height: 10),
-
-              // Title
-              Text(
+              const Text(
                 "Sign in",
                 style: TextStyle(
                   fontSize: 26,
@@ -129,19 +194,18 @@ class _SignInPageState extends State<SignInPage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 6),
-              Text(
-                "Hi! Welcome back, you've been missed",
+              const Text(
+                "Welcome back! Login to continue",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: Colors.black54),
               ),
               const SizedBox(height: 24),
 
-              // Form
+              /// --- Form Fields ---
               Form(
                 key: _formKey,
                 child: Column(
                   children: [
-                    // Email
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -169,8 +233,6 @@ class _SignInPageState extends State<SignInPage> {
                       },
                     ),
                     const SizedBox(height: 14),
-
-                    // Password
                     TextFormField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
@@ -189,27 +251,21 @@ class _SignInPageState extends State<SignInPage> {
                                 ? Icons.visibility
                                 : Icons.visibility_off,
                           ),
-                          onPressed: () {
-                            setState(
-                              () => _obscurePassword = !_obscurePassword,
-                            );
-                          },
+                          onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword,
+                          ),
                         ),
                       ),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'Please enter your password';
                         }
-                        if (value.trim().length < 6) {
-                          return 'Password must be at least 6 characters';
-                        }
                         return null;
                       },
                     ),
-
                     const SizedBox(height: 10),
 
-                    // Forgot Password
+                    /// Forgot Password button
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
@@ -221,20 +277,14 @@ class _SignInPageState extends State<SignInPage> {
                             ),
                           );
                         },
-                        child: Text(
-                          "Forgot password?",
-                          style: TextStyle(
-                            color: _primaryBrown,
-                            fontWeight: FontWeight.w500,
-                            decoration: TextDecoration.underline,
-                          ),
+                        child: const Text(
+                          "Forgot Password?",
+                          style: TextStyle(color: Colors.brown),
                         ),
                       ),
                     ),
 
-                    const SizedBox(height: 14),
-
-                    // Sign in button
+                    const SizedBox(height: 10),
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
@@ -247,7 +297,7 @@ class _SignInPageState extends State<SignInPage> {
                           ),
                         ),
                         child: _isSubmitting
-                            ? SizedBox(
+                            ? const SizedBox(
                                 width: 18,
                                 height: 18,
                                 child: CircularProgressIndicator(
@@ -255,7 +305,7 @@ class _SignInPageState extends State<SignInPage> {
                                   color: Colors.white,
                                 ),
                               )
-                            : Text(
+                            : const Text(
                                 "Sign in",
                                 style: TextStyle(
                                   fontSize: 16,
@@ -264,14 +314,14 @@ class _SignInPageState extends State<SignInPage> {
                               ),
                       ),
                     ),
+
                     const SizedBox(height: 18),
 
-                    // Divider
                     Row(
                       children: [
                         Expanded(child: Divider(color: Colors.black26)),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.0),
                           child: Text(
                             "Or sign in with",
                             style: TextStyle(color: Colors.black54),
@@ -282,7 +332,6 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                     const SizedBox(height: 14),
 
-                    // Google button
                     Center(
                       child: IconButton(
                         icon: Image.asset(
@@ -295,11 +344,11 @@ class _SignInPageState extends State<SignInPage> {
                     ),
                     const SizedBox(height: 20),
 
-                    // Sign up
+                    /// Removed Terms & Conditions field here
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
+                        const Text(
                           "Don’t have an account?",
                           style: TextStyle(color: Colors.black54),
                         ),

@@ -358,12 +358,7 @@ class _AddCarPageState extends State<AddCarPage> {
                     IconButton(
                       icon: const Icon(Icons.arrow_back),
                       onPressed: () {
-                        Navigator.pushReplacement(
-                          context,
-                          MaterialPageRoute(
-                            builder: (c) => const HandleBusinessPage(),
-                          ),
-                        );
+                        Navigator.pop(context);
                       },
                     ),
                     const Text(

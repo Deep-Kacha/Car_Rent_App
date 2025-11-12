@@ -3,12 +3,16 @@ import 'package:express_car/HomeDetails/Booking/Booked_car.dart';
 import 'package:express_car/HomeDetails/Favorite_car/Favorite.dart';
 import 'package:express_car/HomeDetails/Menu/Menu.dart';
 import 'package:express_car/HomeDetails/Menu/Menus_Files/ViewProfile.dart';
+import 'package:express_car/HomeDetails/Home_Page/car_model.dart';
+import 'package:express_car/HomeDetails/Home_Page/car_data.dart';
 import 'package:flutter/material.dart';
-import 'car_model.dart';
-import 'car_data.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:express_car/Authentication/auth_wrapper.dart';
 
 class HomePage extends StatefulWidget {
   static List<Map<String, dynamic>> bookedCarsMaps = [];
+  static var bookedCars;
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -22,7 +26,9 @@ class _HomePageState extends State<HomePage> {
 
   final List<String> categories = ["All", "Cars", "SUVs", "XUVs", "Vans"];
 
-  void onToggleFavorite(Car car) {
+  User? get currentUser => FirebaseAuth.instance.currentUser;
+
+  void onToggleFavorite(Car car) async {
     setState(() {
       if (favoriteCars.contains(car.name)) {
         favoriteCars.remove(car.name);
@@ -30,15 +36,25 @@ class _HomePageState extends State<HomePage> {
         favoriteCars.add(car.name);
       }
     });
+
+    // 🔹 Optional: Persist to Firestore (Favorites)
+    try {
+      final uid = currentUser?.uid;
+      if (uid != null) {
+        await FirebaseFirestore.instance.collection('users').doc(uid).update({
+          'favorites': favoriteCars.toList(),
+        });
+      }
+    } catch (e) {
+      print("⚠️ Failed to save favorites: $e");
+    }
   }
 
   List<Car> get filteredCars {
     final carsByCategory = selectedCategory == "All"
         ? cars
         : cars.where((car) => car.category == selectedCategory).toList();
-
     if (searchQuery.isEmpty) return carsByCategory;
-
     return carsByCategory
         .where(
           (car) => car.name.toLowerCase().contains(searchQuery.toLowerCase()),
@@ -46,276 +62,316 @@ class _HomePageState extends State<HomePage> {
         .toList();
   }
 
-  Widget buildHomePage() {
-    // Get screen dimensions for responsive sizing
-    final screenWidth = MediaQuery.of(context).size.width;
-    final screenHeight = MediaQuery.of(context).size.height;
+  Future<Map<String, dynamic>?> _fetchCurrentUserData() async {
+    final user = currentUser;
+    if (user == null) return null;
 
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      final firestoreData = doc.data();
+
+      // 🔹 Merge Firestore + Auth Data
+      return {
+        'displayName':
+            firestoreData?['displayName'] ?? user.displayName ?? 'Guest User',
+        'photoURL': firestoreData?['photoURL'] ?? user.photoURL ?? '',
+      };
+    } catch (e) {
+      print("⚠️ Error fetching user data: $e");
+      return {
+        'displayName': user.displayName ?? 'Guest User',
+        'photoURL': user.photoURL ?? '',
+      };
+    }
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+
+    // Navigate back to AuthWrapper
+    if (mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const AuthWrapper()),
+        (route) => false,
+      );
+    }
+  }
+
+  Widget buildHomePage() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
-          // Use screen-relative padding
-          padding: EdgeInsets.symmetric(
-            horizontal: screenWidth * 0.04,
-            vertical: 16,
-          ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ViewProfilePage()),
-                  );
-                },
-                child: Row(
-                  children: [
-                    CircleAvatar(
-                      radius: screenWidth * 0.06, // Responsive radius
-                      backgroundImage: const AssetImage(
-                        "assets/images/profile.jpg",
-                      ),
+          padding: const EdgeInsets.all(16),
+          child: FutureBuilder<Map<String, dynamic>?>(
+            future: _fetchCurrentUserData(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final name = snapshot.data?['displayName'] ?? 'Guest User';
+              final photoURL = snapshot.data?['photoURL'];
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => ViewProfilePage()),
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 22,
+                          backgroundImage:
+                              (photoURL == null || photoURL.isEmpty)
+                              ? const AssetImage("assets/images/profile.jpg")
+                                    as ImageProvider
+                              : NetworkImage(photoURL),
+                        ),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Text(
+                            name,
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        PopupMenuButton<String>(
+                          onSelected: (value) async {
+                            if (value == 'logout') {
+                              await _logout(context);
+                            }
+                          },
+                          itemBuilder: (context) => const [
+                            PopupMenuItem(
+                              value: 'logout',
+                              child: Text('Logout'),
+                            ),
+                          ],
+                          icon: const Icon(
+                            Icons.more_vert,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(width: screenWidth * 0.04), // Responsive spacing
-                    const Text(
-                      "Ethan John",
-                      style: TextStyle(
-                        fontSize: 24, // Slightly adjusted for better scaling
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 20),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: "Search cars near you...",
-                  prefixIcon: const Icon(Icons.search),
-                  filled: true,
-                  fillColor: const Color(0xFFF5F5F5),
-                  border: const OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                    borderSide: BorderSide.none,
                   ),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    searchQuery = value;
-                  });
-                },
-              ),
-            ],
+                  const SizedBox(height: 15),
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: "Search cars near you...",
+                      prefixIcon: const Icon(Icons.search),
+                      filled: true,
+                      fillColor: const Color(0xFFF5F5F5),
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                        borderSide: BorderSide.none,
+                      ),
+                    ),
+                    onChanged: (value) => setState(() => searchQuery = value),
+                  ),
+                ],
+              );
+            },
           ),
         ),
 
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-          child: const Text(
+        const Padding(
+          padding: EdgeInsets.all(16),
+          child: Text(
             "Categories",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
-        const SizedBox(height: 10),
-        // Use a Wrap widget for categories to handle different screen widths
-        Padding(
-          padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-          child: Wrap(
-            spacing: 12.0, // Horizontal space between chips
-            runSpacing: 8.0, // Vertical space between lines
-            children: categories.map((category) {
+
+        SizedBox(
+          height: 40,
+          child: ListView.builder(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: 16),
+            itemCount: categories.length,
+            itemBuilder: (context, index) {
+              final category = categories[index];
               final isSelected = selectedCategory == category;
-              return ChoiceChip(
-                label: Text(category),
-                selected: isSelected,
-                onSelected: (selected) {
-                  if (selected) {
-                    setState(() {
-                      selectedCategory = category;
-                    });
-                  }
-                },
-                labelStyle: TextStyle(
-                  fontWeight: isSelected ? FontWeight.bold : FontWeight.normal,
-                  color: isSelected ? Colors.white : Colors.grey[600],
-                ),
-                backgroundColor: Colors.grey[200],
-                selectedColor: Colors.orange,
-                shape: StadiumBorder(),
-                padding: const EdgeInsets.symmetric(
-                  horizontal: 16,
-                  vertical: 8,
-                ),
-              );
-            }).toList(),
-          ),
-        ),
-
-        const SizedBox(height: 20),
-
-        /// Cars List
-        Expanded(
-          child: LayoutBuilder(
-            builder: (context, constraints) {
-              // Use GridView for wider screens (e.g., tablets or landscape)
-              bool useGridView = constraints.maxWidth > 600;
-
-              if (filteredCars.isEmpty) {
-                return const Center(
-                  child: Text(
-                    "No cars available in this category",
-                    style: TextStyle(color: Colors.grey),
+              return GestureDetector(
+                onTap: () => setState(() => selectedCategory = category),
+                child: Container(
+                  margin: const EdgeInsets.only(right: 20),
+                  padding: EdgeInsets.symmetric(
+                    horizontal: isSelected ? 30 : 16,
+                    vertical: 8,
                   ),
-                );
-              }
-
-              return GridView.builder(
-                padding: EdgeInsets.symmetric(horizontal: screenWidth * 0.04),
-                itemCount: filteredCars.length,
-                itemBuilder: (context, index) {
-                  final car = filteredCars[index];
-                  final isFavorite = favoriteCars.contains(car.name);
-
-                  return Container(
-                    margin: const EdgeInsets.only(bottom: 16),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(15),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.black.withOpacity(0.1),
-                          blurRadius: 5,
-                          offset: const Offset(0, 3),
-                        ),
-                      ],
+                  decoration: isSelected
+                      ? BoxDecoration(
+                          color: Colors.orange,
+                          borderRadius: BorderRadius.circular(30),
+                        )
+                      : null,
+                  alignment: Alignment.center,
+                  child: Text(
+                    category,
+                    style: TextStyle(
+                      fontSize: 17,
+                      fontWeight: isSelected
+                          ? FontWeight.bold
+                          : FontWeight.normal,
+                      color: isSelected ? Colors.white : Colors.grey,
                     ),
-                    child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
-                      children: [
-                        ClipRRect(
-                          borderRadius: const BorderRadius.vertical(
-                            top: Radius.circular(15),
-                          ),
-                          child: Image.asset(
-                            car.image,
-                            height: screenHeight * 0.22, // Responsive height
-                            width: double.infinity,
-                            fit: BoxFit.cover,
-                          ),
-                        ),
-                        Container(
-                          width: double.infinity,
-                          decoration: const BoxDecoration(
-                            color: Color(0xFF3E2723),
-                            borderRadius: BorderRadius.vertical(
-                              bottom: Radius.circular(15),
-                            ),
-                          ),
-                          padding: const EdgeInsets.all(12),
-                          child: Column(
-                            crossAxisAlignment: CrossAxisAlignment.start,
-                            children: [
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Text(
-                                    car.name,
-                                    style: const TextStyle(
-                                      fontSize: 16,
-                                      fontWeight: FontWeight.bold,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  GestureDetector(
-                                    onTap: () {
-                                      onToggleFavorite(car);
-                                    },
-                                    child: Icon(
-                                      isFavorite
-                                          ? Icons.favorite
-                                          : Icons.favorite_border,
-                                      color: Colors.redAccent,
-                                    ),
-                                  ),
-                                ],
-                              ),
-
-                              const SizedBox(height: 4),
-                              Row(
-                                mainAxisAlignment:
-                                    MainAxisAlignment.spaceBetween,
-                                children: [
-                                  Expanded(
-                                    child: Text(
-                                      car.address,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontSize: 15,
-                                      ),
-                                    ),
-                                  ),
-                                  ElevatedButton(
-                                    style: ElevatedButton.styleFrom(
-                                      backgroundColor: Colors.orange,
-                                      shape: RoundedRectangleBorder(
-                                        borderRadius: BorderRadius.circular(8),
-                                      ),
-                                      padding: const EdgeInsets.symmetric(
-                                        horizontal: 14,
-                                        vertical: 6,
-                                      ),
-                                    ),
-                                    onPressed: () async {
-                                      await Navigator.push(
-                                        context,
-                                        MaterialPageRoute(
-                                          builder: (context) => BookingPage(
-                                            car: car,
-                                            onCarBooked:
-                                                (
-                                                  Map<String, dynamic>
-                                                  bookingDetails,
-                                                ) {},
-                                          ),
-                                        ),
-                                      );
-                                      setState(() {});
-                                    },
-                                    child: Text(
-                                      car.price,
-                                      style: const TextStyle(
-                                        color: Colors.white,
-                                        fontWeight: FontWeight.bold,
-                                        fontSize: 14,
-                                      ),
-                                    ),
-                                  ),
-                                ],
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  );
-                },
-                gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-                  crossAxisCount: useGridView
-                      ? 2
-                      : 1, // 2 columns for grid, 1 for list
-                  childAspectRatio: useGridView
-                      ? 1.1
-                      : 1.3, // Adjust aspect ratio
-                  crossAxisSpacing: 16,
-                  mainAxisSpacing: 16,
+                  ),
                 ),
               );
             },
           ),
+        ),
+
+        const SizedBox(height: 10),
+
+        Expanded(
+          child: filteredCars.isEmpty
+              ? const Center(
+                  child: Text(
+                    "No cars available in this category",
+                    style: TextStyle(color: Colors.grey),
+                  ),
+                )
+              : ListView.builder(
+                  padding: const EdgeInsets.symmetric(horizontal: 16),
+                  itemCount: filteredCars.length,
+                  itemBuilder: (context, index) {
+                    final car = filteredCars[index];
+                    final isFavorite = favoriteCars.contains(car.name);
+
+                    return Container(
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: Colors.white,
+                        borderRadius: BorderRadius.circular(15),
+                        boxShadow: [
+                          BoxShadow(
+                            color: Colors.black.withOpacity(0.1),
+                            blurRadius: 5,
+                            offset: const Offset(0, 3),
+                          ),
+                        ],
+                      ),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: [
+                          ClipRRect(
+                            borderRadius: const BorderRadius.vertical(
+                              top: Radius.circular(15),
+                            ),
+                            child: Image.asset(
+                              car.image,
+                              height: 180,
+                              width: double.infinity,
+                              fit: BoxFit.cover,
+                            ),
+                          ),
+                          Container(
+                            decoration: const BoxDecoration(
+                              color: Color(0xFF3E2723),
+                              borderRadius: BorderRadius.vertical(
+                                bottom: Radius.circular(15),
+                              ),
+                            ),
+                            padding: const EdgeInsets.all(12),
+                            child: Column(
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Text(
+                                      car.name,
+                                      style: const TextStyle(
+                                        fontSize: 17,
+                                        fontWeight: FontWeight.bold,
+                                        color: Colors.white,
+                                      ),
+                                    ),
+                                    GestureDetector(
+                                      onTap: () => onToggleFavorite(car),
+                                      child: Icon(
+                                        isFavorite
+                                            ? Icons.favorite
+                                            : Icons.favorite_border,
+                                        color: Colors.redAccent,
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                const SizedBox(height: 3),
+                                Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    Expanded(
+                                      child: Text(
+                                        car.address,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontSize: 16,
+                                        ),
+                                      ),
+                                    ),
+                                    ElevatedButton(
+                                      style: ElevatedButton.styleFrom(
+                                        backgroundColor: Colors.orange,
+                                        shape: RoundedRectangleBorder(
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                        ),
+                                        padding: const EdgeInsets.symmetric(
+                                          horizontal: 14,
+                                          vertical: 6,
+                                        ),
+                                      ),
+                                      onPressed: () async {
+                                        await Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (_) => BookingPage(
+                                              car: car,
+                                              onCarBooked: (details) {},
+                                            ),
+                                          ),
+                                        );
+                                        setState(() {});
+                                      },
+                                      child: Text(
+                                        car.price,
+                                        style: const TextStyle(
+                                          color: Colors.white,
+                                          fontWeight: FontWeight.bold,
+                                          fontSize: 14,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
+                            ),
+                          ),
+                        ],
+                      ),
+                    );
+                  },
+                ),
         ),
       ],
     );
@@ -325,7 +381,6 @@ class _HomePageState extends State<HomePage> {
     final favoriteList = cars
         .where((car) => favoriteCars.contains(car.name))
         .toList();
-
     return FavoritePage(
       favoriteCars: favoriteList,
       onToggleFavorite: onToggleFavorite,
@@ -334,22 +389,19 @@ class _HomePageState extends State<HomePage> {
 
   Widget buildMenuPage() => MenuPage();
 
-  Widget buildBookedPage() {
-    return BookedCar(bookedCars: HomePage.bookedCarsMaps);
-  }
+  Widget buildBookedPage() => BookedCar(bookedCars: HomePage.bookedCarsMaps);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: selectedIndex == 0
-            ? buildHomePage()
-            : selectedIndex == 1
-            ? buildBookedPage()
-            : selectedIndex == 2
-            ? buildFavoritesPage()
-            : buildMenuPage(),
+        child: [
+          buildHomePage(),
+          buildBookedPage(),
+          buildFavoritesPage(),
+          buildMenuPage(),
+        ][selectedIndex],
       ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
@@ -365,11 +417,7 @@ class _HomePageState extends State<HomePage> {
         ),
         child: BottomNavigationBar(
           currentIndex: selectedIndex,
-          onTap: (index) {
-            setState(() {
-              selectedIndex = index;
-            });
-          },
+          onTap: (index) => setState(() => selectedIndex = index),
           selectedItemColor: Colors.black,
           unselectedItemColor: Colors.grey,
           showSelectedLabels: true,

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'enter_otp_repass.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'signin_page.dart';
 
 class ForgotPasswordPage extends StatefulWidget {
@@ -12,6 +12,57 @@ class ForgotPasswordPage extends StatefulWidget {
 class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
   final TextEditingController emailController = TextEditingController();
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
+
+  bool isLoading = false;
+
+  // Function to send reset email
+  Future<void> _resetPassword() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    setState(() => isLoading = true);
+    try {
+      await FirebaseAuth.instance.sendPasswordResetEmail(
+        email: emailController.text.trim(),
+      );
+
+      setState(() => isLoading = false);
+
+      // Success dialog
+      showDialog(
+        context: context,
+        builder: (context) => AlertDialog(
+          title: const Text("Email Sent"),
+          content: const Text(
+            "A password reset link has been sent to your email address. Please check your inbox.",
+          ),
+          actions: [
+            TextButton(
+              onPressed: () {
+                Navigator.pushReplacement(
+                  context,
+                  MaterialPageRoute(builder: (context) => SignInPage()),
+                );
+              },
+              child: const Text("OK"),
+            ),
+          ],
+        ),
+      );
+    } on FirebaseAuthException catch (e) {
+      setState(() => isLoading = false);
+
+      String message = "Something went wrong.";
+      if (e.code == 'user-not-found') {
+        message = "No user found with this email.";
+      } else if (e.code == 'invalid-email') {
+        message = "Invalid email format.";
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text(message), backgroundColor: Colors.red),
+      );
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -60,18 +111,18 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
 
                 const SizedBox(height: 30),
 
-                // Illustration Image
+                // Illustration
                 SizedBox(
                   height: 200,
                   child: Image.asset(
-                    'assets/images/ForgotPassword.jpg', // Ensure image exists
+                    'assets/images/ForgotPassword.jpg',
                     fit: BoxFit.contain,
                   ),
                 ),
 
                 const SizedBox(height: 40),
 
-                // Email input with realtime validation
+                // Email Field
                 TextFormField(
                   controller: emailController,
                   keyboardType: TextInputType.emailAddress,
@@ -110,26 +161,17 @@ class _ForgotPasswordPageState extends State<ForgotPasswordPage> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    onPressed: () {
-                      if (_formKey.currentState!.validate()) {
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => VerifyCodeScreen(
-                              email: emailController.text.trim(),
+                    onPressed: isLoading ? null : _resetPassword,
+                    child: isLoading
+                        ? const CircularProgressIndicator(color: Colors.white)
+                        : const Text(
+                            "Continue",
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
                             ),
                           ),
-                        );
-                      }
-                    },
-                    child: const Text(
-                      "Continue",
-                      style: TextStyle(
-                        fontSize: 18,
-                        fontWeight: FontWeight.bold,
-                        color: Colors.white,
-                      ),
-                    ),
                   ),
                 ),
 

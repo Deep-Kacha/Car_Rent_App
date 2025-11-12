@@ -1,4 +1,3 @@
-
 import 'package:express_car/HomeDetails/Home_Page/car_model.dart';
 import 'package:express_car/HomeDetails/Booking/Book_car.dart';
 import 'package:flutter/material.dart';
@@ -146,7 +145,14 @@ class FavoritePage extends StatelessWidget {
                                               context,
                                               MaterialPageRoute(
                                                 builder: (context) =>
-                                                    BookingPage(car: car, onCarBooked: (Map<String, dynamic> bookingDetails) {  },),
+                                                    BookingPage(
+                                                      car: car,
+                                                      onCarBooked:
+                                                          (
+                                                            Map<String, dynamic>
+                                                            bookingDetails,
+                                                          ) {},
+                                                    ),
                                               ),
                                             );
                                           },

@@ -1,10 +1,11 @@
-import 'package:express_car/Authentication/CompleteProfile.dart';
-import 'package:express_car/HomeDetails/Home_Page/home_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:express_car/Authentication/TermsConditions.dart';
+import 'package:express_car/Authentication/verify_email_page.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
-import 'package:flutter/gestures.dart';
-import 'TermsConditions.dart';
+import 'package:flutter/foundation.dart' show kIsWeb;
+import '../firebase_options.dart';
 import 'signin_page.dart';
 
 class SignUpPage extends StatefulWidget {
@@ -16,11 +17,11 @@ class _SignUpPageState extends State<SignUpPage> {
   final _formKey = GlobalKey<FormState>();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
-  bool _agree = false;
   bool _obscurePassword = true;
   bool _isSubmitting = false;
+  bool agreeToTerms = false; // Added checkbox state
 
-  final Color _primaryBrown = const Color(0xFF3E2723); // same as sign in page
+  final Color _primaryBrown = const Color(0xFF3E2723);
 
   @override
   void dispose() {
@@ -29,75 +30,156 @@ class _SignUpPageState extends State<SignUpPage> {
     super.dispose();
   }
 
-  Future<void> _sendOtpAndNavigate() async {
+  Future<void> _ensureUserDocExists(User user) async {
+    final docRef = FirebaseFirestore.instance.collection('users').doc(user.uid);
+    final doc = await docRef.get();
+    if (!doc.exists) {
+      await docRef.set({
+        'email': user.email,
+        'createdAt': FieldValue.serverTimestamp(),
+        'displayName': user.displayName ?? '',
+        'photoURL': user.photoURL ?? '',
+      });
+    }
+  }
+
+  Future<void> _signUp() async {
     if (!_formKey.currentState!.validate()) return;
-    if (!_agree) {
+
+    // Check if Terms are accepted
+    if (!agreeToTerms) {
       ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Please agree with Terms & Conditions')),
+        const SnackBar(content: Text('Please agree to the Terms & Conditions')),
       );
       return;
     }
 
-    Navigator.push(
-      context,
-      MaterialPageRoute(builder: (context) => CompleteProfilePage()),
-    );
+    setState(() => _isSubmitting = true);
+
+    try {
+      final credential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: _emailController.text.trim(),
+            password: _passwordController.text.trim(),
+          );
+
+      final user = credential.user;
+      if (user != null) {
+        await _ensureUserDocExists(user);
+        await user.sendEmailVerification();
+
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text(
+              'Verification email sent! Please check your inbox before signing in.',
+            ),
+          ),
+        );
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const VerifyEmailPage()),
+        );
+      }
+    } on FirebaseAuthException catch (e) {
+      String message;
+      switch (e.code) {
+        case 'email-already-in-use':
+          message = 'This email is already registered.';
+          break;
+        case 'invalid-email':
+          message = 'Please enter a valid email.';
+          break;
+        case 'weak-password':
+          message = 'Password must be at least 6 characters.';
+          break;
+        default:
+          message = 'Sign-up failed: ${e.message}';
+      }
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
+    } catch (e) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('An unexpected error occurred.')),
+      );
+    } finally {
+      setState(() => _isSubmitting = false);
+    }
   }
 
-  Future<void> _signInWithGoogle() async {
+  Future<void> _signUpWithGoogle() async {
+    setState(() => _isSubmitting = true);
     try {
-      // For web, you need to provide the client ID.
-      // Replace 'YOUR_WEB_CLIENT_ID...' with your actual web client ID from Firebase/Google Cloud.
       final GoogleSignIn googleSignIn = GoogleSignIn(
-        //clientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
+        clientId: kIsWeb
+            ? DefaultFirebaseOptions.currentPlatform.iosClientId
+            : null,
       );
+
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-      if (googleUser == null) return;
+      if (googleUser == null) {
+        setState(() => _isSubmitting = false);
+        return;
+      }
+
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
-      final credential = GoogleAuthProvider.credential(
+      final OAuthCredential credential = GoogleAuthProvider.credential(
         accessToken: googleAuth.accessToken,
         idToken: googleAuth.idToken,
       );
-      await FirebaseAuth.instance.signInWithCredential(credential);
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Signed in as ${googleUser.email}')),
+
+      final userCredential = await FirebaseAuth.instance.signInWithCredential(
+        credential,
       );
-      Navigator.pushAndRemoveUntil(
+      final user = userCredential.user;
+
+      if (user != null) {
+        await _ensureUserDocExists(user);
+      }
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(
+          content: Text('Signed up with Google as ${user?.email ?? ''}'),
+        ),
+      );
+
+      Navigator.pushReplacement(
         context,
-        MaterialPageRoute(builder: (context) => HomePage()),
-        (route) => false,
+        MaterialPageRoute(builder: (context) => const VerifyEmailPage()),
       );
     } catch (e) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text('Google sign-in failed: $e')));
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(
+          content: Text('Google sign-up failed. Please try again.'),
+        ),
+      );
+    } finally {
+      setState(() => _isSubmitting = false);
     }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // full white background
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: SingleChildScrollView(
           padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Back button
               Align(
                 alignment: Alignment.centerLeft,
                 child: IconButton(
-                  icon: Icon(Icons.arrow_back, color: Colors.black87),
+                  icon: const Icon(Icons.arrow_back, color: Colors.black87),
                   onPressed: () => Navigator.pop(context),
                 ),
               ),
               const SizedBox(height: 10),
-
-              // Title
-              Text(
-                'Create Account',
+              const Text(
+                "Create Account",
                 style: TextStyle(
                   fontSize: 26,
                   fontWeight: FontWeight.w600,
@@ -106,19 +188,18 @@ class _SignUpPageState extends State<SignUpPage> {
                 textAlign: TextAlign.center,
               ),
               const SizedBox(height: 6),
-              Text(
-                'Fill your information below or register with your social account.',
-                style: TextStyle(fontSize: 14, color: Colors.black54),
+              const Text(
+                "Fill your information below or register with your social account.",
                 textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 14, color: Colors.black54),
               ),
               const SizedBox(height: 24),
 
-              // Form
+              // Form Fields
               Form(
                 key: _formKey,
                 child: Column(
                   children: [
-                    // Email
                     TextFormField(
                       controller: _emailController,
                       keyboardType: TextInputType.emailAddress,
@@ -146,8 +227,6 @@ class _SignUpPageState extends State<SignUpPage> {
                       },
                     ),
                     const SizedBox(height: 14),
-
-                    // Password
                     TextFormField(
                       controller: _passwordController,
                       obscureText: _obscurePassword,
@@ -166,11 +245,9 @@ class _SignUpPageState extends State<SignUpPage> {
                                 ? Icons.visibility
                                 : Icons.visibility_off,
                           ),
-                          onPressed: () {
-                            setState(
-                              () => _obscurePassword = !_obscurePassword,
-                            );
-                          },
+                          onPressed: () => setState(
+                            () => _obscurePassword = !_obscurePassword,
+                          ),
                         ),
                       ),
                       validator: (value) {
@@ -183,48 +260,53 @@ class _SignUpPageState extends State<SignUpPage> {
                         return null;
                       },
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 12),
 
-                    // Terms & Conditions
-                    CheckboxListTile(
-                      contentPadding: EdgeInsets.zero,
-                      value: _agree,
-                      onChanged: (v) => setState(() => _agree = v ?? false),
-                      title: RichText(
-                        text: TextSpan(
-                          style: Theme.of(context).textTheme.bodyLarge
-                              ?.copyWith(color: Colors.black54),
-                          children: [
-                            const TextSpan(text: 'Agree with '),
-                            TextSpan(
-                              text: 'Terms & Conditions',
-                              style: TextStyle(
-                                color: _primaryBrown,
-                                decoration: TextDecoration.underline,
-                              ),
-                              recognizer: TapGestureRecognizer()
-                                ..onTap = () {
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) =>
-                                          const TermsConditions(),
-                                    ),
-                                  );
-                                },
-                            ),
-                          ],
+                    // Terms & Conditions Checkbox
+                    Row(
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Checkbox(
+                          value: agreeToTerms,
+                          activeColor: _primaryBrown,
+                          onChanged: (value) {
+                            setState(() {
+                              agreeToTerms = value ?? false;
+                            });
+                          },
                         ),
-                      ),
-                      controlAffinity: ListTileControlAffinity.leading,
+                        const Text(
+                          "Agree with ",
+                          style: TextStyle(fontSize: 14, color: Colors.black87),
+                        ),
+                        GestureDetector(
+                          onTap: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => TermsConditions(),
+                              ),
+                            );
+                          },
+                          child: const Text(
+                            "Terms & conditions",
+                            style: TextStyle(
+                              fontSize: 14,
+                              color: Color(0xFF3E2723),
+                              fontWeight: FontWeight.w600,
+                              decoration: TextDecoration.underline,
+                            ),
+                          ),
+                        ),
+                      ],
                     ),
-                    const SizedBox(height: 14),
+                    const SizedBox(height: 16),
 
-                    // Sign up button
+                    // Sign Up Button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _isSubmitting ? null : _sendOtpAndNavigate,
+                        onPressed: _isSubmitting ? null : _signUp,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _primaryBrown,
                           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -233,26 +315,13 @@ class _SignUpPageState extends State<SignUpPage> {
                           ),
                         ),
                         child: _isSubmitting
-                            ? Row(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: const [
-                                  SizedBox(
-                                    width: 20,
-                                    height: 20,
-                                    child: CircularProgressIndicator(
-                                      strokeWidth: 2.5,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                  SizedBox(width: 12),
-                                  Text(
-                                    "Signing up...",
-                                    style: TextStyle(
-                                      fontSize: 16,
-                                      color: Colors.white,
-                                    ),
-                                  ),
-                                ],
+                            ? const SizedBox(
+                                width: 18,
+                                height: 18,
+                                child: CircularProgressIndicator(
+                                  strokeWidth: 2,
+                                  color: Colors.white,
+                                ),
                               )
                             : const Text(
                                 "Sign up",
@@ -269,8 +338,8 @@ class _SignUpPageState extends State<SignUpPage> {
                     Row(
                       children: [
                         Expanded(child: Divider(color: Colors.black26)),
-                        Padding(
-                          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+                        const Padding(
+                          padding: EdgeInsets.symmetric(horizontal: 8.0),
                           child: Text(
                             "Or sign up with",
                             style: TextStyle(color: Colors.black54),
@@ -281,7 +350,7 @@ class _SignUpPageState extends State<SignUpPage> {
                     ),
                     const SizedBox(height: 14),
 
-                    // Google button
+                    // Google Sign-Up Button
                     Center(
                       child: IconButton(
                         icon: Image.asset(
@@ -289,22 +358,22 @@ class _SignUpPageState extends State<SignUpPage> {
                           width: 48,
                           height: 48,
                         ),
-                        onPressed: _signInWithGoogle,
+                        onPressed: _signUpWithGoogle,
                       ),
                     ),
                     const SizedBox(height: 20),
 
-                    // Sign in link
+                    // Already have an account
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(
+                        const Text(
                           "Already have an account?",
                           style: TextStyle(color: Colors.black54),
                         ),
                         TextButton(
                           onPressed: () {
-                            Navigator.pushReplacement(
+                            Navigator.push(
                               context,
                               MaterialPageRoute(
                                 builder: (context) => SignInPage(),
