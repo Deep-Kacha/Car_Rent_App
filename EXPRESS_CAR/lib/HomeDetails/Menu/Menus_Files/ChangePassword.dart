@@ -188,8 +188,6 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       ),
     );
   }
-
-  /// Reusable password field with eye icon + validation
   Widget _buildPasswordField({
     required String label,
     required TextEditingController controller,

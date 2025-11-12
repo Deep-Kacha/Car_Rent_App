@@ -21,12 +21,9 @@ class DashboardPage extends StatelessWidget {
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
-                    onPressed: () => Navigator.push(
-                      context,
-                      MaterialPageRoute(
-                        builder: (context) => const HandleBusinessPage(),
-                      ),
-                    ),
+                    onPressed: () {
+                      Navigator.pop(context);
+                    },
                   ),
                   const Text(
                     "Dashboard",

@@ -4,7 +4,6 @@ import 'Add_Car.dart';
 import 'DashBoard.dart';
 import 'Manage_Booking.dart';
 import 'Manage_Cars.dart';
-// TODO: The following imports are from a different project and their paths need to be corrected.
 import 'package:express_car/HomeDetails/Home_Page/home_page.dart';
 import 'package:express_car/HomeDetails/Menu/Menus_Files/ViewProfile.dart';
 import 'package:express_car/Splash/GetStart.dart';
@@ -32,11 +31,9 @@ class HandleBusinessPage extends StatelessWidget {
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
-                      Navigator.push(
+                      Navigator.pop(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const MenuPage(),
-                        ),
+                        MaterialPageRoute(builder: (context) => MenuPage()),
                       );
                     },
                   ),
@@ -51,13 +48,12 @@ class HandleBusinessPage extends StatelessWidget {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48), // spacing to balance row
+                  const SizedBox(width: 48),
                 ],
               ),
 
               const SizedBox(height: 20),
 
-              // Profile info (tappable)
               GestureDetector(
                 onTap: () {
                   Navigator.push(
@@ -145,8 +141,6 @@ class HandleBusinessPage extends StatelessWidget {
               }),
 
               const Spacer(),
-
-              // Back to Home button
               SizedBox(
                 width: double.infinity,
                 child: ElevatedButton(
@@ -176,7 +170,6 @@ class HandleBusinessPage extends StatelessWidget {
     );
   }
 
-  // Reusable Menu Item with icon
   Widget _buildMenuItem(IconData icon, String title, VoidCallback onTap) {
     return Container(
       margin: const EdgeInsets.only(bottom: 14),
@@ -185,7 +178,7 @@ class HandleBusinessPage extends StatelessWidget {
         borderRadius: BorderRadius.circular(12),
       ),
       child: ListTile(
-        leading: Icon(icon, color: Colors.black), //  Icon added
+        leading: Icon(icon, color: Colors.black),
         title: Text(
           title,
           style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w500),

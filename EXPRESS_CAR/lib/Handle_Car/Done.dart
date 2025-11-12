@@ -80,7 +80,7 @@ class _FinalDonePageState extends State<FinalDonePage> {
                 child: ElevatedButton(
                   onPressed: isChecked
                       ? () {
-                          // ✅ Navigate to DashboardPage when checkbox is ticked
+                          //  Navigate to DashboardPage when checkbox is ticked
                           Navigator.pushReplacement(
                             context,
                             MaterialPageRoute(

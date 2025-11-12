@@ -21,11 +21,70 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
   final _pinController = TextEditingController();
   bool _isVerifying = false;
   bool _isResending = false;
+  bool _emailSent = false;
+
+  @override
+  void initState() {
+    super.initState();
+    _sendVerificationEmail();
+  }
 
   @override
   void dispose() {
     _pinController.dispose();
     super.dispose();
+  }
+
+  /// Send the Firebase verification email
+  Future<void> _sendVerificationEmail() async {
+    setState(() => _isResending = true);
+    try {
+      final userCredential = await FirebaseAuth.instance
+          .createUserWithEmailAndPassword(
+            email: widget.email,
+            password: widget.password,
+          );
+
+      await userCredential.user?.sendEmailVerification();
+
+      setState(() {
+        _isResending = false;
+        _emailSent = true;
+      });
+
+      _showSnackBar("Verification email sent to ${widget.email}");
+    } on FirebaseAuthException catch (e) {
+      _showSnackBar(e.message ?? "Failed to send verification email");
+      setState(() => _isResending = false);
+    }
+  }
+
+  /// Check if user verified their email
+  Future<void> _verifyEmailStatus() async {
+    setState(() => _isVerifying = true);
+
+    User? user = FirebaseAuth.instance.currentUser;
+    await user?.reload();
+    user = FirebaseAuth.instance.currentUser;
+
+    if (user != null && user.emailVerified) {
+      _showSnackBar("Email verified successfully!");
+      Navigator.pushAndRemoveUntil(
+        context,
+        MaterialPageRoute(builder: (context) => HomePage()),
+        (route) => false,
+      );
+    } else {
+      _showSnackBar("Email not verified yet. Please check your inbox.");
+    }
+
+    setState(() => _isVerifying = false);
+  }
+
+  void _showSnackBar(String message) {
+    ScaffoldMessenger.of(
+      context,
+    ).showSnackBar(SnackBar(content: Text(message)));
   }
 
   @override
@@ -61,13 +120,15 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
 
             /// Subtitle
             Text(
-              "Please enter the code we just sent to email\n${widget.email}",
+              _emailSent
+                  ? "We sent a verification link to:\n${widget.email}\nPlease verify your email to continue."
+                  : "Sending verification email to:\n${widget.email}",
               textAlign: TextAlign.center,
               style: const TextStyle(fontSize: 14, color: Colors.grey),
             ),
             const SizedBox(height: 30),
 
-            /// Image just above OTP field
+            /// Image
             SizedBox(
               height: 180,
               child: Image.asset(
@@ -77,10 +138,10 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
             ),
             const SizedBox(height: 20),
 
-            /// OTP Input
+            /// Dummy OTP Input (UI only, kept same)
             Pinput(
               controller: _pinController,
-              length: 6, // changed from 4 to 6
+              length: 6,
               defaultPinTheme: PinTheme(
                 width: 60,
                 height: 60,
@@ -93,16 +154,11 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
                   borderRadius: BorderRadius.circular(12),
                 ),
               ),
+              readOnly: true, // Since OTP not used in this flow
             ),
             const SizedBox(height: 20),
 
-            /// Didn't receive OTP text
-            const Text(
-              "Didn't receive OTP?",
-              style: TextStyle(color: Colors.grey, fontSize: 14),
-            ),
-
-            /// Resend Code as clickable text
+            /// Resend Verification Email
             _isResending
                 ? const Padding(
                     padding: EdgeInsets.all(8.0),
@@ -116,9 +172,9 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
                     ),
                   )
                 : GestureDetector(
-                    onTap: _resendOtp,
+                    onTap: _sendVerificationEmail,
                     child: const Text(
-                      "Resend code",
+                      "Resend verification email",
                       style: TextStyle(
                         color: Colors.brown,
                         fontWeight: FontWeight.bold,
@@ -133,7 +189,7 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
             SizedBox(
               width: double.infinity,
               child: ElevatedButton(
-                onPressed: _onVerifyPressed,
+                onPressed: _isVerifying ? null : _verifyEmailStatus,
                 style: ElevatedButton.styleFrom(
                   backgroundColor: const Color(0xFF3B2A25),
                   padding: const EdgeInsets.symmetric(vertical: 14),
@@ -161,82 +217,5 @@ class _VerifyCodeScreenState extends State<VerifyCodeScreen> {
         ),
       ),
     );
-  }
-
-  void _showSnackBar(String message) {
-    if (mounted) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(SnackBar(content: Text(message)));
-    }
-  }
-
-  Future<void> _resendOtp() async {
-    if (_isResending) return;
-    setState(() => _isResending = true);
-
-    // Simulate a network delay for testing
-    await Future.delayed(const Duration(seconds: 2));
-
-    _showSnackBar('OTP resent successfully!');
-
-    // Reset the resending state
-    if (mounted) {
-      setState(() => _isResending = false);
-    }
-  }
-
-  /// Verifies the OTP with the backend.
-  /// Returns an error message string on failure, or null on success.
-  Future<String?> _verifyOtp(String otp) async {
-    // For testing, we are bypassing the server call and assuming success.
-    await Future.delayed(const Duration(seconds: 2));
-
-    // Returning null indicates that the OTP verification was successful.
-    // The _onVerifyPressed function will then proceed with Firebase registration.
-    return null;
-  }
-
-  Future<void> _onVerifyPressed() async {
-    if (_isVerifying) return;
-
-    final otp = _pinController.text.trim();
-    if (otp.length != 6) {
-      _showSnackBar('Please enter the 6-digit OTP');
-      return;
-    }
-
-    setState(() => _isVerifying = true);
-
-    final String? errorMessage = await _verifyOtp(otp);
-
-    if (errorMessage == null) {
-      // OTP is valid, proceed with registration
-      try {
-        await FirebaseAuth.instance.createUserWithEmailAndPassword(
-          email: widget.email,
-          password: widget.password,
-        );
-        if (mounted) {
-          _showSnackBar('Registration successful!');
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => HomePage()),
-            (route) => false,
-          );
-        }
-      } on FirebaseAuthException catch (e) {
-        _showSnackBar(
-          'Registration failed: ${e.message ?? "An unknown error occurred."}',
-        );
-      }
-    } else {
-      // Show the specific error from the server
-      _showSnackBar(errorMessage);
-    }
-
-    if (mounted) {
-      setState(() => _isVerifying = false);
-    }
   }
 }

@@ -1,16 +1,17 @@
-
 import 'package:express_car/HomeDetails/Booking/Book_car.dart';
 import 'package:express_car/HomeDetails/Booking/Booked_car.dart';
 import 'package:express_car/HomeDetails/Favorite_car/Favorite.dart';
 import 'package:express_car/HomeDetails/Menu/Menu.dart';
 import 'package:express_car/HomeDetails/Menu/Menus_Files/ViewProfile.dart';
+import 'package:express_car/HomeDetails/Home_Page/car_model.dart';
+import 'package:express_car/HomeDetails/Home_Page/car_data.dart';
 import 'package:flutter/material.dart';
-import 'car_model.dart';
-import 'car_data.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:express_car/Authentication/auth_wrapper.dart';
 
 class HomePage extends StatefulWidget {
   static List<Map<String, dynamic>> bookedCarsMaps = [];
-
   static var bookedCars;
 
   @override
@@ -25,7 +26,9 @@ class _HomePageState extends State<HomePage> {
 
   final List<String> categories = ["All", "Cars", "SUVs", "XUVs", "Vans"];
 
-  void onToggleFavorite(Car car) {
+  User? get currentUser => FirebaseAuth.instance.currentUser;
+
+  void onToggleFavorite(Car car) async {
     setState(() {
       if (favoriteCars.contains(car.name)) {
         favoriteCars.remove(car.name);
@@ -33,15 +36,25 @@ class _HomePageState extends State<HomePage> {
         favoriteCars.add(car.name);
       }
     });
+
+    // 🔹 Optional: Persist to Firestore (Favorites)
+    try {
+      final uid = currentUser?.uid;
+      if (uid != null) {
+        await FirebaseFirestore.instance.collection('users').doc(uid).update({
+          'favorites': favoriteCars.toList(),
+        });
+      }
+    } catch (e) {
+      print("⚠️ Failed to save favorites: $e");
+    }
   }
 
   List<Car> get filteredCars {
     final carsByCategory = selectedCategory == "All"
         ? cars
         : cars.where((car) => car.category == selectedCategory).toList();
-
     if (searchQuery.isEmpty) return carsByCategory;
-
     return carsByCategory
         .where(
           (car) => car.name.toLowerCase().contains(searchQuery.toLowerCase()),
@@ -49,71 +62,140 @@ class _HomePageState extends State<HomePage> {
         .toList();
   }
 
+  Future<Map<String, dynamic>?> _fetchCurrentUserData() async {
+    final user = currentUser;
+    if (user == null) return null;
+
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      final firestoreData = doc.data();
+
+      // 🔹 Merge Firestore + Auth Data
+      return {
+        'displayName':
+            firestoreData?['displayName'] ?? user.displayName ?? 'Guest User',
+        'photoURL': firestoreData?['photoURL'] ?? user.photoURL ?? '',
+      };
+    } catch (e) {
+      print("⚠️ Error fetching user data: $e");
+      return {
+        'displayName': user.displayName ?? 'Guest User',
+        'photoURL': user.photoURL ?? '',
+      };
+    }
+  }
+
+  Future<void> _logout(BuildContext context) async {
+    await FirebaseAuth.instance.signOut();
+
+    // Navigate back to AuthWrapper
+    if (mounted) {
+      Navigator.of(context).pushAndRemoveUntil(
+        MaterialPageRoute(builder: (_) => const AuthWrapper()),
+        (route) => false,
+      );
+    }
+  }
+
   Widget buildHomePage() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
-        /// Profile + Search
         Padding(
           padding: const EdgeInsets.all(16),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => ViewProfilePage()),
-                  );
-                },
-                child: Row(
-                  children: const [
-                    CircleAvatar(
-                      radius: 22,
-                      backgroundImage: AssetImage("assets/images/profile.jpg"),
+          child: FutureBuilder<Map<String, dynamic>?>(
+            future: _fetchCurrentUserData(),
+            builder: (context, snapshot) {
+              if (snapshot.connectionState == ConnectionState.waiting) {
+                return const Center(child: CircularProgressIndicator());
+              }
+
+              final name = snapshot.data?['displayName'] ?? 'Guest User';
+              final photoURL = snapshot.data?['photoURL'];
+
+              return Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(builder: (_) => ViewProfilePage()),
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 22,
+                          backgroundImage:
+                              (photoURL == null || photoURL.isEmpty)
+                              ? const AssetImage("assets/images/profile.jpg")
+                                    as ImageProvider
+                              : NetworkImage(photoURL),
+                        ),
+                        const SizedBox(width: 15),
+                        Expanded(
+                          child: Text(
+                            name,
+                            style: const TextStyle(
+                              fontSize: 26,
+                              fontWeight: FontWeight.w500,
+                              color: Colors.black,
+                            ),
+                            overflow: TextOverflow.ellipsis,
+                          ),
+                        ),
+                        PopupMenuButton<String>(
+                          onSelected: (value) async {
+                            if (value == 'logout') {
+                              await _logout(context);
+                            }
+                          },
+                          itemBuilder: (context) => const [
+                            PopupMenuItem(
+                              value: 'logout',
+                              child: Text('Logout'),
+                            ),
+                          ],
+                          icon: const Icon(
+                            Icons.more_vert,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
-                    SizedBox(width: 15),
-                    Text(
-                      "Ethan John",
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
+                  ),
+                  const SizedBox(height: 15),
+                  TextField(
+                    decoration: InputDecoration(
+                      hintText: "Search cars near you...",
+                      prefixIcon: const Icon(Icons.search),
+                      filled: true,
+                      fillColor: const Color(0xFFF5F5F5),
+                      border: const OutlineInputBorder(
+                        borderRadius: BorderRadius.all(Radius.circular(12)),
+                        borderSide: BorderSide.none,
                       ),
                     ),
-                  ],
-                ),
-              ),
-              const SizedBox(height: 15),
-              TextField(
-                decoration: InputDecoration(
-                  hintText: "Search cars near you...",
-                  prefixIcon: Icon(Icons.search),
-                  filled: true,
-                  fillColor: Color(0xFFF5F5F5),
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.all(Radius.circular(12)),
-                    borderSide: BorderSide.none,
+                    onChanged: (value) => setState(() => searchQuery = value),
                   ),
-                ),
-                onChanged: (value) {
-                  setState(() {
-                    searchQuery = value;
-                  });
-                },
-              ),
-            ],
+                ],
+              );
+            },
           ),
         ),
 
-        /// Categories
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: const Text(
+        const Padding(
+          padding: EdgeInsets.all(16),
+          child: Text(
             "Categories",
             style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
+
         SizedBox(
           height: 40,
           child: ListView.builder(
@@ -123,13 +205,8 @@ class _HomePageState extends State<HomePage> {
             itemBuilder: (context, index) {
               final category = categories[index];
               final isSelected = selectedCategory == category;
-
               return GestureDetector(
-                onTap: () {
-                  setState(() {
-                    selectedCategory = category;
-                  });
-                },
+                onTap: () => setState(() => selectedCategory = category),
                 child: Container(
                   margin: const EdgeInsets.only(right: 20),
                   padding: EdgeInsets.symmetric(
@@ -161,7 +238,6 @@ class _HomePageState extends State<HomePage> {
 
         const SizedBox(height: 10),
 
-        /// Cars List
         Expanded(
           child: filteredCars.isEmpty
               ? const Center(
@@ -205,7 +281,6 @@ class _HomePageState extends State<HomePage> {
                             ),
                           ),
                           Container(
-                            width: double.infinity,
                             decoration: const BoxDecoration(
                               color: Color(0xFF3E2723),
                               borderRadius: BorderRadius.vertical(
@@ -216,7 +291,6 @@ class _HomePageState extends State<HomePage> {
                             child: Column(
                               crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
-                                /// Car Name + Favorite
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -224,21 +298,13 @@ class _HomePageState extends State<HomePage> {
                                     Text(
                                       car.name,
                                       style: const TextStyle(
-                                        fontSize: 16,
+                                        fontSize: 17,
                                         fontWeight: FontWeight.bold,
                                         color: Colors.white,
                                       ),
                                     ),
                                     GestureDetector(
-                                      onTap: () {
-                                        setState(() {
-                                          if (isFavorite) {
-                                            favoriteCars.remove(car.name);
-                                          } else {
-                                            favoriteCars.add(car.name);
-                                          }
-                                        });
-                                      },
+                                      onTap: () => onToggleFavorite(car),
                                       child: Icon(
                                         isFavorite
                                             ? Icons.favorite
@@ -248,8 +314,7 @@ class _HomePageState extends State<HomePage> {
                                     ),
                                   ],
                                 ),
-
-                                const SizedBox(height: 4),
+                                const SizedBox(height: 3),
                                 Row(
                                   mainAxisAlignment:
                                       MainAxisAlignment.spaceBetween,
@@ -259,7 +324,7 @@ class _HomePageState extends State<HomePage> {
                                         car.address,
                                         style: const TextStyle(
                                           color: Colors.white,
-                                          fontSize: 15,
+                                          fontSize: 16,
                                         ),
                                       ),
                                     ),
@@ -280,19 +345,13 @@ class _HomePageState extends State<HomePage> {
                                         await Navigator.push(
                                           context,
                                           MaterialPageRoute(
-                                            builder: (context) => BookingPage(
+                                            builder: (_) => BookingPage(
                                               car: car,
-                                              onCarBooked:
-                                                  (
-                                                    Map<String, dynamic>
-                                                    bookingDetails,
-                                                  ) {},
+                                              onCarBooked: (details) {},
                                             ),
                                           ),
                                         );
-                                        setState(
-                                          () {},
-                                        ); // refresh after booking
+                                        setState(() {});
                                       },
                                       child: Text(
                                         car.price,
@@ -322,7 +381,6 @@ class _HomePageState extends State<HomePage> {
     final favoriteList = cars
         .where((car) => favoriteCars.contains(car.name))
         .toList();
-
     return FavoritePage(
       favoriteCars: favoriteList,
       onToggleFavorite: onToggleFavorite,
@@ -331,22 +389,19 @@ class _HomePageState extends State<HomePage> {
 
   Widget buildMenuPage() => MenuPage();
 
-  Widget buildBookedPage() {
-    return BookedCar(bookedCars: HomePage.bookedCarsMaps);
-  }
+  Widget buildBookedPage() => BookedCar(bookedCars: HomePage.bookedCarsMaps);
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: selectedIndex == 0
-            ? buildHomePage()
-            : selectedIndex == 1
-            ? buildBookedPage()
-            : selectedIndex == 2
-            ? buildFavoritesPage()
-            : buildMenuPage(),
+        child: [
+          buildHomePage(),
+          buildBookedPage(),
+          buildFavoritesPage(),
+          buildMenuPage(),
+        ][selectedIndex],
       ),
       bottomNavigationBar: Container(
         decoration: const BoxDecoration(
@@ -362,11 +417,7 @@ class _HomePageState extends State<HomePage> {
         ),
         child: BottomNavigationBar(
           currentIndex: selectedIndex,
-          onTap: (index) {
-            setState(() {
-              selectedIndex = index;
-            });
-          },
+          onTap: (index) => setState(() => selectedIndex = index),
           selectedItemColor: Colors.black,
           unselectedItemColor: Colors.grey,
           showSelectedLabels: true,

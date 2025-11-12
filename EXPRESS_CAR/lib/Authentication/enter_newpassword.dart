@@ -1,6 +1,7 @@
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'signin_page.dart';
+
 class ConfirmPasswordPage extends StatefulWidget {
   final String email;
 
@@ -27,7 +28,6 @@ class _ConfirmPasswordPageState extends State<ConfirmPasswordPage> {
     super.dispose();
   }
 
-  // Password validation method
   String? passwordValidator(String? value) {
     if (value == null || value.isEmpty) {
       return "Password is required";
@@ -43,41 +43,60 @@ class _ConfirmPasswordPageState extends State<ConfirmPasswordPage> {
 
   void _showSnackBar(String message) {
     if (mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(message)));
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text(message)));
     }
   }
 
+  /// Main logic for confirming password reset
   Future<void> _onConfirmPressed() async {
-    if (!_formKey.currentState!.validate()) {
-      return;
-    }
+    if (!_formKey.currentState!.validate()) return;
+
     setState(() => _isSubmitting = true);
+    final newPassword = newPasswordController.text.trim();
 
     try {
-      // Check if the user account exists in Firebase Auth
-      final List<String> signInMethods =
-          await FirebaseAuth.instance.fetchSignInMethodsForEmail(widget.email);
+      final user = FirebaseAuth.instance.currentUser;
 
-      if (signInMethods.isEmpty) {
-        _showSnackBar('Account not found for this email.');
+      if (user != null) {
+        // User is already logged in → update password directly
+        await user.updatePassword(newPassword);
+        _showSnackBar("Password updated successfully!");
       } else {
-        // Account exists. Send the official password reset email.
-        await FirebaseAuth.instance.sendPasswordResetEmail(email: widget.email);
-        _showSnackBar('Password reset link sent to ${widget.email}.');
-        if (mounted) {
-          Navigator.pushAndRemoveUntil(
-            context,
-            MaterialPageRoute(builder: (context) => SignInPage()),
-            (route) => false,
+        // User not logged in → send a password reset email
+        final methods = await FirebaseAuth.instance.fetchSignInMethodsForEmail(
+          widget.email,
+        );
+        if (methods.isEmpty) {
+          _showSnackBar("No account found for this email.");
+        } else {
+          await FirebaseAuth.instance.sendPasswordResetEmail(
+            email: widget.email,
           );
+          _showSnackBar("Password reset link sent to ${widget.email}.");
         }
       }
-    } on FirebaseAuthException catch (e) {
-      _showSnackBar('An error occurred: ${e.message}');
-    } finally {
+
       if (mounted) {
-        setState(() => _isSubmitting = false);
+        Navigator.pushAndRemoveUntil(
+          context,
+          MaterialPageRoute(builder: (context) => SignInPage()),
+          (route) => false,
+        );
       }
+    } on FirebaseAuthException catch (e) {
+      String errorMessage = "An error occurred.";
+      if (e.code == 'weak-password') {
+        errorMessage = "Password is too weak.";
+      } else if (e.code == 'requires-recent-login') {
+        errorMessage = "Please re-login before changing your password.";
+      } else {
+        errorMessage = e.message ?? errorMessage;
+      }
+      _showSnackBar(errorMessage);
+    } finally {
+      if (mounted) setState(() => _isSubmitting = false);
     }
   }
 
@@ -94,10 +113,8 @@ class _ConfirmPasswordPageState extends State<ConfirmPasswordPage> {
             autovalidateMode: AutovalidateMode.onUserInteraction,
             child: Column(
               children: [
-                // Back button
                 const SizedBox(height: 10),
 
-                // Title
                 const Text(
                   "Confirm Password",
                   style: TextStyle(
@@ -115,7 +132,6 @@ class _ConfirmPasswordPageState extends State<ConfirmPasswordPage> {
 
                 const SizedBox(height: 30),
 
-                // Illustration image
                 SizedBox(
                   height: 190,
                   child: Image.asset('assets/images/ChangePassword.jpg'),
@@ -123,13 +139,11 @@ class _ConfirmPasswordPageState extends State<ConfirmPasswordPage> {
 
                 const SizedBox(height: 40),
 
-                // New Password Field
                 TextFormField(
                   controller: newPasswordController,
                   obscureText: !isPasswordVisible,
                   decoration: InputDecoration(
                     labelText: "New Password",
-                    hintText: "",
                     filled: true,
                     fillColor: const Color(0xFFF5F5F5),
                     border: OutlineInputBorder(
@@ -144,9 +158,7 @@ class _ConfirmPasswordPageState extends State<ConfirmPasswordPage> {
                         color: Colors.grey,
                       ),
                       onPressed: () {
-                        setState(() {
-                          isPasswordVisible = !isPasswordVisible;
-                        });
+                        setState(() => isPasswordVisible = !isPasswordVisible);
                       },
                     ),
                   ),
@@ -155,13 +167,11 @@ class _ConfirmPasswordPageState extends State<ConfirmPasswordPage> {
 
                 const SizedBox(height: 20),
 
-                // Confirm Password Field
                 TextFormField(
                   controller: confirmPasswordController,
                   obscureText: !isConfirmPasswordVisible,
                   decoration: InputDecoration(
                     labelText: "Confirm Password",
-                    hintText: "",
                     filled: true,
                     fillColor: const Color(0xFFF5F5F5),
                     border: OutlineInputBorder(
@@ -176,17 +186,16 @@ class _ConfirmPasswordPageState extends State<ConfirmPasswordPage> {
                         color: Colors.grey,
                       ),
                       onPressed: () {
-                        setState(() {
-                          isConfirmPasswordVisible = !isConfirmPasswordVisible;
-                        });
+                        setState(
+                          () => isConfirmPasswordVisible =
+                              !isConfirmPasswordVisible,
+                        );
                       },
                     ),
                   ),
                   validator: (value) {
-                    // First run the password validation on confirm password as well
                     final error = passwordValidator(value);
                     if (error != null) return error;
-
                     if (value != newPasswordController.text) {
                       return "Passwords do not match";
                     }
@@ -196,7 +205,6 @@ class _ConfirmPasswordPageState extends State<ConfirmPasswordPage> {
 
                 const SizedBox(height: 30),
 
-                // Confirm Button
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
@@ -212,11 +220,18 @@ class _ConfirmPasswordPageState extends State<ConfirmPasswordPage> {
                         ? const SizedBox(
                             height: 20,
                             width: 20,
-                            child: CircularProgressIndicator(color: Colors.white, strokeWidth: 3),
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 3,
+                            ),
                           )
                         : const Text(
                             "Confirm Password",
-                            style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold, color: Colors.white),
+                            style: TextStyle(
+                              fontSize: 18,
+                              fontWeight: FontWeight.bold,
+                              color: Colors.white,
+                            ),
                           ),
                   ),
                 ),

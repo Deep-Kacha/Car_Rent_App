@@ -8,8 +8,8 @@ class AccountPage extends StatefulWidget {
 }
 
 class _AccountPageState extends State<AccountPage> {
-  bool _obscurePassword = true; //  password toggle
-  final String _password = "ethanjohn@123"; //  your actual password
+  bool _obscurePassword = true;
+  final String _password = "ethanjohn@123";
 
   @override
   Widget build(BuildContext context) {
@@ -27,7 +27,7 @@ class _AccountPageState extends State<AccountPage> {
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
-                      Navigator.pop(context);
+                      Navigator.pop(context); 
                     },
                   ),
                   const SizedBox(width: 8),
@@ -40,7 +40,6 @@ class _AccountPageState extends State<AccountPage> {
 
               const SizedBox(height: 30),
 
-              /// Email
               const Text(
                 "Email",
                 style: TextStyle(fontSize: 14, color: Colors.grey),
@@ -61,7 +60,6 @@ class _AccountPageState extends State<AccountPage> {
 
               const SizedBox(height: 20),
 
-              /// Password with toggle
               const Text(
                 "Password",
                 style: TextStyle(fontSize: 14, color: Colors.grey),
@@ -98,7 +96,6 @@ class _AccountPageState extends State<AccountPage> {
 
               const SizedBox(height: 20),
 
-              /// Phone number
               const Text(
                 "Phone number",
                 style: TextStyle(fontSize: 14, color: Colors.grey),
@@ -119,7 +116,6 @@ class _AccountPageState extends State<AccountPage> {
 
               const SizedBox(height: 20),
 
-              /// Google
               const Text(
                 "Google",
                 style: TextStyle(fontSize: 14, color: Colors.grey),
