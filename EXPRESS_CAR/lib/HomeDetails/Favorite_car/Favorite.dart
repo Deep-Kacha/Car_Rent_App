@@ -128,7 +128,7 @@ class FavoritePage extends StatelessWidget {
                                             car.address,
                                             style: TextStyle(
                                               color: Colors.white,
-                                              fontSize: 12,
+                                              fontSize: 16,
                                             ),
                                           ),
                                         ),
