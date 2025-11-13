@@ -1,4 +1,4 @@
-
+// Path: lib/Splash/splash.dart
 import 'package:express_car/Authentication/auth_wrapper.dart';
 import 'package:flutter/material.dart';
 import 'dart:async';
@@ -12,8 +12,7 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-
-    // Navigate to HomePage after 2 seconds
+    // Navigate after 2 seconds to AuthWrapper which will route to sign-in or home
     Timer(const Duration(seconds: 2), () {
       Navigator.pushReplacement(
         context,
@@ -25,23 +24,17 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // background color
+      backgroundColor: Colors.white,
       body: Stack(
         children: [
-          // Logo positioned manually
           Positioned(
-            top: 155, // distance from top
+            top: 155,
             left: 0,
             right: 0,
-            child: Image.asset(
-              "assets/images/splash.jpg", // your splash image
-              height: 500,
-            ),
+            child: Image.asset("assets/images/splash.jpg", height: 500),
           ),
-
-          // Text positioned manually
           const Positioned(
-            bottom: 100, // distance from bottom
+            bottom: 100,
             left: 0,
             right: 0,
             child: Text(

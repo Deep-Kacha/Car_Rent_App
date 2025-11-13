@@ -1,3 +1,6 @@
+// Path: lib/Authentication/CompleteProfile.dart
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:express_car/HomeDetails/Home_Page/home_page.dart';
 
@@ -27,17 +30,50 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
     super.dispose();
   }
 
-  void _onContinue() {
+  Future<void> _saveProfile() async {
     if (!_formKey.currentState!.validate()) return;
+
     setState(() => _isSubmitting = true);
 
-    Future.delayed(const Duration(seconds: 1), () {
-      setState(() => _isSubmitting = false);
+    try {
+      final user = FirebaseAuth.instance.currentUser;
+      if (user == null) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('No user signed in. Please log in again.')),
+        );
+        return;
+      }
+
+      final docRef = FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid);
+
+      await docRef.update({
+        'displayName': _nameController.text.trim(),
+        'phone': _phoneController.text.trim(),
+        'address': _addressController.text.trim(),
+        'dob': _dobController.text.trim(),
+        'gender': _selectedGender,
+        'updatedAt': FieldValue.serverTimestamp(),
+      });
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Profile completed successfully!')),
+      );
+
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
       );
-    });
+    } catch (e, s) {
+      print('Profile update error: $e');
+      print('Stack: $s');
+      ScaffoldMessenger.of(context).showSnackBar(
+        SnackBar(content: Text('Failed to save profile. See console.')),
+      );
+    } finally {
+      setState(() => _isSubmitting = false);
+    }
   }
 
   InputDecoration _fieldDecoration(
@@ -65,7 +101,6 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              // Top bar with back button + centered title
               Row(
                 children: [
                   IconButton(
@@ -84,18 +119,16 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                       ),
                     ),
                   ),
-                  const SizedBox(width: 48), // keeps title centered
+                  const SizedBox(width: 48),
                 ],
               ),
               const SizedBox(height: 6),
-
               Text(
                 "Give the information to make you trusted user",
                 textAlign: TextAlign.center,
                 style: TextStyle(fontSize: 14, color: Colors.black54),
               ),
               const SizedBox(height: 24),
-
               Center(
                 child: Image.asset(
                   "assets/images/complete_profile.jpg",
@@ -103,22 +136,18 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                 ),
               ),
               const SizedBox(height: 16),
-
               Form(
                 key: _formKey,
                 autovalidateMode: AutovalidateMode.onUserInteraction,
                 child: Column(
                   children: [
-                    // Full Name
                     TextFormField(
                       controller: _nameController,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       decoration: _fieldDecoration("Full Name", "Ethan John"),
                       validator: (value) {
                         if (value == null || value.trim().isEmpty) {
                           return 'Please enter your full name';
                         }
-                        // Only alphabets (a-z, A-Z) and spaces allowed
                         if (!RegExp(r'^[a-zA-Z ]+$').hasMatch(value.trim())) {
                           return 'Name should contain only letters';
                         }
@@ -126,12 +155,9 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                       },
                     ),
                     const SizedBox(height: 14),
-
-                    // Phone
                     TextFormField(
                       controller: _phoneController,
                       keyboardType: TextInputType.phone,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       decoration: _fieldDecoration(
                         "Phone Number",
                         "Enter phone number",
@@ -146,11 +172,8 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                       },
                     ),
                     const SizedBox(height: 14),
-
-                    // Address
                     TextFormField(
                       controller: _addressController,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       decoration: _fieldDecoration(
                         "Address",
                         "Enter your address",
@@ -163,12 +186,9 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                       },
                     ),
                     const SizedBox(height: 14),
-
-                    // Date of Birth
                     TextFormField(
                       controller: _dobController,
                       readOnly: true,
-                      autovalidateMode: AutovalidateMode.onUserInteraction,
                       decoration: _fieldDecoration(
                         "Date Of Birth",
                         "Select your date of birth",
@@ -195,8 +215,6 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                       },
                     ),
                     const SizedBox(height: 14),
-
-                    // Gender Dropdown
                     DropdownButtonFormField<String>(
                       decoration: _fieldDecoration("Gender", "Select gender"),
                       value: _selectedGender,
@@ -214,12 +232,10 @@ class _CompleteProfilePageState extends State<CompleteProfilePage> {
                           value == null ? "Please select your gender" : null,
                     ),
                     const SizedBox(height: 24),
-
-                    // Continue Button
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: _isSubmitting ? null : _onContinue,
+                        onPressed: _isSubmitting ? null : _saveProfile,
                         style: ElevatedButton.styleFrom(
                           backgroundColor: _primaryBrown,
                           padding: const EdgeInsets.symmetric(vertical: 16),

@@ -14,6 +14,14 @@
       },
       "oauth_client": [
         {
+          "client_id": "136403017507-12m59fmu5r87n246h45u8j9kfm7415ra.apps.googleusercontent.com",
+          "client_type": 1,
+          "android_info": {
+            "package_name": "com.example.car_rental_project",
+            "certificate_hash": "0627378ea6f893b581545b816ff0f17704456120"
+          }
+        },
+        {
           "client_id": "136403017507-qh07tvg7o43bf32cm4g57j47bsmvj80o.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {

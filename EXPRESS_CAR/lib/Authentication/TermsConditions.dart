@@ -27,28 +27,27 @@ class _TermsConditionsState extends State<TermsConditions> {
         ),
         centerTitle: false,
       ),
-      body: SafeArea(
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              // Title
-              const Text(
-                "Terms & conditions",
-                style: TextStyle(
-                  fontSize: 26,
-                  fontWeight: FontWeight.bold,
-                  color: Colors.black,
-                ),
+      body: Padding(
+        padding: const EdgeInsets.all(20.0),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            // Title
+            const Text(
+              "Terms & conditions",
+              style: TextStyle(
+                fontSize: 26,
+                fontWeight: FontWeight.w600,
+                color: Colors.black,
               ),
-              const SizedBox(height: 20),
+            ),
+            const SizedBox(height: 15),
 
-              // Scrollable Terms
-              Expanded(
-                child: SingleChildScrollView(
-                  child: const Text(
-                    """
+            // Scrollable Terms text
+            Expanded(
+              child: SingleChildScrollView(
+                child: const Text(
+                  """
 These Terms and Conditions govern your use of the Express Car Rental App provided.
 
 1. Acceptance of Terms: By downloading, installing, accessing, or using the Express Car Rental App, you agree to be bound by these Terms. The Company reserves the right to update, modify, or replace these Terms at any time without prior notice. Your continued use of the App after any changes to these Terms constitutes acceptance of such changes.
@@ -57,49 +56,43 @@ These Terms and Conditions govern your use of the Express Car Rental App provide
 
 3. Use of the App: The Express Car Rental App is intended for personal, non-commercial use only. You agree not to use the App for any unlawful or prohibited purpose or in any manner that could damage, disable, overburden, or impair the functionality of the App.
                   """,
-                    style: TextStyle(
-                      fontSize: 15,
-                      height: 1.6,
-                      color: Colors.black87,
-                    ),
+                  style: TextStyle(
+                    fontSize: 15,
+                    height: 1.6,
+                    color: Colors.black87,
                   ),
                 ),
               ),
+            ),
 
-              const SizedBox(height: 15),
+            const SizedBox(height: 20),
 
-              // Continue Button
-              SizedBox(
-                width: double.infinity,
-                height: 55,
-                child: TextButton(
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: const Color.fromARGB(
-                      255,
-                      63,
-                      34,
-                      26,
-                    ), // dark brown
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(30),
-                    ),
-                  ),
-                  onPressed: () {
-                    Navigator.pop(context); // go back or navigate anywhere else
-                  },
-                  child: Text(
-                    "Continue",
-                    style: TextStyle(
-                      fontSize: 18,
-                      color: Colors.white,
-                      fontWeight: FontWeight.bold,
-                    ),
+            // Continue Button
+            SizedBox(
+              width: double.infinity,
+              height: 55,
+              child: ElevatedButton(
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: const Color.fromARGB(
+                    255,
+                    63,
+                    34,
+                    26,
+                  ), // dark brown
+                  shape: RoundedRectangleBorder(
+                    borderRadius: BorderRadius.circular(30),
                   ),
                 ),
+                onPressed: () {
+                  Navigator.pop(context); // go back or navigate anywhere else
+                },
+                child: const Text(
+                  "Continue",
+                  style: TextStyle(fontSize: 18, color: Colors.white),
+                ),
               ),
-              const SizedBox(height: 10),
-            ],
-          ),
+            ),
+          ],
         ),
       ),
     );
