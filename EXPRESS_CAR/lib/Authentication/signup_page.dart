@@ -108,19 +108,13 @@ class _SignUpPageState extends State<SignUpPage> {
     }
   }
 
-  Future<void> _signUpWithGoogle() async {
-    setState(() => _isSubmitting = true);
+  Future<void> _signInWithGoogle() async {
     try {
-      final GoogleSignIn googleSignIn;
-      if (kIsWeb) {
-        // For web, use the iOS client ID as it's the web client ID in your firebase_options
-        googleSignIn = GoogleSignIn(
-          clientId: DefaultFirebaseOptions.ios.iosClientId,
-        );
-      } else {
-        googleSignIn = GoogleSignIn();
-      }
-
+      // For web, you need to provide the client ID.
+      // Replace 'YOUR_WEB_CLIENT_ID...' with your actual web client ID from Firebase/Google Cloud.
+      final GoogleSignIn googleSignIn = GoogleSignIn(
+        //clientId: 'YOUR_WEB_CLIENT_ID.apps.googleusercontent.com',
+      );
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
       if (googleUser == null) {
         setState(() => _isSubmitting = false);
@@ -401,3 +395,4 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 }
+  

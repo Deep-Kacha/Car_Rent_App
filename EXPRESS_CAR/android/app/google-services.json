@@ -66,14 +66,6 @@
       },
       "oauth_client": [
         {
-          "client_id": "136403017507-6l1j8n1geqtr6o4bt1af0cff5qvj9b2c.apps.googleusercontent.com",
-          "client_type": 1,
-          "android_info": {
-            "package_name": "com.example.express_car",
-            "certificate_hash": "b9491699921fbb7ff74e9908c253f10fa150003c"
-          }
-        },
-        {
           "client_id": "136403017507-l2bu7plrsc4s1pc017qqgvl0ok695c4h.apps.googleusercontent.com",
           "client_type": 1,
           "android_info": {
