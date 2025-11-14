@@ -66,9 +66,7 @@ class _BookedCarState extends State<BookedCar> {
                             height: 150,
                             width: double.infinity,
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF3E2723,
-                              ), 
+                              color: const Color(0xFF3E2723),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             padding: const EdgeInsets.all(10),
@@ -86,7 +84,7 @@ class _BookedCarState extends State<BookedCar> {
                                 ),
 
                                 const SizedBox(width: 12),
-                                
+
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:

@@ -18,7 +18,7 @@ class AuthWrapper extends StatelessWidget {
             body: Center(
               child: CircularProgressIndicator(color: Color(0xFF3E2723)),
             ),
-          );
+          );  
         }
 
         if (snapshot.hasData && snapshot.data != null) {
