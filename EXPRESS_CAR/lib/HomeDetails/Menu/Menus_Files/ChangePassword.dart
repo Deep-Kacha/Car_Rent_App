@@ -1,3 +1,5 @@
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class ChangePasswordPage extends StatefulWidget {
@@ -8,35 +10,77 @@ class ChangePasswordPage extends StatefulWidget {
 }
 
 class _ChangePasswordPageState extends State<ChangePasswordPage> {
+  final _formKey = GlobalKey<FormState>();
+
   final TextEditingController oldPasswordController = TextEditingController();
   final TextEditingController newPasswordController = TextEditingController();
   final TextEditingController confirmPasswordController =
       TextEditingController();
 
-  bool oldPasswordVisible = false;
-  bool newPasswordVisible = false;
-  bool confirmPasswordVisible = false;
+  bool hasPassword = true;
+  bool isUpdating = false;
 
-  String? newPasswordError;
-  String? confirmPasswordError;
+  bool oldVisible = false;
+  bool newVisible = false;
+  bool confirmVisible = false;
 
-  // Password validation (same style as SignUp)
-  String? _validatePassword(String value) {
-    if (value.isEmpty) return "Password is required";
-    if (value.length < 6) {
-      return "Password must be at least 6 characters";
-    }
-    if (!RegExp(r'^(?=.*[A-Z])(?=.*[0-9])').hasMatch(value)) {
-      return "Must contain at least 1 uppercase & 1 number";
-    }
-    return null;
+  final Color brown = const Color.fromARGB(255, 63, 34, 26);
+
+  @override
+  void initState() {
+    super.initState();
+    _checkPasswordState();
   }
 
-  String? _validateConfirmPassword(String value) {
-    if (value != newPasswordController.text) {
-      return "Passwords do not match";
+  Future<void> _checkPasswordState() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return;
+
+    hasPassword = user.providerData.any((p) => p.providerId == "password");
+
+    setState(() {});
+  }
+
+  Future<void> _updatePassword() async {
+    if (!_formKey.currentState!.validate()) return;
+
+    if (newPasswordController.text != confirmPasswordController.text) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(const SnackBar(content: Text("Passwords do not match")));
+      return;
     }
-    return null;
+
+    setState(() => isUpdating = true);
+
+    final user = FirebaseAuth.instance.currentUser;
+
+    try {
+      if (hasPassword) {
+        final credential = EmailAuthProvider.credential(
+          email: user!.email!,
+          password: oldPasswordController.text.trim(),
+        );
+        await user.reauthenticateWithCredential(credential);
+      }
+
+      await user!.updatePassword(newPasswordController.text.trim());
+      await FirebaseFirestore.instance.collection('users').doc(user.uid).update(
+        {"hasPassword": true},
+      );
+
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text("Password updated successfully!")),
+      );
+
+      Navigator.pop(context);
+    } catch (e) {
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text("Failed: ${e.toString()}")));
+    } finally {
+      setState(() => isUpdating = false);
+    }
   }
 
   @override
@@ -47,18 +91,15 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
         child: SingleChildScrollView(
           padding: const EdgeInsets.all(20),
           child: Form(
-            autovalidateMode: AutovalidateMode.onUserInteraction,
+            key: _formKey,
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.center,
               children: [
-                /// Back button + Title
                 Row(
                   children: [
                     IconButton(
                       icon: const Icon(Icons.arrow_back),
-                      onPressed: () {
-                        Navigator.pop(context);
-                      },
+                      onPressed: () => Navigator.pop(context),
                     ),
                     const Expanded(
                       child: Center(
@@ -77,110 +118,113 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
 
                 const SizedBox(height: 20),
 
-                const Text(
-                  "Enter your new password below",
-                  style: TextStyle(color: Colors.grey, fontSize: 14),
-                ),
-
-                const SizedBox(height: 30),
-
-                // Illustration
-                Center(
-                  child: Image.asset(
-                    "assets/images/ChangePassword.jpg",
-                    height: 180,
-                  ),
-                ),
-
-                const SizedBox(height: 30),
-
-                // Old Password
-                _buildPasswordField(
-                  label: "Old Password",
-                  controller: oldPasswordController,
-                  isVisible: oldPasswordVisible,
-                  toggleVisibility: () {
-                    setState(() {
-                      oldPasswordVisible = !oldPasswordVisible;
-                    });
-                  },
-                ),
-
-                // New Password
-                _buildPasswordField(
-                  label: "New Password",
-                  controller: newPasswordController,
-                  isVisible: newPasswordVisible,
-                  toggleVisibility: () {
-                    setState(() {
-                      newPasswordVisible = !newPasswordVisible;
-                    });
-                  },
-                  validator: _validatePassword,
-                  onChanged: (val) {
-                    setState(() {
-                      newPasswordError = _validatePassword(val);
-                    });
-                  },
-                  errorText: newPasswordError,
-                ),
-
-                // Confirm Password
-                _buildPasswordField(
-                  label: "Confirm Password",
-                  controller: confirmPasswordController,
-                  isVisible: confirmPasswordVisible,
-                  toggleVisibility: () {
-                    setState(() {
-                      confirmPasswordVisible = !confirmPasswordVisible;
-                    });
-                  },
-                  validator: _validateConfirmPassword,
-                  onChanged: (val) {
-                    setState(() {
-                      confirmPasswordError = _validateConfirmPassword(val);
-                    });
-                  },
-                  errorText: confirmPasswordError,
-                ),
-
-                const SizedBox(height: 30),
-
-                // Confirm Button
-                SizedBox(
-                  width: double.infinity,
-                  child: ElevatedButton(
-                    onPressed: () {
-                      if (newPasswordError == null &&
-                          confirmPasswordError == null &&
-                          newPasswordController.text.isNotEmpty) {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Password changed successfully!"),
-                          ),
-                        );
-                        Navigator.pop(context);
-                      } else {
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text("Please fix the errors first!"),
-                          ),
-                        );
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: const Color.fromARGB(255, 63, 34, 26),
-                      padding: const EdgeInsets.symmetric(vertical: 16),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(30),
+                if (!hasPassword)
+                  Column(
+                    children: [
+                      const SizedBox(height: 30),
+                      Image.asset(
+                        "assets/images/ChangePassword.jpg",
+                        height: 180,
                       ),
-                    ),
-                    child: const Text(
-                      "Confirm Password",
-                      style: TextStyle(fontSize: 16, color: Colors.white),
+                      const SizedBox(height: 20),
+                      const Text(
+                        "You signed in using Google.\nNo password is set for this account.",
+                        textAlign: TextAlign.center,
+                        style: TextStyle(fontSize: 16, color: Colors.grey),
+                      ),
+                      const SizedBox(height: 30),
+                      SizedBox(
+                        width: double.infinity,
+                        child: ElevatedButton(
+                          onPressed: () => setState(() => hasPassword = true),
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: brown,
+                            padding: const EdgeInsets.symmetric(vertical: 16),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(30),
+                            ),
+                          ),
+                          child: const Text(
+                            "Set Password",
+                            style: TextStyle(fontSize: 16, color: Colors.white),
+                          ),
+                        ),
+                      ),
+                    ],
+                  )
+                else ...[
+                  const Text(
+                    "Enter your new password below",
+                    style: TextStyle(color: Colors.grey, fontSize: 14),
+                  ),
+                  const SizedBox(height: 30),
+                  Image.asset("assets/images/ChangePassword.jpg", height: 180),
+                  const SizedBox(height: 30),
+
+                  _buildField(
+                    label: "Old Password",
+                    controller: oldPasswordController,
+                    isVisible: oldVisible,
+                    toggleVisibility: () =>
+                        setState(() => oldVisible = !oldVisible),
+                    validator: (value) =>
+                        value.isEmpty ? "Enter old password" : null,
+                  ),
+
+                  _buildField(
+                    label: "New Password",
+                    controller: newPasswordController,
+                    isVisible: newVisible,
+                    toggleVisibility: () =>
+                        setState(() => newVisible = !newVisible),
+                    validator: (value) {
+                      if (value.isEmpty) return "Password required";
+                      if (value.length < 6) {
+                        return "Password must be at least 6 characters";
+                      }
+                      return null;
+                    },
+                  ),
+
+                  _buildField(
+                    label: "Confirm Password",
+                    controller: confirmPasswordController,
+                    isVisible: confirmVisible,
+                    toggleVisibility: () =>
+                        setState(() => confirmVisible = !confirmVisible),
+                    validator: (value) => value != newPasswordController.text
+                        ? "Passwords do not match"
+                        : null,
+                  ),
+
+                  const SizedBox(height: 30),
+
+                  SizedBox(
+                    width: double.infinity,
+                    child: ElevatedButton(
+                      onPressed: isUpdating ? null : _updatePassword,
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: brown,
+                        padding: const EdgeInsets.symmetric(vertical: 16),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(30),
+                        ),
+                      ),
+                      child: isUpdating
+                          ? const CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            )
+                          : const Text(
+                              "Confirm Password",
+                              style: TextStyle(
+                                fontSize: 16,
+                                color: Colors.white,
+                              ),
+                            ),
                     ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
@@ -188,14 +232,13 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
       ),
     );
   }
-  Widget _buildPasswordField({
+
+  Widget _buildField({
     required String label,
     required TextEditingController controller,
     required bool isVisible,
     required VoidCallback toggleVisibility,
-    String? Function(String)? validator,
-    Function(String)? onChanged,
-    String? errorText,
+    required String? Function(String) validator,
   }) {
     return Padding(
       padding: const EdgeInsets.only(bottom: 16),
@@ -207,12 +250,10 @@ class _ChangePasswordPageState extends State<ChangePasswordPage> {
           TextFormField(
             controller: controller,
             obscureText: !isVisible,
-            onChanged: onChanged,
-            validator: (value) => validator?.call(value ?? ""),
+            validator: (value) => validator(value ?? ""),
             decoration: InputDecoration(
               filled: true,
               fillColor: const Color(0xFFF5F5F5),
-              errorText: errorText,
               border: OutlineInputBorder(
                 borderRadius: BorderRadius.circular(10),
                 borderSide: BorderSide.none,
