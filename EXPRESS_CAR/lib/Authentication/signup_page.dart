@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:express_car/Authentication/TermsConditions.dart';
 import 'package:express_car/Authentication/verify_email_page.dart';
+import 'package:express_car/Splash/GetStart.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
@@ -174,7 +175,10 @@ class _SignUpPageState extends State<SignUpPage> {
                 alignment: Alignment.centerLeft,
                 child: IconButton(
                   icon: const Icon(Icons.arrow_back, color: Colors.black87),
-                  onPressed: () => Navigator.pop(context),
+                  onPressed: () => Navigator.pushReplacement(
+                    context,
+                    MaterialPageRoute(builder: (context) => GetStart()),
+                  ),
                 ),
               ),
               const SizedBox(height: 10),
@@ -397,4 +401,3 @@ class _SignUpPageState extends State<SignUpPage> {
     );
   }
 }
-  
