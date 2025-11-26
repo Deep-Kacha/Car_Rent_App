@@ -8,9 +8,14 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
-class MenuPage extends StatelessWidget {
+class MenuPage extends StatefulWidget {
   const MenuPage({Key? key}) : super(key: key);
 
+  @override
+  State<MenuPage> createState() => _MenuPageState();
+}
+
+class _MenuPageState extends State<MenuPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
@@ -119,13 +124,15 @@ class MenuPage extends StatelessWidget {
                       },
                     ),
                     _buildMenuItem(Icons.logout, "Log Out", () async {
+                      // Check if the widget is still mounted before using the context.
+                      if (!mounted) return;
+                      final navigator = Navigator.of(context);
+
                       await FirebaseAuth.instance.signOut();
                       await GoogleSignIn().signOut();
-                      Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (context) => GetStart(),
-                        ), // Replace with your sign in page widget
-                        (route) => false,
+                      await navigator.pushAndRemoveUntil(
+                        MaterialPageRoute(builder: (context) => GetStart()),
+                        (Route<dynamic> route) => false,
                       );
                     }),
                   ],
