@@ -1,118 +1,187 @@
-
 import 'package:express_car/HomeDetails/Menu/Menus_Files/EditProfile.dart';
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
-class ViewProfilePage extends StatelessWidget {
+class ViewProfilePage extends StatefulWidget {
   const ViewProfilePage({Key? key}) : super(key: key);
+
+  @override
+  State<ViewProfilePage> createState() => _ViewProfilePageState();
+}
+
+class _ViewProfilePageState extends State<ViewProfilePage> {
+  User? currentUser = FirebaseAuth.instance.currentUser;
+  Map<String, dynamic>? userData;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    if (currentUser == null) return;
+
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser!.uid)
+          .get();
+
+      final data = doc.data() ?? {};
+
+      setState(() {
+        userData = {
+          'displayName':
+              data['displayName'] ?? currentUser!.displayName ?? 'Guest User',
+          'photoURL': data['photoURL'] ?? currentUser!.photoURL ?? '',
+          'email': currentUser!.email ?? 'Not Provided',
+          'phone': data['phone'] ?? 'Not Provided',
+          'address': data['address'] ?? 'Not Provided',
+          'dob': data['dob'] ?? 'Not Provided',
+          'gender': data['gender'] ?? 'Not Provided',
+          'googleConnected': currentUser!.providerData.any(
+            (p) => p.providerId == 'google.com',
+          ),
+        };
+      });
+    } catch (e) {
+      print("Error fetching user data: $e");
+      setState(() {
+        userData = {
+          'displayName': currentUser!.displayName ?? 'Guest User',
+          'photoURL': currentUser!.photoURL ?? '',
+          'email': currentUser!.email ?? 'Not Provided',
+          'phone': 'Not Provided',
+          'address': 'Not Provided',
+          'dob': 'Not Provided',
+          'gender': 'Not Provided',
+          'googleConnected': currentUser!.providerData.any(
+            (p) => p.providerId == 'google.com',
+          ),
+        };
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: Colors.white,
       body: SafeArea(
-        child: SingleChildScrollView(
-          padding: const EdgeInsets.all(20),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.center,
-            children: [
-              Row(
-                children: [
-                  IconButton(
-                    icon: const Icon(Icons.arrow_back),
-                    onPressed: () {
-                      Navigator.pop(context);
-                    },
-                  ),
-                  const Expanded(
-                    child: Center(
+        child: userData == null
+            ? const Center(child: CircularProgressIndicator())
+            : SingleChildScrollView(
+                padding: const EdgeInsets.all(20),
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.center,
+                  children: [
+                    // Top Row: Back button + title
+                    Row(
+                      children: [
+                        IconButton(
+                          icon: const Icon(Icons.arrow_back),
+                          onPressed: () => Navigator.pop(context),
+                        ),
+                        const Expanded(
+                          child: Center(
+                            child: Text(
+                              "Profile",
+                              style: TextStyle(
+                                fontSize: 28,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          ),
+                        ),
+                        const SizedBox(width: 48),
+                      ],
+                    ),
+
+                    const SizedBox(height: 20),
+
+                    // Profile photo
+                    CircleAvatar(
+                      radius: 50,
+                      backgroundImage: userData!['photoURL'] != ''
+                          ? NetworkImage(userData!['photoURL'])
+                          : const AssetImage("assets/images/profile.jpg")
+                                as ImageProvider,
+                    ),
+                    const SizedBox(height: 12),
+
+                    // Name
+                    Text(
+                      userData!['displayName'],
+                      style: const TextStyle(
+                        fontSize: 28,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                    const SizedBox(height: 4),
+
+                    // Description
+                    const Text(
+                      "Profile with personal info and connected social media appear more trustworthy.",
+                      textAlign: TextAlign.center,
+                      style: TextStyle(fontSize: 16, color: Colors.grey),
+                    ),
+
+                    const SizedBox(height: 20),
+                    const Divider(),
+
+                    // Verified Info Title
+                    const Align(
+                      alignment: Alignment.centerLeft,
                       child: Text(
-                        "Profile",
+                        "Verified Info",
                         style: TextStyle(
-                          fontSize: 28,
-                          fontWeight: FontWeight.w500,
+                          fontSize: 16,
+                          fontWeight: FontWeight.bold,
                         ),
                       ),
                     ),
-                  ),
-                  const SizedBox(width: 48),
-                ],
-              ),
+                    const SizedBox(height: 16),
 
-              const SizedBox(height: 20),
+                    // Email
+                    _buildInfoField("Email", userData!['email']),
 
-              const CircleAvatar(
-                radius: 50,
-                backgroundImage: AssetImage("assets/images/profile.jpg"),
-              ),
-              const SizedBox(height: 12),
+                    // Google
+                    _buildInfoField(
+                      "Google",
+                      userData!['googleConnected'] == true
+                          ? "Connected"
+                          : "Not connected",
+                    ),
 
-              const Text(
-                "Ethan John",
-                style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
-              ),
-              const SizedBox(height: 4),
+                    // Phone
+                    _buildInfoField("Phone", userData!['phone']),
 
-              // Description
-              const Text(
-                "Profile with personal info and connected social media appear more trustworthy.",
-                textAlign: TextAlign.center,
-                style: TextStyle(fontSize: 16, color: Colors.grey),
-              ),
+                    // Address
+                    _buildInfoField("Address", userData!['address']),
 
-              const SizedBox(height: 20),
-              const Divider(),
-
-              // Section Title
-              const Align(
-                alignment: Alignment.centerLeft,
-                child: Text(
-                  "Verified Info",
-                  style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    // DOB & Gender
+                    Row(
+                      children: [
+                        Expanded(
+                          child: _buildInfoField(
+                            "Date of Birth",
+                            userData!['dob'],
+                          ),
+                        ),
+                        const SizedBox(width: 12),
+                        Expanded(
+                          child: _buildInfoField("Gender", userData!['gender']),
+                        ),
+                      ],
+                    ),
+                  ],
                 ),
               ),
-              const SizedBox(height: 16),
-
-              // Email row
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text("Email address"),
-                trailing: IconButton(
-                  icon: const Icon(Icons.settings, color: Colors.grey),
-                  onPressed: () {},
-                ),
-              ),
-
-              // Google row
-              ListTile(
-                contentPadding: EdgeInsets.zero,
-                title: const Text("Google"),
-                trailing: TextButton(
-                  onPressed: () {},
-                  child: const Text("Connect"),
-                ),
-              ),
-
-              // Phone
-              _buildInfoField("Phone", "+91 41555 50132"),
-
-              // Address
-              _buildInfoField("Address", "Rajkot, Gujarat, India"),
-
-              // DOB & Gender
-              Row(
-                children: [
-                  Expanded(
-                    child: _buildInfoField("Date of Birth", "20/05/2004"),
-                  ),
-                  const SizedBox(width: 12),
-                  Expanded(child: _buildInfoField("Gender", "Male")),
-                ],
-              ),
-            ],
-          ),
-        ),
       ),
 
+      // Floating edit button
       floatingActionButton: FloatingActionButton(
         backgroundColor: const Color.fromARGB(255, 63, 34, 26),
         shape: const CircleBorder(),

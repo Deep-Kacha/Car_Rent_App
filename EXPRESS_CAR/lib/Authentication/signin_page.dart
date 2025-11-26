@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:express_car/Authentication/CompleteProfile.dart';
 import 'package:express_car/HomeDetails/Home_Page/home_page.dart';
 import 'package:express_car/Splash/GetStart.dart';
 import 'package:flutter/material.dart';
@@ -32,7 +33,7 @@ class _SignInPageState extends State<SignInPage> {
   Future<void> _checkAutoLogin() async {
     await Future.delayed(const Duration(milliseconds: 500));
     final user = FirebaseAuth.instance.currentUser;
-    if (user != null && user.emailVerified) {
+    if (user != null) {
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (context) => HomePage()),
@@ -61,23 +62,17 @@ class _SignInPageState extends State<SignInPage> {
       final user = userCredential.user;
 
       if (user != null) {
-        if (user.emailVerified) {
-          ScaffoldMessenger.of(
-            context,
-          ).showSnackBar(const SnackBar(content: Text('Login successful!')));
+        final docRef = FirebaseFirestore.instance
+            .collection('users')
+            .doc(user.uid);
+        final doc = await docRef.get();
+
+        if (!doc.exists || doc.data()!['phone'] == null) {
           Navigator.pushReplacement(
             context,
-            MaterialPageRoute(builder: (context) => HomePage()),
+            MaterialPageRoute(builder: (context) => CompleteProfilePage()),
           );
         } else {
-          await user.sendEmailVerification();
-          ScaffoldMessenger.of(context).showSnackBar(
-            const SnackBar(
-              content: Text(
-                'Please verify your email before logging in. Verification link sent again.',
-              ),
-            ),
-          );
           Navigator.pushReplacement(
             context,
             MaterialPageRoute(builder: (context) => HomePage()),
@@ -117,10 +112,7 @@ class _SignInPageState extends State<SignInPage> {
       );
 
       final GoogleSignInAccount? googleUser = await googleSignIn.signIn();
-      if (googleUser == null) {
-        setState(() => _isSubmitting = false);
-        return;
-      }
+      if (googleUser == null) return;
 
       final GoogleSignInAuthentication googleAuth =
           await googleUser.authentication;
@@ -139,6 +131,7 @@ class _SignInPageState extends State<SignInPage> {
             .collection('users')
             .doc(user.uid);
         final doc = await docRef.get();
+
         if (!doc.exists) {
           await docRef.set({
             'email': user.email,
@@ -146,15 +139,24 @@ class _SignInPageState extends State<SignInPage> {
             'photoURL': user.photoURL ?? '',
             'createdAt': FieldValue.serverTimestamp(),
           });
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => CompleteProfilePage()),
+          );
+        } else if (doc.data()!['phone'] == null ||
+            doc.data()!['address'] == null ||
+            doc.data()!['dob'] == null ||
+            doc.data()!['gender'] == null) {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => CompleteProfilePage()),
+          );
+        } else {
+          Navigator.pushReplacement(
+            context,
+            MaterialPageRoute(builder: (context) => HomePage()),
+          );
         }
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Signed in as ${user.email ?? ''}')),
-        );
-        Navigator.pushReplacement(
-          context,
-          MaterialPageRoute(builder: (context) => HomePage()),
-        );
       }
     } catch (e) {
       ScaffoldMessenger.of(context).showSnackBar(
@@ -204,8 +206,6 @@ class _SignInPageState extends State<SignInPage> {
                 style: TextStyle(fontSize: 14, color: Colors.black54),
               ),
               const SizedBox(height: 24),
-
-              /// --- Form Fields ---
               Form(
                 key: _formKey,
                 child: Column(
@@ -224,15 +224,13 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                       ),
                       validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
+                        if (value == null || value.trim().isEmpty)
                           return 'Please enter your email';
-                        }
                         final emailRegex = RegExp(
                           r"^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9]+\.[a-zA-Z]+",
                         );
-                        if (!emailRegex.hasMatch(value)) {
+                        if (!emailRegex.hasMatch(value))
                           return 'Please enter a valid email';
-                        }
                         return null;
                       },
                     ),
@@ -261,15 +259,12 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                       ),
                       validator: (value) {
-                        if (value == null || value.trim().isEmpty) {
+                        if (value == null || value.trim().isEmpty)
                           return 'Please enter your password';
-                        }
                         return null;
                       },
                     ),
                     const SizedBox(height: 10),
-
-                    /// Forgot Password button
                     Align(
                       alignment: Alignment.centerRight,
                       child: TextButton(
@@ -287,7 +282,6 @@ class _SignInPageState extends State<SignInPage> {
                         ),
                       ),
                     ),
-
                     const SizedBox(height: 10),
                     SizedBox(
                       width: double.infinity,
@@ -318,9 +312,7 @@ class _SignInPageState extends State<SignInPage> {
                               ),
                       ),
                     ),
-
                     const SizedBox(height: 18),
-
                     Row(
                       children: [
                         Expanded(child: Divider(color: Colors.black26)),
@@ -335,7 +327,6 @@ class _SignInPageState extends State<SignInPage> {
                       ],
                     ),
                     const SizedBox(height: 14),
-
                     Center(
                       child: IconButton(
                         icon: Image.asset(
@@ -347,8 +338,6 @@ class _SignInPageState extends State<SignInPage> {
                       ),
                     ),
                     const SizedBox(height: 20),
-
-                    /// Removed Terms & Conditions field here
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [

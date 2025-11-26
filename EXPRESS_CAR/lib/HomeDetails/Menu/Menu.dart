@@ -7,124 +7,170 @@ import 'package:express_car/Splash/GetStart.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:google_sign_in/google_sign_in.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class MenuPage extends StatelessWidget {
   const MenuPage({Key? key}) : super(key: key);
 
+  Future<Map<String, dynamic>> _fetchUserData() async {
+    final user = FirebaseAuth.instance.currentUser;
+    if (user == null) return {'displayName': 'Guest User', 'photoURL': ''};
+
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(user.uid)
+          .get();
+      final data = doc.data();
+
+      return {
+        'displayName': data?['displayName'] ?? user.displayName ?? 'Guest User',
+        'photoURL': data?['photoURL'] ?? user.photoURL ?? '',
+      };
+    } catch (e) {
+      print("Error fetching user data: $e");
+      return {
+        'displayName': user.displayName ?? 'Guest User',
+        'photoURL': user.photoURL ?? '',
+      };
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      backgroundColor: Colors.white, // Full white background
+      backgroundColor: Colors.white,
       body: SafeArea(
-        child: Container(
-          width: double.infinity,
-          height: double.infinity,
+        child: Padding(
           padding: const EdgeInsets.all(20),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
               const SizedBox(height: 10),
-
-              /// Title
               const Text(
                 "Menu",
                 style: TextStyle(fontSize: 28, fontWeight: FontWeight.w500),
               ),
-
               const SizedBox(height: 20),
 
-              /// Profile (row: avatar + name)
-              /// Profile (row: avatar + name)
-              GestureDetector(
-                onTap: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                      builder: (context) => const ViewProfilePage(),
+              /// Profile Row
+              FutureBuilder<Map<String, dynamic>>(
+                future: _fetchUserData(),
+                builder: (context, snapshot) {
+                  if (snapshot.connectionState == ConnectionState.waiting) {
+                    return Row(
+                      children: const [
+                        CircleAvatar(radius: 25, backgroundColor: Colors.grey),
+                        SizedBox(width: 15),
+                        Text("Loading...", style: TextStyle(fontSize: 26)),
+                      ],
+                    );
+                  }
+
+                  final userData = snapshot.data ?? {};
+                  final name = userData['displayName'] ?? 'Guest User';
+                  final photoUrl = userData['photoURL'] ?? '';
+
+                  return GestureDetector(
+                    onTap: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => ViewProfilePage(),
+                        ),
+                      );
+                    },
+                    child: Row(
+                      children: [
+                        CircleAvatar(
+                          radius: 25,
+                          backgroundImage: photoUrl.isNotEmpty
+                              ? NetworkImage(photoUrl)
+                              : const AssetImage("assets/images/profile.jpg")
+                                    as ImageProvider,
+                        ),
+                        const SizedBox(width: 15),
+                        Text(
+                          name,
+                          style: const TextStyle(
+                            fontSize: 26,
+                            fontWeight: FontWeight.w500,
+                            color: Colors.black,
+                          ),
+                        ),
+                      ],
                     ),
                   );
                 },
-                child: Row(
-                  children: const [
-                    CircleAvatar(
-                      radius: 25,
-                      backgroundImage: AssetImage("assets/images/profile.jpg"),
-                    ),
-                    SizedBox(width: 15),
-                    Text(
-                      "Ethan John",
-                      style: TextStyle(
-                        fontSize: 26,
-                        fontWeight: FontWeight.w500,
-                        color: Colors.black,
-                      ),
-                    ),
-                  ],
-                ),
               ),
 
               const SizedBox(height: 20),
-
-              /// Divider
-              Divider(color: Colors.grey, thickness: 1),
-
+              const Divider(color: Colors.grey, thickness: 1),
               const SizedBox(height: 20),
 
               /// Menu Items
               Expanded(
                 child: ListView(
                   children: [
-                    _buildMenuItem(Icons.person_outline, "Account", () {
+                    _buildMenuItem(
+                      Icons.person_outline,
+                      "Account",
+                      context,
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => AccountPage()),
+                        );
+                      },
+                    ),
+                    _buildMenuItem(
+                      Icons.badge_outlined,
+                      "View Profile",
+                      context,
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(builder: (_) => ViewProfilePage()),
+                        );
+                      },
+                    ),
+                    _buildMenuItem(Icons.edit, "Edit Profile", context, () {
                       Navigator.push(
                         context,
-                        MaterialPageRoute(
-                          builder: (context) => const AccountPage(),
-                        ),
-                      );
-                    }),
-                    _buildMenuItem(Icons.badge_outlined, "View Profile", () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ViewProfilePage(),
-                        ),
-                      );
-                    }),
-                    _buildMenuItem(Icons.edit, "Edit Profile", () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const EditProfilePage(),
-                        ),
-                      );
-                    }),
-                    _buildMenuItem(Icons.lock_outline, "Change Password", () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => const ChangePasswordPage(),
-                        ),
+                        MaterialPageRoute(builder: (_) => EditProfilePage()),
                       );
                     }),
                     _buildMenuItem(
-                      Icons.business_center,
-                      "Handle Business",
+                      Icons.lock_outline,
+                      "Change Password",
+                      context,
                       () {
                         Navigator.push(
                           context,
                           MaterialPageRoute(
-                            builder: (context) => const HandleBusinessPage(),
+                            builder: (_) => ChangePasswordPage(),
                           ),
                         );
                       },
                     ),
-                    _buildMenuItem(Icons.logout, "Log Out", () async {
+                    _buildMenuItem(
+                      Icons.business_center,
+                      "Handle Business",
+                      context,
+                      () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (_) => HandleBusinessPage(),
+                          ),
+                        );
+                      },
+                    ),
+                    _buildMenuItem(Icons.logout, "Log Out", context, () async {
                       await FirebaseAuth.instance.signOut();
                       await GoogleSignIn().signOut();
                       Navigator.of(context).pushAndRemoveUntil(
-                        MaterialPageRoute(
-                          builder: (context) => GetStart(),
-                        ), // Replace with your sign in page widget
+                        MaterialPageRoute(builder: (_) => GetStart()),
                         (route) => false,
                       );
                     }),
@@ -138,10 +184,10 @@ class MenuPage extends StatelessWidget {
     );
   }
 
-  /// Menu Item UI
   static Widget _buildMenuItem(
     IconData icon,
     String title,
+    BuildContext context,
     VoidCallback onTap,
   ) {
     return Container(
