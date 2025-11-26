@@ -78,12 +78,25 @@ class FavoritePage extends StatelessWidget {
                                 borderRadius: BorderRadius.vertical(
                                   top: Radius.circular(15),
                                 ),
-                                child: Image.asset(
-                                  car.image,
-                                  height: 180,
-                                  width: double.infinity,
-                                  fit: BoxFit.cover,
-                                ),
+                                child: (car.imageUrl != null && car.imageUrl!.isNotEmpty)
+                                    ? Image.network(
+                                        car.imageUrl!,
+                                        height: 180,
+                                        width: double.infinity,
+                                        fit: BoxFit.cover,
+                                        errorBuilder: (context, error, stackTrace) {
+                                          return Container(
+                                            height: 180,
+                                            color: Colors.grey[300],
+                                            child: const Icon(Icons.directions_car),
+                                          );
+                                        },
+                                      )
+                                    : Container(
+                                        height: 180,
+                                        color: Colors.grey[300],
+                                        child: const Icon(Icons.directions_car),
+                                      ),
                               ),
                               Container(
                                 width: double.infinity,
@@ -125,7 +138,7 @@ class FavoritePage extends StatelessWidget {
                                       children: [
                                         Expanded(
                                           child: Text(
-                                            car.address,
+                                            car.location,
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontSize: 16,
@@ -157,7 +170,7 @@ class FavoritePage extends StatelessWidget {
                                             );
                                           },
                                           child: Text(
-                                            car.price,
+                                            "₹${car.pricePerDay.toInt()}/day",
                                             style: TextStyle(
                                               color: Colors.white,
                                               fontWeight: FontWeight.bold,

@@ -59,7 +59,7 @@ class _BookingPageState extends State<BookingPage> {
   /// -------------------------------------------------------------
   bool isCarAlreadyBooked(DateTime start, DateTime end) {
     for (var booking in HomePage.bookedCarsMaps) {
-      if (booking['car'].name == widget.car.name) {
+      if (booking['car'].carId == widget.car.carId) {
         DateTime s = DateTime.parse(booking['startDate']);
         DateTime e = DateTime.parse(booking['endDate']);
 
@@ -107,12 +107,25 @@ class _BookingPageState extends State<BookingPage> {
                 /// Car Image
                 ClipRRect(
                   borderRadius: const BorderRadius.all(Radius.circular(20)),
-                  child: Image.asset(
-                    car.image,
-                    height: 250,
-                    width: double.infinity,
-                    fit: BoxFit.cover,
-                  ),
+                  child: (car.imageUrl != null && car.imageUrl!.isNotEmpty)
+                      ? Image.network(
+                          car.imageUrl!,
+                          height: 250,
+                          width: double.infinity,
+                          fit: BoxFit.cover,
+                          errorBuilder: (context, error, stackTrace) {
+                            return Container(
+                              height: 250,
+                              color: Colors.grey[300],
+                              child: const Icon(Icons.directions_car),
+                            );
+                          },
+                        )
+                      : Container(
+                          height: 250,
+                          color: Colors.grey[300],
+                          child: const Icon(Icons.directions_car),
+                        ),
                 ),
 
                 /// Car Name
@@ -175,7 +188,7 @@ class _BookingPageState extends State<BookingPage> {
                           ),
                           const SizedBox(width: 6),
                           Text(
-                            car.address,
+                            car.location,
                             style: const TextStyle(
                               fontSize: 18,
                               color: Colors.grey,
@@ -262,7 +275,7 @@ class _BookingPageState extends State<BookingPage> {
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 12),
                   child: Text(
-                    car.description ?? '',
+                    car.description,
                     style: const TextStyle(fontSize: 15, color: Colors.black87),
                   ),
                 ),
@@ -361,7 +374,7 @@ class _BookingPageState extends State<BookingPage> {
                       }
                     },
                     child: Text(
-                      "Total ${car.price}",
+                      "Total ₹${car.pricePerDay.toInt()}/day",
                       style: const TextStyle(
                         fontSize: 16,
                         color: Colors.white,

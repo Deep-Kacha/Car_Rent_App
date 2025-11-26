@@ -24,9 +24,25 @@ class _HomePageState extends State<HomePage> {
   String searchQuery = "";
   Set<String> favoriteCars = {};
 
-  final List<String> categories = ["All", "Cars", "SUVs", "XUVs", "Vans"];
+  final List<String> categories = ["All", "Sedan", "SUV", "Hatchback", "Van", "Coupe", "Convertible"];
+  
+  late Future<Map<String, dynamic>?> _userDataFuture;
 
   User? get currentUser => FirebaseAuth.instance.currentUser;
+  
+  @override
+  void initState() {
+    super.initState();
+    _userDataFuture = _fetchCurrentUserData();
+    _loadCars();
+  }
+
+  Future<void> _loadCars() async {
+    await fetchCarsFromFirestore();
+    if (mounted) {
+      setState(() {});
+    }
+  }
 
   void onToggleFavorite(Car car) async {
     setState(() {
@@ -53,7 +69,7 @@ class _HomePageState extends State<HomePage> {
   List<Car> get filteredCars {
     final carsByCategory = selectedCategory == "All"
         ? cars
-        : cars.where((car) => car.category == selectedCategory).toList();
+        : cars.where((car) => car.type == selectedCategory).toList();
     if (searchQuery.isEmpty) return carsByCategory;
     return carsByCategory
         .where(
@@ -101,13 +117,14 @@ class _HomePageState extends State<HomePage> {
   }
 
   Widget buildHomePage() {
+    print("🏠 buildHomePage called - Cars count: ${cars.length}");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.all(16),
           child: FutureBuilder<Map<String, dynamic>?>(
-            future: _fetchCurrentUserData(),
+            future: _userDataFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -240,10 +257,19 @@ class _HomePageState extends State<HomePage> {
 
         Expanded(
           child: filteredCars.isEmpty
-              ? const Center(
-                  child: Text(
-                    "No cars available in this category",
-                    style: TextStyle(color: Colors.grey),
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Total cars: ${cars.length}",
+                        style: const TextStyle(color: Colors.grey, fontSize: 12),
+                      ),
+                      const Text(
+                        "No cars available in this category",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
                   ),
                 )
               : ListView.builder(
@@ -273,12 +299,25 @@ class _HomePageState extends State<HomePage> {
                             borderRadius: const BorderRadius.vertical(
                               top: Radius.circular(15),
                             ),
-                            child: Image.asset(
-                              car.image,
-                              height: 180,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
+                            child: (car.imageUrl != null && car.imageUrl!.isNotEmpty)
+                                ? Image.network(
+                                    car.imageUrl!,
+                                    height: 180,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        height: 180,
+                                        color: Colors.grey[300],
+                                        child: const Icon(Icons.directions_car),
+                                      );
+                                    },
+                                  )
+                                : Container(
+                                    height: 180,
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.directions_car),
+                                  ),
                           ),
                           Container(
                             decoration: const BoxDecoration(
@@ -321,7 +360,7 @@ class _HomePageState extends State<HomePage> {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        car.address,
+                                        car.location,
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 16,
@@ -354,7 +393,7 @@ class _HomePageState extends State<HomePage> {
                                         setState(() {});
                                       },
                                       child: Text(
-                                        car.price,
+                                        "₹${car.pricePerDay.toInt()}/day",
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,

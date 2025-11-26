@@ -1,10 +1,11 @@
 import 'dart:io';
 import 'package:express_car/Handle_Car/HandleBussiness.dart';
-// import 'package:express_car/HomeDetails/Menu/Menu.dart';
-
 import 'Done.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloudinary_public/cloudinary_public.dart';
 
 class AddCarPage extends StatefulWidget {
   const AddCarPage({Key? key}) : super(key: key);
@@ -15,6 +16,7 @@ class AddCarPage extends StatefulWidget {
 
 class _AddCarPageState extends State<AddCarPage> {
   final _formKey = GlobalKey<FormState>();
+  bool _isSaving = false;
 
   final TextEditingController carNameController = TextEditingController();
   final TextEditingController modelController = TextEditingController();
@@ -26,6 +28,13 @@ class _AddCarPageState extends State<AddCarPage> {
 
   File? _carImage;
   final ImagePicker _picker = ImagePicker();
+
+  // Initialize Cloudinary
+  final cloudinary = CloudinaryPublic(
+    'dstlqyncg', // Replace with your Cloudinary cloud name
+    'carimages18', // Replace with your Cloudinary upload preset
+    cache: false,
+  );
 
   String? _selectedCarType;
   List<String> _selectedFeatures = [];
@@ -87,19 +96,80 @@ class _AddCarPageState extends State<AddCarPage> {
     }
   }
 
+  // Get the next car ID using a Firestore transaction
+  Future<int> _getNextCarId() async {
+    final counterRef =
+        FirebaseFirestore.instance.collection('counters').doc('car_counter');
+
+    return FirebaseFirestore.instance.runTransaction<int>((transaction) async {
+      final snapshot = await transaction.get(counterRef);
+
+      if (!snapshot.exists) {
+        transaction.set(counterRef, {'current_id': 1});
+        return 1;
+      }
+
+      final newId = (snapshot.data()!['current_id'] as int) + 1;
+      transaction.update(counterRef, {'current_id': newId});
+      return newId;
+    });
+  }
+
   // Save car
-  void _saveCar() {
+  Future<void> _saveCar() async {
     if (_formKey.currentState!.validate() &&
         _carImage != null &&
         _selectedCarType != null &&
         _selectedFeatures.isNotEmpty) {
-      ScaffoldMessenger.of(
-        context,
-      ).showSnackBar(const SnackBar(content: Text("Car saved successfully!")));
-      Navigator.push(
-        context,
-        MaterialPageRoute(builder: (context) => const FinalDonePage()),
-      );
+      setState(() => _isSaving = true);
+
+      try {
+        // 1. Upload image to Cloudinary
+        final response = await cloudinary.uploadFile(
+          CloudinaryFile.fromFile(_carImage!.path,
+              resourceType: CloudinaryResourceType.Image),
+        );
+        final imageUrl = response.secureUrl;
+
+        // 2. Get current user and next car ID
+        final user = FirebaseAuth.instance.currentUser;
+        if (user == null) throw Exception("User not logged in");
+
+        final carId = await _getNextCarId();
+
+        // 3. Prepare data for Firestore
+        final carData = {
+          'car_id': carId,
+          'owner_email': user.email,
+          'name': carNameController.text,
+          'model': modelController.text,
+          'type': _selectedCarType,
+          'number_plate': numberPlateController.text,
+          'features': _selectedFeatures,
+          'location': pickupDropController.text,
+          'year': int.tryParse(yearController.text),
+          'price_per_day': double.tryParse(priceController.text),
+          'description': descriptionController.text,
+          'image_url': imageUrl,
+          'created_at': FieldValue.serverTimestamp(),
+        };
+
+        // 4. Save to Firestore
+        await FirebaseFirestore.instance
+            .collection('cars')
+            .doc(carId.toString())
+            .set(carData);
+
+        Navigator.pushReplacement(
+          context,
+          MaterialPageRoute(builder: (context) => const FinalDonePage()),
+        );
+      } catch (e) {
+        ScaffoldMessenger.of(context)
+            .showSnackBar(SnackBar(content: Text("Failed to save car: $e")));
+      } finally {
+        if (mounted) setState(() => _isSaving = false);
+      }
     } else {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text("Fill all fields and selections!")),
@@ -476,7 +546,7 @@ class _AddCarPageState extends State<AddCarPage> {
                 SizedBox(
                   width: double.infinity,
                   child: ElevatedButton(
-                    onPressed: _saveCar,
+                    onPressed: _isSaving ? null : _saveCar,
                     style: ElevatedButton.styleFrom(
                       backgroundColor: const Color.fromARGB(255, 63, 34, 26),
                       padding: const EdgeInsets.symmetric(vertical: 16),
@@ -484,10 +554,19 @@ class _AddCarPageState extends State<AddCarPage> {
                         borderRadius: BorderRadius.circular(30),
                       ),
                     ),
-                    child: const Text(
-                      "Save Car",
-                      style: TextStyle(color: Colors.white),
-                    ),
+                    child: _isSaving
+                        ? const SizedBox(
+                            width: 20,
+                            height: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : const Text(
+                            "Save Car",
+                            style: TextStyle(color: Colors.white),
+                          ),
                   ),
                 ),
               ],
