@@ -34,14 +34,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _userDataFuture = _fetchCurrentUserData();
-    _loadCars();
-  }
-
-  Future<void> _loadCars() async {
-    await fetchCarsFromFirestore();
-    if (mounted) {
-      setState(() {});
-    }
+    // 🔹 Cars are now fetched once at app startup in main.dart
   }
 
   void onToggleFavorite(Car car) async {
@@ -205,11 +198,36 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
 
-        const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text(
-            "Categories",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        Padding(
+          padding: const EdgeInsets.all(16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Categories",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              GestureDetector(
+                onTap: () async {
+                  // 🔄 Refresh cars from Firebase
+                  await fetchCarsFromFirestore();
+                  if (mounted) {
+                    setState(() {});
+                    ScaffoldMessenger.of(context).showSnackBar(
+                      const SnackBar(
+                        content: Text('✅ Cars refreshed!'),
+                        duration: Duration(seconds: 2),
+                      ),
+                    );
+                  }
+                },
+                child: const Icon(
+                  Icons.refresh,
+                  color: Colors.orange,
+                  size: 24,
+                ),
+              ),
+            ],
           ),
         ),
 

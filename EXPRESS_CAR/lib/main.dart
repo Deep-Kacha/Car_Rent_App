@@ -4,6 +4,7 @@ import 'package:firebase_core/firebase_core.dart';
 import 'firebase_options.dart';
 import 'Splash/splash.dart';
 import 'Authentication/auth_wrapper.dart';
+import 'HomeDetails/Home_Page/car_data.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -12,6 +13,8 @@ void main() async {
     await Firebase.initializeApp(
       options: DefaultFirebaseOptions.currentPlatform,
     );
+    // 🔹 Fetch cars once at app startup (not on each home_page navigation)
+    await fetchCarsFromFirestore();
   } catch (e) {
     print('Firebase initialization error: $e');
   }
