@@ -31,7 +31,7 @@ class _BookedCarState extends State<BookedCar> {
     // Remove from global list also (REAL-TIME)
     HomePage.bookedCarsMaps.removeWhere(
       (item) =>
-          item['car'].name == car.name &&
+          item['car'].carId == car.carId &&
           item['startDate'] == widget.bookedCars[index]['startDate'],
     );
 
@@ -82,12 +82,27 @@ class _BookedCarState extends State<BookedCar> {
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
-                                  child: Image.asset(
-                                    car.image,
-                                    width: 150,
-                                    height: 150,
-                                    fit: BoxFit.cover,
-                                  ),
+                                  child: (car.imageUrl != null && car.imageUrl!.isNotEmpty)
+                                      ? Image.network(
+                                          car.imageUrl!,
+                                          width: 150,
+                                          height: 150,
+                                          fit: BoxFit.cover,
+                                          errorBuilder: (context, error, stackTrace) {
+                                            return Container(
+                                              width: 150,
+                                              height: 150,
+                                              color: Colors.grey[300],
+                                              child: const Icon(Icons.directions_car),
+                                            );
+                                          },
+                                        )
+                                      : Container(
+                                          width: 150,
+                                          height: 150,
+                                          color: Colors.grey[300],
+                                          child: const Icon(Icons.directions_car),
+                                        ),
                                 ),
                                 const SizedBox(width: 12),
 
@@ -120,7 +135,7 @@ class _BookedCarState extends State<BookedCar> {
                                         ),
                                       ),
                                       Text(
-                                        "Location : ${car.address}",
+                                        "Location : ${car.location}",
                                         style: const TextStyle(
                                           color: Colors.white70,
                                           fontSize: 12,
