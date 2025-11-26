@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:express_car/HomeDetails/Home_Page/car_model.dart';
+import 'package:express_car/HomeDetails/Home_Page/home_page.dart';
 
 class BookedCar extends StatefulWidget {
   final List<Map<String, dynamic>> bookedCars;
@@ -21,9 +22,18 @@ class _BookedCarState extends State<BookedCar> {
 
   void cancelBooking(int index) {
     final car = localBookedCars[index]['car'];
+
+    // Remove from UI list
     setState(() {
       localBookedCars.removeAt(index);
     });
+
+    // Remove from global list also (REAL-TIME)
+    HomePage.bookedCarsMaps.removeWhere(
+      (item) =>
+          item['car'].name == car.name &&
+          item['startDate'] == widget.bookedCars[index]['startDate'],
+    );
 
     ScaffoldMessenger.of(
       context,
@@ -46,7 +56,6 @@ class _BookedCarState extends State<BookedCar> {
               ),
               const SizedBox(height: 20),
 
-              /// List of booked cars
               Expanded(
                 child: localBookedCars.isEmpty
                     ? const Center(
@@ -59,21 +68,17 @@ class _BookedCarState extends State<BookedCar> {
                         itemCount: localBookedCars.length,
                         itemBuilder: (context, index) {
                           final booking = localBookedCars[index];
-                          final car = booking['car'] as Car;
+                          final Car car = booking['car'];
 
                           return Container(
                             margin: const EdgeInsets.only(bottom: 16),
                             height: 150,
-                            width: double.infinity,
                             decoration: BoxDecoration(
-                              color: const Color(
-                                0xFF3E2723,
-                              ), 
+                              color: const Color(0xFF3E2723),
                               borderRadius: BorderRadius.circular(12),
                             ),
                             padding: const EdgeInsets.all(10),
                             child: Row(
-                              crossAxisAlignment: CrossAxisAlignment.start,
                               children: [
                                 ClipRRect(
                                   borderRadius: BorderRadius.circular(10),
@@ -84,9 +89,8 @@ class _BookedCarState extends State<BookedCar> {
                                     fit: BoxFit.cover,
                                   ),
                                 ),
-
                                 const SizedBox(width: 12),
-                                
+
                                 Expanded(
                                   child: Column(
                                     crossAxisAlignment:
@@ -102,14 +106,14 @@ class _BookedCarState extends State<BookedCar> {
                                       ),
                                       const SizedBox(height: 6),
                                       Text(
-                                        "Start Date : ${booking['startDate']}",
+                                        "Start Date : ${booking['startDate'].substring(0, 10)}",
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 12,
                                         ),
                                       ),
                                       Text(
-                                        "End Date : ${booking['endDate']}",
+                                        "End Date : ${booking['endDate'].substring(0, 10)}",
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 12,
@@ -124,7 +128,6 @@ class _BookedCarState extends State<BookedCar> {
                                       ),
                                       const Spacer(),
 
-                                      /// Cancel Button
                                       Align(
                                         alignment: Alignment.bottomRight,
                                         child: ElevatedButton(
@@ -134,10 +137,6 @@ class _BookedCarState extends State<BookedCar> {
                                             padding: const EdgeInsets.symmetric(
                                               horizontal: 16,
                                               vertical: 8,
-                                            ),
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(8),
                                             ),
                                           ),
                                           onPressed: () => cancelBooking(index),

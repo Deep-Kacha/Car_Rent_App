@@ -29,7 +29,6 @@ class _BookingPageState extends State<BookingPage> {
         if (isStart) {
           startDate = picked;
 
-          // Reset endDate if it's before the new startDate
           if (endDate != null && endDate!.isBefore(startDate!)) {
             endDate = null;
             ScaffoldMessenger.of(context).showSnackBar(
@@ -40,7 +39,6 @@ class _BookingPageState extends State<BookingPage> {
             );
           }
         } else {
-          // Validate End Date
           if (startDate != null && picked.isBefore(startDate!)) {
             ScaffoldMessenger.of(context).showSnackBar(
               const SnackBar(
@@ -55,6 +53,26 @@ class _BookingPageState extends State<BookingPage> {
       });
     }
   }
+
+  /// -------------------------------------------------------------
+  /// REAL-TIME BOOKING CHECK (NO UI CHANGE)
+  /// -------------------------------------------------------------
+  bool isCarAlreadyBooked(DateTime start, DateTime end) {
+    for (var booking in HomePage.bookedCarsMaps) {
+      if (booking['car'].name == widget.car.name) {
+        DateTime s = DateTime.parse(booking['startDate']);
+        DateTime e = DateTime.parse(booking['endDate']);
+
+        // If date range overlaps → reject
+        if (start.isBefore(e) && end.isAfter(s)) {
+          return true;
+        }
+      }
+    }
+    return false;
+  }
+
+  /// -------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -229,6 +247,7 @@ class _BookingPageState extends State<BookingPage> {
                   ),
                 ),
                 const Divider(),
+
                 Padding(
                   padding: const EdgeInsets.all(12),
                   child: Text(
@@ -296,12 +315,33 @@ class _BookingPageState extends State<BookingPage> {
                     ),
                     onPressed: () {
                       if (startDate != null && endDate != null) {
+                        /// ----------------------------
+                        /// REAL-TIME DATE CHECK
+                        /// ----------------------------
+                        if (isCarAlreadyBooked(startDate!, endDate!)) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            const SnackBar(
+                              content: Text(
+                                "Car already booked for selected dates",
+                              ),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                          return;
+                        }
+
                         final bookedCarInfo = {
                           'car': widget.car,
-                          'startDate':
-                              "${startDate!.day}/${startDate!.month}/${startDate!.year}",
-                          'endDate':
-                              "${endDate!.day}/${endDate!.month}/${endDate!.year}",
+                          'startDate': DateTime(
+                            startDate!.year,
+                            startDate!.month,
+                            startDate!.day,
+                          ).toIso8601String(),
+                          'endDate': DateTime(
+                            endDate!.year,
+                            endDate!.month,
+                            endDate!.day,
+                          ).toIso8601String(),
                         };
 
                         HomePage.bookedCarsMaps.add(bookedCarInfo);
