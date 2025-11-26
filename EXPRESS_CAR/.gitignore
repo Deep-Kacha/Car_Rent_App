@@ -50,3 +50,7 @@ app.*.map.json
 /windows/
 /web/
 
+# Firebase & Flutter build/debug artifacts
+firestore.rules
+flutter_run_verbose.txt
+

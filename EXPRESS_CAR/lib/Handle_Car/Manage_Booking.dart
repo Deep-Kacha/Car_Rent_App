@@ -1,5 +1,7 @@
 import 'HandleBussiness.dart';
 import 'package:flutter/material.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class ManageBookingsPage extends StatefulWidget {
   const ManageBookingsPage({Key? key}) : super(key: key);
@@ -9,79 +11,82 @@ class ManageBookingsPage extends StatefulWidget {
 }
 
 class _ManageBookingsPageState extends State<ManageBookingsPage> {
-  List<Map<String, dynamic>> bookings = [
-    {
-      "car": "Toyota Corolla",
-      "date": "2025-06-28 → 2025-06-29",
-      "status": "confirmed",
-    },
-    {
-      "car": "Volvo C40 EV",
-      "date": "2025-06-25 → 2025-06-27",
-      "status": "pending",
-    },
-  ];
+  List<Map<String, dynamic>> bookings = [];
+  bool _isLoading = true;
+  int _totalBooked = 0;
 
-  //  Confirm booking
-  void _confirmBooking(int index) {
-    setState(() {
-      bookings[index]["status"] = "confirmed";
-    });
+  final _firestore = FirebaseFirestore.instance;
+  final _auth = FirebaseAuth.instance;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOwnerBookings();
   }
 
-  //  Cancel booking (only if not confirmed)
-  void _cancelBooking(int index) {
-    if (bookings[index]["status"] == "confirmed") {
+  Future<void> _loadOwnerBookings() async {
+    setState(() => _isLoading = true);
+
+    try {
+      final user = _auth.currentUser;
+      if (user == null) {
+        setState(() => _isLoading = false);
+        return;
+      }
+
+      // Get all cars owned by this user
+      final carsSnap = await _firestore
+          .collection('cars')
+          .where('owner_email', isEqualTo: user.email)
+          .get();
+
+      final carIds = carsSnap.docs.map((doc) => (doc['car_id'] as int)).toList();
+      if (carIds.isEmpty) {
+        setState(() {
+          bookings = [];
+          _totalBooked = 0;
+          _isLoading = false;
+        });
+        return;
+      }
+
+      // Get bookings for these cars
+      final bookingsSnap = await _firestore
+          .collection('bookings')
+          .where('car_id', whereIn: carIds)
+          .get();
+
+      final List<Map<String, dynamic>> loaded = [];
+      for (final doc in bookingsSnap.docs) {
+        final data = doc.data();
+        loaded.add({
+          'booking_id': data['booking_id'] ?? doc.id,
+          'car_id': data['car_id'] ?? 0,
+          'car_name': data['car_name'] ?? 'Car ${data['car_id']}',
+          'user_email': data['user_mail'] ?? 'unknown',
+          'start_date': data['start_date'] ?? '',
+          'end_date': data['end_date'] ?? '',
+          'total_amount': data['total_amount'] ?? 0,
+        });
+      }
+
+      setState(() {
+        bookings = loaded;
+        _totalBooked = loaded.length;
+        _isLoading = false;
+      });
+    } catch (e) {
+      print('Error loading bookings: $e');
       ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text("Confirmed booking cannot be cancelled")),
+        SnackBar(content: Text('Failed to load bookings: $e')),
       );
-      return;
+      setState(() => _isLoading = false);
     }
-
-    setState(() {
-      bookings[index]["status"] = "cancelled";
-    });
   }
 
-  //  Status badge widget
-  Widget _statusBadge(String status) {
-    Color bgColor;
-    Color textColor;
+  
 
-    switch (status) {
-      case "confirmed":
-        bgColor = Colors.green.shade100;
-        textColor = Colors.green.shade800;
-        break;
-      case "pending":
-        bgColor = Colors.red.shade100;
-        textColor = Colors.red.shade800;
-        break;
-      case "cancelled":
-        bgColor = Colors.grey.shade300;
-        textColor = Colors.grey.shade800;
-        break;
-      default:
-        bgColor = Colors.grey.shade200;
-        textColor = Colors.black;
-    }
-
-    return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 6),
-      decoration: BoxDecoration(
-        color: bgColor,
-        borderRadius: BorderRadius.circular(20),
-      ),
-      child: Text(
-        status,
-        style: TextStyle(
-          fontSize: 12,
-          fontWeight: FontWeight.w500,
-          color: textColor,
-        ),
-      ),
-    );
-  }
+  
 
   @override
   Widget build(BuildContext context) {
@@ -129,95 +134,107 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
 
               const SizedBox(height: 10),
 
+              Text(
+                "Total Booked Cars: $_totalBooked",
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+              ),
+
+              const SizedBox(height: 6),
+
               const Text(
-                "Approve or cancel booking requests",
+                "Bookings for your cars",
                 style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
 
               const SizedBox(height: 20),
 
               Expanded(
-                child: ListView.builder(
-                  itemCount: bookings.length,
-                  itemBuilder: (context, index) {
-                    final booking = bookings[index];
-                    final status = booking["status"];
-
-                    return Container(
-                      margin: const EdgeInsets.only(bottom: 12),
-                      padding: const EdgeInsets.all(12),
-                      decoration: BoxDecoration(
-                        color: Colors.white,
-                        border: Border.all(color: Colors.grey.shade300),
-                        borderRadius: BorderRadius.circular(12),
-                      ),
-                      child: Row(
-                        children: [
-                          // Placeholder for car image
-                          Container(
-                            height: 50,
-                            width: 50,
-                            decoration: BoxDecoration(
-                              color: Colors.grey.shade200,
-                              borderRadius: BorderRadius.circular(8),
+                child: _isLoading
+                    ? const Center(child: CircularProgressIndicator())
+                    : (bookings.isEmpty
+                        ? const Center(
+                            child: Text(
+                              "No bookings yet",
+                              style: TextStyle(color: Colors.grey),
                             ),
-                          ),
-                          const SizedBox(width: 12),
+                          )
+                        : ListView.builder(
+                            itemCount: bookings.length,
+                            itemBuilder: (context, index) {
+                              final booking = bookings[index];
+                              final carName = booking['car_name'] ?? 'Unknown Car';
+                              final startDate = booking['start_date']?.toString().substring(0, 10) ?? 'N/A';
+                              final endDate = booking['end_date']?.toString().substring(0, 10) ?? 'N/A';
+                              final totalAmount = booking['total_amount'] ?? 0;
+                              final userEmail = booking['user_email'] ?? 'unknown';
 
-                          // Car details
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  booking["car"],
-                                  style: const TextStyle(
-                                    fontSize: 16,
-                                    fontWeight: FontWeight.w600,
-                                  ),
+                              return Container(
+                                margin: const EdgeInsets.only(bottom: 12),
+                                padding: const EdgeInsets.all(12),
+                                decoration: BoxDecoration(
+                                  color: Colors.white,
+                                  border: Border.all(color: Colors.grey.shade300),
+                                  borderRadius: BorderRadius.circular(12),
                                 ),
-                                Text(
-                                  booking["date"],
-                                  style: const TextStyle(
-                                    fontSize: 14,
-                                    color: Colors.grey,
-                                  ),
-                                ),
-                              ],
-                            ),
-                          ),
+                                child: Row(
+                                  children: [
+                                    // Placeholder for car image
+                                    Container(
+                                      height: 50,
+                                      width: 50,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey.shade200,
+                                        borderRadius: BorderRadius.circular(8),
+                                      ),
+                                      child: const Icon(Icons.directions_car),
+                                    ),
+                                    const SizedBox(width: 12),
 
-                          // Status Badge
-                          _statusBadge(status),
+                                    // Car details
+                                    Expanded(
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            carName,
+                                            style: const TextStyle(
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                          Text(
+                                            "$startDate → $endDate",
+                                            style: const TextStyle(
+                                              fontSize: 12,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          Text(
+                                            "User: $userEmail",
+                                            style: const TextStyle(
+                                              fontSize: 11,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          Text(
+                                            "Total: ₹$totalAmount",
+                                            style: const TextStyle(
+                                              fontSize: 13,
+                                              fontWeight: FontWeight.w600,
+                                              color: Colors.green,
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
 
-                          const SizedBox(width: 8),
-
-                          // Confirm/Cancel buttons (only for pending)
-                          if (status == "pending")
-                            Column(
-                              mainAxisSize: MainAxisSize.min,
-                              children: [
-                                TextButton(
-                                  onPressed: () => _confirmBooking(index),
-                                  child: const Text(
-                                    "Confirm",
-                                    style: TextStyle(color: Colors.green),
-                                  ),
+                                    const SizedBox(width: 8),
+                                  ],
                                 ),
-                                TextButton(
-                                  onPressed: () => _cancelBooking(index),
-                                  child: const Text(
-                                    "Cancel",
-                                    style: TextStyle(color: Colors.red),
-                                  ),
-                                ),
-                              ],
-                            ),
-                        ],
-                      ),
-                    );
-                  },
-                ),
+                              );
+                            },
+                          )),
               ),
             ],
           ),
