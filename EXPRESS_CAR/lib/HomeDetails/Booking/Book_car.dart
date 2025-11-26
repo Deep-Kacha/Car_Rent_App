@@ -396,6 +396,8 @@ class _BookingPageState extends State<BookingPage> {
                             'booking_id': bookingId,
                             'car_id': widget.car.carId,
                             'user_mail': userEmail,
+                            'userId': user?.uid,
+                            'owner_email': widget.car.ownerEmail ?? '',
                             'start_date': startIso,
                             'end_date': endIso,
                             'total_amount': totalAmount,
@@ -416,18 +418,6 @@ class _BookingPageState extends State<BookingPage> {
                             'total_amount': totalAmount,
                           };
 
-                          HomePage.bookedCarsMaps.add(bookedCarInfo);
-                          widget.onCarBooked(bookedCarInfo);
-
-                          ScaffoldMessenger.of(context).showSnackBar(
-                            const SnackBar(
-                              content: Text('✅ Booking saved'),
-                              backgroundColor: Colors.green,
-                            ),
-                          );
-
-                          // Ensure UI state is reset before popping to avoid setState-after-dispose
-                          if (mounted) setState(() => _isBooking = false);
                           Navigator.pop(context, 1);
                         } on FirebaseException catch (e) {
                           // Handle Firestore permission errors specifically

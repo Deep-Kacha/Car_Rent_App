@@ -50,6 +50,12 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
         return;
       }
 
+      // Create a map of car data for easy lookup
+      final Map<int, Map<String, dynamic>> carDataById = {
+        for (var doc in carsSnap.docs)
+          (doc['car_id'] as int): doc.data() as Map<String, dynamic>
+      };
+
       // Get bookings for these cars
       final bookingsSnap = await _firestore
           .collection('bookings')
@@ -59,14 +65,19 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
       final List<Map<String, dynamic>> loaded = [];
       for (final doc in bookingsSnap.docs) {
         final data = doc.data();
+        final carId = data['car_id'] as int? ?? 0;
+        final carData = carDataById[carId];
+        final imageUrl = carData != null ? carData['image_url'] : '';
+
         loaded.add({
           'booking_id': data['booking_id'] ?? doc.id,
-          'car_id': data['car_id'] ?? 0,
-          'car_name': data['car_name'] ?? 'Car ${data['car_id']}',
+          'car_id': carId,
+          'car_name': data['car_name'] ?? 'Car $carId',
           'user_email': data['user_mail'] ?? 'unknown',
           'start_date': data['start_date'] ?? '',
           'end_date': data['end_date'] ?? '',
           'total_amount': data['total_amount'] ?? 0,
+          'image_url': imageUrl,
         });
       }
 
@@ -167,6 +178,7 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
                               final endDate = booking['end_date']?.toString().substring(0, 10) ?? 'N/A';
                               final totalAmount = booking['total_amount'] ?? 0;
                               final userEmail = booking['user_email'] ?? 'unknown';
+                              final imageUrl = booking['image_url'] as String? ?? '';
 
                               return Container(
                                 margin: const EdgeInsets.only(bottom: 12),
@@ -178,15 +190,26 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
                                 ),
                                 child: Row(
                                   children: [
-                                    // Placeholder for car image
+                                    // Car Image
                                     Container(
                                       height: 50,
-                                      width: 50,
+                                      width: 70,
                                       decoration: BoxDecoration(
-                                        color: Colors.grey.shade200,
+                                        color: const Color(0xFFF5F5F5),
                                         borderRadius: BorderRadius.circular(8),
+                                        image: imageUrl.isNotEmpty
+                                            ? DecorationImage(
+                                                image: NetworkImage(imageUrl),
+                                                fit: BoxFit.cover,
+                                              )
+                                            : null,
                                       ),
-                                      child: const Icon(Icons.directions_car),
+                                      child: imageUrl.isEmpty
+                                          ? const Icon(
+                                              Icons.directions_car,
+                                              color: Colors.grey,
+                                            )
+                                          : null,
                                     ),
                                     const SizedBox(width: 12),
 

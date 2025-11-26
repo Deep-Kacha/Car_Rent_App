@@ -101,7 +101,8 @@ class _HomePageState extends State<HomePage> {
     await FirebaseAuth.instance.signOut();
 
     // Navigate back to AuthWrapper
-    if (mounted) {
+    // Check if the widget is still mounted before using its context for navigation.
+    if (context.mounted) {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const AuthWrapper()),
         (route) => false,
@@ -198,36 +199,11 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
 
-        Padding(
-          padding: const EdgeInsets.all(16),
-          child: Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              const Text(
-                "Categories",
-                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-              ),
-              GestureDetector(
-                onTap: () async {
-                  // 🔄 Refresh cars from Firebase
-                  await fetchCarsFromFirestore();
-                  if (mounted) {
-                    setState(() {});
-                    ScaffoldMessenger.of(context).showSnackBar(
-                      const SnackBar(
-                        content: Text('✅ Cars refreshed!'),
-                        duration: Duration(seconds: 2),
-                      ),
-                    );
-                  }
-                },
-                child: const Icon(
-                  Icons.refresh,
-                  color: Colors.orange,
-                  size: 24,
-                ),
-              ),
-            ],
+        const Padding(
+          padding: EdgeInsets.all(16),
+          child: Text(
+            "Categories",
+            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
           ),
         ),
 
@@ -399,7 +375,8 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       onPressed: () async {
-                                        await Navigator.push(
+                                        // Check the result from BookingPage
+                                        final result = await Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (_) => BookingPage(
@@ -408,7 +385,8 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                           ),
                                         );
-                                        setState(() {});
+                                        // Only trigger refresh if a booking was made (result == 1)
+                                        // No longer need to trigger a refresh manually.
                                       },
                                       child: Text(
                                         "₹${car.pricePerDay.toInt()}/day",
