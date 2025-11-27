@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:firebase_auth/firebase_auth.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 
 class AccountPage extends StatefulWidget {
   const AccountPage({Key? key}) : super(key: key);
@@ -9,7 +11,51 @@ class AccountPage extends StatefulWidget {
 
 class _AccountPageState extends State<AccountPage> {
   bool _obscurePassword = true;
-  final String _password = "ethanjohn@123";
+
+  User? currentUser = FirebaseAuth.instance.currentUser;
+  Map<String, dynamic>? userData;
+
+  @override
+  void initState() {
+    super.initState();
+    _fetchUserData();
+  }
+
+  Future<void> _fetchUserData() async {
+    if (currentUser == null) return;
+
+    try {
+      final doc = await FirebaseFirestore.instance
+          .collection('users')
+          .doc(currentUser!.uid)
+          .get();
+
+      final data = doc.data() ?? {};
+
+      setState(() {
+        userData = {
+          'email': currentUser!.email ?? 'No Email',
+          'phone': data['phone'] ?? 'Not Provided',
+          'password': data['password'] ?? '********',
+          'googleConnected': currentUser!.providerData.any(
+            (p) => p.providerId == 'google.com',
+          ),
+        };
+      });
+    } catch (e) {
+      print("Error fetching user data: $e");
+      setState(() {
+        userData = {
+          'email': currentUser!.email ?? 'No Email',
+          'phone': 'Not Provided',
+          'password': '********',
+          'googleConnected': currentUser!.providerData.any(
+            (p) => p.providerId == 'google.com',
+          ),
+        };
+      });
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -21,13 +67,13 @@ class _AccountPageState extends State<AccountPage> {
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              /// Back button + Title
+              // Back button + Title
               Row(
                 children: [
                   IconButton(
                     icon: const Icon(Icons.arrow_back),
                     onPressed: () {
-                      Navigator.pop(context); 
+                      Navigator.pop(context);
                     },
                   ),
                   const SizedBox(width: 8),
@@ -37,9 +83,9 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                 ],
               ),
-
               const SizedBox(height: 30),
 
+              // Email
               const Text(
                 "Email",
                 style: TextStyle(fontSize: 14, color: Colors.grey),
@@ -48,7 +94,7 @@ class _AccountPageState extends State<AccountPage> {
               TextField(
                 readOnly: true,
                 decoration: InputDecoration(
-                  hintText: "example@gmail.com",
+                  hintText: userData?['email'] ?? "Loading...",
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   border: OutlineInputBorder(
@@ -57,9 +103,9 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
 
+              // Password
               const Text(
                 "Password",
                 style: TextStyle(fontSize: 14, color: Colors.grey),
@@ -69,7 +115,9 @@ class _AccountPageState extends State<AccountPage> {
                 readOnly: true,
                 obscureText: _obscurePassword,
                 controller: TextEditingController(
-                  text: _obscurePassword ? "**********" : _password,
+                  text: _obscurePassword
+                      ? "**********"
+                      : userData?['password'] ?? '********',
                 ),
                 decoration: InputDecoration(
                   filled: true,
@@ -93,9 +141,9 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
 
+              // Phone number
               const Text(
                 "Phone number",
                 style: TextStyle(fontSize: 14, color: Colors.grey),
@@ -104,7 +152,7 @@ class _AccountPageState extends State<AccountPage> {
               TextField(
                 readOnly: true,
                 decoration: InputDecoration(
-                  hintText: "+91 41555 50132",
+                  hintText: userData?['phone'] ?? "Loading...",
                   filled: true,
                   fillColor: const Color(0xFFF5F5F5),
                   border: OutlineInputBorder(
@@ -113,17 +161,19 @@ class _AccountPageState extends State<AccountPage> {
                   ),
                 ),
               ),
-
               const SizedBox(height: 20),
 
+              // Google connection
               const Text(
                 "Google",
                 style: TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const SizedBox(height: 6),
-              const Text(
-                "Not connected",
-                style: TextStyle(fontSize: 14, color: Colors.grey),
+              Text(
+                userData?['googleConnected'] == true
+                    ? "Connected"
+                    : "Not connected",
+                style: const TextStyle(fontSize: 14, color: Colors.grey),
               ),
               const Divider(thickness: 0.8, height: 30),
             ],

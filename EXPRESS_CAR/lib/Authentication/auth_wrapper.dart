@@ -43,7 +43,7 @@ class AuthWrapper extends StatelessWidget {
         if (snapshot.hasData && snapshot.data != null) {
           final user = snapshot.data!;
 
-          /// 🟢 Ensure Firestore user profile exists
+          ///Ensure Firestore user profile exists
           _createUserDocumentIfNeeded(user);
 
           if (user.emailVerified) {

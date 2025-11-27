@@ -5,10 +5,11 @@ import 'package:express_car/HomeDetails/Menu/Menu.dart';
 import 'package:express_car/HomeDetails/Menu/Menus_Files/ViewProfile.dart';
 import 'package:express_car/HomeDetails/Home_Page/car_model.dart';
 import 'package:express_car/HomeDetails/Home_Page/car_data.dart';
+import 'package:express_car/Splash/GetStart.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:express_car/Authentication/auth_wrapper.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class HomePage extends StatefulWidget {
   static List<Map<String, dynamic>> bookedCarsMaps = [];
@@ -24,9 +25,26 @@ class _HomePageState extends State<HomePage> {
   String searchQuery = "";
   Set<String> favoriteCars = {};
 
-  final List<String> categories = ["All", "Cars", "SUVs", "XUVs", "Vans"];
+  final List<String> categories = [
+    "All",
+    "Sedan",
+    "SUV",
+    "Hatchback",
+    "Van",
+    "Coupe",
+    "Convertible",
+  ];
+
+  late Future<Map<String, dynamic>?> _userDataFuture;
 
   User? get currentUser => FirebaseAuth.instance.currentUser;
+
+  @override
+  void initState() {
+    super.initState();
+    _userDataFuture = _fetchCurrentUserData();
+    //Cars are now fetched once at app startup in main.dart
+  }
 
   void onToggleFavorite(Car car) async {
     setState(() {
@@ -37,7 +55,7 @@ class _HomePageState extends State<HomePage> {
       }
     });
 
-    // 🔹 Optional: Persist to Firestore (Favorites)
+    //Optional: Persist to Firestore (Favorites)
     try {
       final uid = currentUser?.uid;
       if (uid != null) {
@@ -53,7 +71,7 @@ class _HomePageState extends State<HomePage> {
   List<Car> get filteredCars {
     final carsByCategory = selectedCategory == "All"
         ? cars
-        : cars.where((car) => car.category == selectedCategory).toList();
+        : cars.where((car) => car.type == selectedCategory).toList();
     if (searchQuery.isEmpty) return carsByCategory;
     return carsByCategory
         .where(
@@ -73,7 +91,6 @@ class _HomePageState extends State<HomePage> {
           .get();
       final firestoreData = doc.data();
 
-      // 🔹 Merge Firestore + Auth Data
       return {
         'displayName':
             firestoreData?['displayName'] ?? user.displayName ?? 'Guest User',
@@ -89,25 +106,36 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
+    // await FirebaseAuth.instance.signOut();
 
-    // Navigate back to AuthWrapper
-    if (mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const AuthWrapper()),
-        (route) => false,
-      );
-    }
+    // // Navigate back to AuthWrapper
+    // // Check if the widget is still mounted before using its context for navigation.
+    // if (context.mounted) {
+    //   Navigator.of(context).pushAndRemoveUntil(
+    //     MaterialPageRoute(builder: (_) => const AuthWrapper()),
+    //     (route) => false,
+    //   );
+    // }
+
+    await FirebaseAuth.instance.signOut();
+    await GoogleSignIn().signOut();
+    // Add a check to ensure the widget is still mounted before using its context.
+    if (!context.mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => GetStart()),
+      (route) => false,
+    );
   }
 
   Widget buildHomePage() {
+    print("🏠 buildHomePage called - Cars count: ${cars.length}");
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         Padding(
           padding: const EdgeInsets.all(16),
           child: FutureBuilder<Map<String, dynamic>?>(
-            future: _fetchCurrentUserData(),
+            future: _userDataFuture,
             builder: (context, snapshot) {
               if (snapshot.connectionState == ConnectionState.waiting) {
                 return const Center(child: CircularProgressIndicator());
@@ -188,11 +216,26 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
 
-        const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text(
-            "Categories",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Categories",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              IconButton(
+                icon: const Icon(Icons.refresh, color: Colors.grey),
+                onPressed: () async {
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Refreshing cars...')),
+                  );
+                  await fetchCarsFromFirestore();
+                  if (mounted) setState(() {});
+                },
+              ),
+            ],
           ),
         ),
 
@@ -240,10 +283,22 @@ class _HomePageState extends State<HomePage> {
 
         Expanded(
           child: filteredCars.isEmpty
-              ? const Center(
-                  child: Text(
-                    "No cars available in this category",
-                    style: TextStyle(color: Colors.grey),
+              ? Center(
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        "Total cars: ${cars.length}",
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
+                      ),
+                      const Text(
+                        "No cars available in this category",
+                        style: TextStyle(color: Colors.grey),
+                      ),
+                    ],
                   ),
                 )
               : ListView.builder(
@@ -273,12 +328,27 @@ class _HomePageState extends State<HomePage> {
                             borderRadius: const BorderRadius.vertical(
                               top: Radius.circular(15),
                             ),
-                            child: Image.asset(
-                              car.image,
-                              height: 180,
-                              width: double.infinity,
-                              fit: BoxFit.cover,
-                            ),
+                            child:
+                                (car.imageUrl != null &&
+                                    car.imageUrl!.isNotEmpty)
+                                ? Image.network(
+                                    car.imageUrl!,
+                                    height: 180,
+                                    width: double.infinity,
+                                    fit: BoxFit.cover,
+                                    errorBuilder: (context, error, stackTrace) {
+                                      return Container(
+                                        height: 180,
+                                        color: Colors.grey[300],
+                                        child: const Icon(Icons.directions_car),
+                                      );
+                                    },
+                                  )
+                                : Container(
+                                    height: 180,
+                                    color: Colors.grey[300],
+                                    child: const Icon(Icons.directions_car),
+                                  ),
                           ),
                           Container(
                             decoration: const BoxDecoration(
@@ -321,7 +391,7 @@ class _HomePageState extends State<HomePage> {
                                   children: [
                                     Expanded(
                                       child: Text(
-                                        car.address,
+                                        car.location,
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontSize: 16,
@@ -342,7 +412,8 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       onPressed: () async {
-                                        await Navigator.push(
+                                        // Check the result from BookingPage
+                                        final result = await Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (_) => BookingPage(
@@ -351,10 +422,11 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                           ),
                                         );
-                                        setState(() {});
+                                        // Only trigger refresh if a booking was made (result == 1)
+                                        // No longer need to trigger a refresh manually.
                                       },
                                       child: Text(
-                                        car.price,
+                                        "₹${car.pricePerDay.toInt()}/day",
                                         style: const TextStyle(
                                           color: Colors.white,
                                           fontWeight: FontWeight.bold,
