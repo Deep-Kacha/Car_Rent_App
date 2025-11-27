@@ -69,12 +69,16 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
         final data = doc.data();
         final carId = data['car_id'] as int? ?? 0;
         final carData = carDataById[carId];
+        //car name
+        final carName = carData != null ? carData['name'] : 'Car $carId';
         final imageUrl = carData != null ? carData['image_url'] : '';
 
         loaded.add({
           'booking_id': data['booking_id'] ?? doc.id,
           'car_id': carId,
-          'car_name': data['car_name'] ?? 'Car $carId',
+
+          //'car_name': data['car_name'] ?? 'Car $carId',
+          'car_name': carName,
           'user_email': data['user_mail'] ?? 'unknown',
           'start_date': data['start_date'] ?? '',
           'end_date': data['end_date'] ?? '',
