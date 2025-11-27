@@ -9,7 +9,6 @@ import 'package:express_car/Splash/GetStart.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:express_car/Authentication/auth_wrapper.dart';
 import 'package:google_sign_in/google_sign_in.dart';
 
 class HomePage extends StatefulWidget {
@@ -44,7 +43,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _userDataFuture = _fetchCurrentUserData();
-    // 🔹 Cars are now fetched once at app startup in main.dart
+    //Cars are now fetched once at app startup in main.dart
   }
 
   void onToggleFavorite(Car car) async {
@@ -56,7 +55,7 @@ class _HomePageState extends State<HomePage> {
       }
     });
 
-    // 🔹 Optional: Persist to Firestore (Favorites)
+    //Optional: Persist to Firestore (Favorites)
     try {
       final uid = currentUser?.uid;
       if (uid != null) {

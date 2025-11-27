@@ -40,7 +40,9 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
           .where('owner_email', isEqualTo: user.email)
           .get();
 
-      final carIds = carsSnap.docs.map((doc) => (doc['car_id'] as int)).toList();
+      final carIds = carsSnap.docs
+          .map((doc) => (doc['car_id'] as int))
+          .toList();
       if (carIds.isEmpty) {
         setState(() {
           bookings = [];
@@ -53,7 +55,7 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
       // Create a map of car data for easy lookup
       final Map<int, Map<String, dynamic>> carDataById = {
         for (var doc in carsSnap.docs)
-          (doc['car_id'] as int): doc.data() as Map<String, dynamic>
+          (doc['car_id'] as int): doc.data() as Map<String, dynamic>,
       };
 
       // Get bookings for these cars
@@ -88,16 +90,12 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
       });
     } catch (e) {
       print('Error loading bookings: $e');
-      ScaffoldMessenger.of(context).showSnackBar(
-        SnackBar(content: Text('Failed to load bookings: $e')),
-      );
+      ScaffoldMessenger.of(
+        context,
+      ).showSnackBar(SnackBar(content: Text('Failed to load bookings: $e')));
       setState(() => _isLoading = false);
     }
   }
-
-  
-
-  
 
   @override
   Widget build(BuildContext context) {
@@ -147,7 +145,10 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
 
               Text(
                 "Total Booked Cars: $_totalBooked",
-                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.w600),
+                style: const TextStyle(
+                  fontSize: 16,
+                  fontWeight: FontWeight.w600,
+                ),
               ),
 
               const SizedBox(height: 6),
@@ -163,101 +164,119 @@ class _ManageBookingsPageState extends State<ManageBookingsPage> {
                 child: _isLoading
                     ? const Center(child: CircularProgressIndicator())
                     : (bookings.isEmpty
-                        ? const Center(
-                            child: Text(
-                              "No bookings yet",
-                              style: TextStyle(color: Colors.grey),
-                            ),
-                          )
-                        : ListView.builder(
-                            itemCount: bookings.length,
-                            itemBuilder: (context, index) {
-                              final booking = bookings[index];
-                              final carName = booking['car_name'] ?? 'Unknown Car';
-                              final startDate = booking['start_date']?.toString().substring(0, 10) ?? 'N/A';
-                              final endDate = booking['end_date']?.toString().substring(0, 10) ?? 'N/A';
-                              final totalAmount = booking['total_amount'] ?? 0;
-                              final userEmail = booking['user_email'] ?? 'unknown';
-                              final imageUrl = booking['image_url'] as String? ?? '';
+                          ? const Center(
+                              child: Text(
+                                "No bookings yet",
+                                style: TextStyle(color: Colors.grey),
+                              ),
+                            )
+                          : ListView.builder(
+                              itemCount: bookings.length,
+                              itemBuilder: (context, index) {
+                                final booking = bookings[index];
+                                final carName =
+                                    booking['car_name'] ?? 'Unknown Car';
+                                final startDate =
+                                    booking['start_date']?.toString().substring(
+                                      0,
+                                      10,
+                                    ) ??
+                                    'N/A';
+                                final endDate =
+                                    booking['end_date']?.toString().substring(
+                                      0,
+                                      10,
+                                    ) ??
+                                    'N/A';
+                                final totalAmount =
+                                    booking['total_amount'] ?? 0;
+                                final userEmail =
+                                    booking['user_email'] ?? 'unknown';
+                                final imageUrl =
+                                    booking['image_url'] as String? ?? '';
 
-                              return Container(
-                                margin: const EdgeInsets.only(bottom: 12),
-                                padding: const EdgeInsets.all(12),
-                                decoration: BoxDecoration(
-                                  color: Colors.white,
-                                  border: Border.all(color: Colors.grey.shade300),
-                                  borderRadius: BorderRadius.circular(12),
-                                ),
-                                child: Row(
-                                  children: [
-                                    // Car Image
-                                    Container(
-                                      height: 50,
-                                      width: 70,
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFF5F5F5),
-                                        borderRadius: BorderRadius.circular(8),
-                                        image: imageUrl.isNotEmpty
-                                            ? DecorationImage(
-                                                image: NetworkImage(imageUrl),
-                                                fit: BoxFit.cover,
+                                return Container(
+                                  margin: const EdgeInsets.only(bottom: 12),
+                                  padding: const EdgeInsets.all(12),
+                                  decoration: BoxDecoration(
+                                    color: Colors.white,
+                                    border: Border.all(
+                                      color: Colors.grey.shade300,
+                                    ),
+                                    borderRadius: BorderRadius.circular(12),
+                                  ),
+                                  child: Row(
+                                    children: [
+                                      // Car Image
+                                      Container(
+                                        height: 50,
+                                        width: 70,
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFF5F5F5),
+                                          borderRadius: BorderRadius.circular(
+                                            8,
+                                          ),
+                                          image: imageUrl.isNotEmpty
+                                              ? DecorationImage(
+                                                  image: NetworkImage(imageUrl),
+                                                  fit: BoxFit.cover,
+                                                )
+                                              : null,
+                                        ),
+                                        child: imageUrl.isEmpty
+                                            ? const Icon(
+                                                Icons.directions_car,
+                                                color: Colors.grey,
                                               )
                                             : null,
                                       ),
-                                      child: imageUrl.isEmpty
-                                          ? const Icon(
-                                              Icons.directions_car,
-                                              color: Colors.grey,
-                                            )
-                                          : null,
-                                    ),
-                                    const SizedBox(width: 12),
+                                      const SizedBox(width: 12),
 
-                                    // Car details
-                                    Expanded(
-                                      child: Column(
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.start,
-                                        children: [
-                                          Text(
-                                            carName,
-                                            style: const TextStyle(
-                                              fontSize: 16,
-                                              fontWeight: FontWeight.w600,
+                                      // Car details
+                                      Expanded(
+                                        child: Column(
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.start,
+                                          children: [
+                                            Text(
+                                              carName,
+                                              style: const TextStyle(
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w600,
+                                              ),
                                             ),
-                                          ),
-                                          Text(
-                                            "$startDate → $endDate",
-                                            style: const TextStyle(
-                                              fontSize: 12,
-                                              color: Colors.grey,
+                                            Text(
+                                              "$startDate → $endDate",
+                                              style: const TextStyle(
+                                                fontSize: 12,
+                                                color: Colors.grey,
+                                              ),
                                             ),
-                                          ),
-                                          Text(
-                                            "User: $userEmail",
-                                            style: const TextStyle(
-                                              fontSize: 11,
-                                              color: Colors.grey,
+                                            Text(
+                                              "User: $userEmail",
+                                              style: const TextStyle(
+                                                fontSize: 11,
+                                                color: Colors.grey,
+                                              ),
                                             ),
-                                          ),
-                                          Text(
-                                            "Total: ₹$totalAmount",
-                                            style: const TextStyle(
-                                              fontSize: 13,
-                                              fontWeight: FontWeight.w600,
-                                              color: Colors.green,
+                                            Text(
+                                              "Total: ₹$totalAmount",
+                                              style: const TextStyle(
+                                                fontSize: 13,
+                                                fontWeight: FontWeight.w600,
+                                                color: Colors.green,
+                                              ),
                                             ),
-                                          ),
-                                        ],
+                                          ],
+                                        ),
                                       ),
-                                    ),
 
-                                    const SizedBox(width: 8),
-                                  ],
-                                ),
-                              );
-                            },
-                          )),
+                                      const SizedBox(width: 8),
+                                    ],
+                                  ),
+                                );
+                              },
+                            )),
               ),
             ],
           ),
