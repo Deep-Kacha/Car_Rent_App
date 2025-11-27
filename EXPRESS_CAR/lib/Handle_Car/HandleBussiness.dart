@@ -129,7 +129,7 @@ class _HandleBusinessPageState extends State<HandleBusinessPage> {
                         Text(
                           _userEmail.isNotEmpty ? _userEmail : '',
                           style: const TextStyle(
-                            fontSize: 18,
+                            fontSize: 12  ,
                             color: Colors.grey,
                           ),
                         ),
@@ -142,14 +142,14 @@ class _HandleBusinessPageState extends State<HandleBusinessPage> {
               const SizedBox(height: 30),
 
               // Menu Items
-              _buildMenuItem(Icons.dashboard, "Dashboard", () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const DashboardPage(),
-                  ),
-                );
-              }),
+              // _buildMenuItem(Icons.dashboard, "Dashboard", () {
+              //   Navigator.push(
+              //     context,
+              //     MaterialPageRoute(
+              //       builder: (context) => const DashboardPage(),
+              //     ),
+              //   );
+              // }),
               _buildMenuItem(Icons.directions_car, "Add Car", () {
                 Navigator.push(
                   context,
