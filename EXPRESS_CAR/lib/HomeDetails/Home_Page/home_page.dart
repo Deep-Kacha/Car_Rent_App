@@ -82,7 +82,7 @@ class _HomePageState extends State<HomePage> {
           .get();
       final firestoreData = doc.data();
 
-      // 🔹 Merge Firestore + Auth Data
+      
       return {
         'displayName':
             firestoreData?['displayName'] ?? user.displayName ?? 'Guest User',
@@ -199,11 +199,27 @@ class _HomePageState extends State<HomePage> {
           ),
         ),
 
-        const Padding(
-          padding: EdgeInsets.all(16),
-          child: Text(
-            "Categories",
-            style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+        Padding(
+          padding: const EdgeInsets.fromLTRB(16, 16, 8, 16),
+          child: Row(
+            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+            children: [
+              const Text(
+                "Categories",
+                style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+              ),
+              IconButton(
+                icon: const Icon(Icons.refresh, color: Colors.grey),
+                onPressed: () async {
+              
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(content: Text('Refreshing cars...')),
+                  );
+                  await fetchCarsFromFirestore();
+                  if (mounted) setState(() {});
+                },
+              ),
+            ],
           ),
         ),
 
