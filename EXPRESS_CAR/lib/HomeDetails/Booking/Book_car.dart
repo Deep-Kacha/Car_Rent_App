@@ -1,5 +1,7 @@
 import 'package:express_car/HomeDetails/Home_Page/car_model.dart';
 import 'package:express_car/HomeDetails/Home_Page/home_page.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 
 class BookingPage extends StatefulWidget {
@@ -15,6 +17,7 @@ class BookingPage extends StatefulWidget {
 class _BookingPageState extends State<BookingPage> {
   DateTime? startDate;
   DateTime? endDate;
+  bool _isBooking = false;
 
   Future<void> pickDate({required bool isStart}) async {
     final DateTime? picked = await showDatePicker(
@@ -57,6 +60,24 @@ class _BookingPageState extends State<BookingPage> {
   /// -------------------------------------------------------------
   /// REAL-TIME BOOKING CHECK (NO UI CHANGE)
   /// -------------------------------------------------------------
+  // Get the next booking ID using a Firestore transaction
+  Future<int> _getNextBookingId() async {
+    final counterRef =
+        FirebaseFirestore.instance.collection('counters').doc('booking_counter');
+
+    return FirebaseFirestore.instance.runTransaction<int>((transaction) async {
+      final snapshot = await transaction.get(counterRef);
+
+      if (!snapshot.exists) {
+        transaction.set(counterRef, {'current_id': 1});
+        return 1;
+      }
+
+      final newId = (snapshot.data()!['current_id'] as int) + 1;
+      transaction.update(counterRef, {'current_id': newId});
+      return newId;
+    });
+  }
   bool isCarAlreadyBooked(DateTime start, DateTime end) {
     for (var booking in HomePage.bookedCarsMaps) {
       if (booking['car'].carId == widget.car.carId) {
@@ -77,6 +98,14 @@ class _BookingPageState extends State<BookingPage> {
   @override
   Widget build(BuildContext context) {
     final car = widget.car;
+    // Calculate rental days and total dynamically
+    int rentalDays = 0;
+    if (startDate != null && endDate != null) {
+      if (!endDate!.isBefore(startDate!)) {
+        rentalDays = endDate!.difference(startDate!).inDays + 1;
+      }
+    }
+    final int totalAmount = (rentalDays * car.pricePerDay).toInt();
 
     return Scaffold(
       backgroundColor: Colors.white,
@@ -326,7 +355,9 @@ class _BookingPageState extends State<BookingPage> {
                       padding: const EdgeInsets.symmetric(vertical: 16),
                       elevation: 0,
                     ),
-                    onPressed: () {
+                    onPressed: _isBooking
+                        ? null
+                        : () async {
                       if (startDate != null && endDate != null) {
                         /// ----------------------------
                         /// REAL-TIME DATE CHECK
@@ -342,26 +373,97 @@ class _BookingPageState extends State<BookingPage> {
                           );
                           return;
                         }
+                        // compute booking details
+                        final startIso = DateTime(
+                          startDate!.year,
+                          startDate!.month,
+                          startDate!.day,
+                        ).toIso8601String();
+                        final endIso = DateTime(
+                          endDate!.year,
+                          endDate!.month,
+                          endDate!.day,
+                        ).toIso8601String();
 
-                        final bookedCarInfo = {
-                          'car': widget.car,
-                          'startDate': DateTime(
-                            startDate!.year,
-                            startDate!.month,
-                            startDate!.day,
-                          ).toIso8601String(),
-                          'endDate': DateTime(
-                            endDate!.year,
-                            endDate!.month,
-                            endDate!.day,
-                          ).toIso8601String(),
-                        };
+                        setState(() => _isBooking = true);
 
-                        HomePage.bookedCarsMaps.add(bookedCarInfo);
+                        try {
+                          final bookingId = await _getNextBookingId();
+                          final user = FirebaseAuth.instance.currentUser;
+                          final userEmail = user?.email ?? 'unknown';
 
-                        widget.onCarBooked(bookedCarInfo);
+                          final bookingData = {
+                            'booking_id': bookingId,
+                            'car_id': widget.car.carId,
+                            'user_mail': userEmail,
+                            'userId': user?.uid,
+                            'owner_email': widget.car.ownerEmail ?? '',
+                            'start_date': startIso,
+                            'end_date': endIso,
+                            'total_amount': totalAmount,
+                            'created_at': FieldValue.serverTimestamp(),
+                          };
 
-                        Navigator.pop(context, 1);
+                          // Save booking to Firestore under 'bookings' collection
+                          await FirebaseFirestore.instance
+                              .collection('bookings')
+                              .doc(bookingId.toString())
+                              .set(bookingData);
+
+                          final bookedCarInfo = {
+                            'car': widget.car,
+                            'startDate': startIso,
+                            'endDate': endIso,
+                            'booking_id': bookingId,
+                            'total_amount': totalAmount,
+                          };
+
+                          Navigator.pop(context, 1);
+                        } on FirebaseException catch (e) {
+                          // Handle Firestore permission errors specifically
+                          final isPermissionError =
+                              e.code == 'permission-denied' ||
+                                  (e.message != null &&
+                                      e.message!.toLowerCase().contains('permission'));
+
+                          if (isPermissionError) {
+                            // Show a blocking dialog with guidance
+                            if (mounted) {
+                              await showDialog<void>(
+                                context: context,
+                                builder: (ctx) => AlertDialog(
+                                  title: const Text('Permission Denied'),
+                                  content: const Text(
+                                      'Cloud Firestore: permission denied — caller does not have permission to perform this operation.\n\nCheck your Firestore security rules or ensure the user is authenticated.'),
+                                  actions: [
+                                    TextButton(
+                                      onPressed: () => Navigator.of(ctx).pop(),
+                                      child: const Text('OK'),
+                                    ),
+                                  ],
+                                ),
+                              );
+                            }
+                            // Also log for debugging
+                            print('Firestore permission denied: ${e.message}');
+                          } else {
+                            ScaffoldMessenger.of(context).showSnackBar(
+                              SnackBar(
+                                content: Text('Failed to save booking: ${e.message}'),
+                                backgroundColor: Colors.red,
+                              ),
+                            );
+                          }
+                        } catch (e) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed to save booking: $e'),
+                              backgroundColor: Colors.red,
+                            ),
+                          );
+                        } finally {
+                          if (mounted) setState(() => _isBooking = false);
+                        }
                       } else {
                         ScaffoldMessenger.of(context).showSnackBar(
                           const SnackBar(
@@ -373,16 +475,29 @@ class _BookingPageState extends State<BookingPage> {
                         );
                       }
                     },
-                    child: Text(
-                      "Total ₹${car.pricePerDay.toInt()}/day",
-                      style: const TextStyle(
-                        fontSize: 16,
-                        color: Colors.white,
-                        fontWeight: FontWeight.w600,
+                    child: _isBooking
+                        ? const SizedBox(
+                            height: 20,
+                            width: 20,
+                            child: CircularProgressIndicator(
+                              color: Colors.white,
+                              strokeWidth: 2,
+                            ),
+                          )
+                        : Text(
+                            // Show dynamic total when both dates are selected, otherwise show 0
+                            startDate != null && endDate != null && rentalDays > 0
+                                ? "Total ₹$totalAmount (${rentalDays} days)"
+                                : "Total ₹0",
+                            style: const TextStyle(
+                              fontSize: 16,
+                              color: Colors.white,
+                              fontWeight: FontWeight.w600,
+                            ),
+                            textAlign: TextAlign.center,
+                          ),
                       ),
                     ),
-                  ),
-                ),
               ],
             ),
           ),

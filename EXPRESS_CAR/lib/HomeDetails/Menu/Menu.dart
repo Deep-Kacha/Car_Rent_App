@@ -169,6 +169,8 @@ class MenuPage extends StatelessWidget {
                     _buildMenuItem(Icons.logout, "Log Out", context, () async {
                       await FirebaseAuth.instance.signOut();
                       await GoogleSignIn().signOut();
+                      // Add a check to ensure the widget is still mounted before using its context.
+                      if (!context.mounted) return;
                       Navigator.of(context).pushAndRemoveUntil(
                         MaterialPageRoute(builder: (_) => GetStart()),
                         (route) => false,

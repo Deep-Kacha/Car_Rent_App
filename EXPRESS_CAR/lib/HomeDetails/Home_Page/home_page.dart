@@ -34,14 +34,7 @@ class _HomePageState extends State<HomePage> {
   void initState() {
     super.initState();
     _userDataFuture = _fetchCurrentUserData();
-    _loadCars();
-  }
-
-  Future<void> _loadCars() async {
-    await fetchCarsFromFirestore();
-    if (mounted) {
-      setState(() {});
-    }
+    // 🔹 Cars are now fetched once at app startup in main.dart
   }
 
   void onToggleFavorite(Car car) async {
@@ -108,7 +101,8 @@ class _HomePageState extends State<HomePage> {
     await FirebaseAuth.instance.signOut();
 
     // Navigate back to AuthWrapper
-    if (mounted) {
+    // Check if the widget is still mounted before using its context for navigation.
+    if (context.mounted) {
       Navigator.of(context).pushAndRemoveUntil(
         MaterialPageRoute(builder: (_) => const AuthWrapper()),
         (route) => false,
@@ -381,7 +375,8 @@ class _HomePageState extends State<HomePage> {
                                         ),
                                       ),
                                       onPressed: () async {
-                                        await Navigator.push(
+                                        // Check the result from BookingPage
+                                        final result = await Navigator.push(
                                           context,
                                           MaterialPageRoute(
                                             builder: (_) => BookingPage(
@@ -390,7 +385,8 @@ class _HomePageState extends State<HomePage> {
                                             ),
                                           ),
                                         );
-                                        setState(() {});
+                                        // Only trigger refresh if a booking was made (result == 1)
+                                        // No longer need to trigger a refresh manually.
                                       },
                                       child: Text(
                                         "₹${car.pricePerDay.toInt()}/day",

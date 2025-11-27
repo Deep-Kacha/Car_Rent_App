@@ -183,6 +183,8 @@ class _HandleBusinessPageState extends State<HandleBusinessPage> {
               _buildMenuItem(Icons.logout, "Logout", () async {
                 await FirebaseAuth.instance.signOut();
                 await GoogleSignIn().signOut();
+                // Add a check to ensure the widget is still mounted before using its context.
+                if (!context.mounted) return;
                 Navigator.of(context).pushAndRemoveUntil(
                   MaterialPageRoute(builder: (context) => const GetStart()),
                   (route) => false,

@@ -43,3 +43,14 @@ app.*.map.json
 /android/app/debug
 /android/app/profile
 /android/app/release
+
+# Platform-specific folders (not needed for Android-only development)
+/ios/
+/macos/
+/windows/
+/web/
+
+# Firebase & Flutter build/debug artifacts
+firestore.rules
+flutter_run_verbose.txt
+
