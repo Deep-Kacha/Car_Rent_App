@@ -5,10 +5,12 @@ import 'package:express_car/HomeDetails/Menu/Menu.dart';
 import 'package:express_car/HomeDetails/Menu/Menus_Files/ViewProfile.dart';
 import 'package:express_car/HomeDetails/Home_Page/car_model.dart';
 import 'package:express_car/HomeDetails/Home_Page/car_data.dart';
+import 'package:express_car/Splash/GetStart.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:express_car/Authentication/auth_wrapper.dart';
+import 'package:google_sign_in/google_sign_in.dart';
 
 class HomePage extends StatefulWidget {
   static List<Map<String, dynamic>> bookedCarsMaps = [];
@@ -24,12 +26,20 @@ class _HomePageState extends State<HomePage> {
   String searchQuery = "";
   Set<String> favoriteCars = {};
 
-  final List<String> categories = ["All", "Sedan", "SUV", "Hatchback", "Van", "Coupe", "Convertible"];
-  
+  final List<String> categories = [
+    "All",
+    "Sedan",
+    "SUV",
+    "Hatchback",
+    "Van",
+    "Coupe",
+    "Convertible",
+  ];
+
   late Future<Map<String, dynamic>?> _userDataFuture;
 
   User? get currentUser => FirebaseAuth.instance.currentUser;
-  
+
   @override
   void initState() {
     super.initState();
@@ -82,7 +92,6 @@ class _HomePageState extends State<HomePage> {
           .get();
       final firestoreData = doc.data();
 
-      
       return {
         'displayName':
             firestoreData?['displayName'] ?? user.displayName ?? 'Guest User',
@@ -98,16 +107,25 @@ class _HomePageState extends State<HomePage> {
   }
 
   Future<void> _logout(BuildContext context) async {
-    await FirebaseAuth.instance.signOut();
+    // await FirebaseAuth.instance.signOut();
 
-    // Navigate back to AuthWrapper
-    // Check if the widget is still mounted before using its context for navigation.
-    if (context.mounted) {
-      Navigator.of(context).pushAndRemoveUntil(
-        MaterialPageRoute(builder: (_) => const AuthWrapper()),
-        (route) => false,
-      );
-    }
+    // // Navigate back to AuthWrapper
+    // // Check if the widget is still mounted before using its context for navigation.
+    // if (context.mounted) {
+    //   Navigator.of(context).pushAndRemoveUntil(
+    //     MaterialPageRoute(builder: (_) => const AuthWrapper()),
+    //     (route) => false,
+    //   );
+    // }
+
+    await FirebaseAuth.instance.signOut();
+    await GoogleSignIn().signOut();
+    // Add a check to ensure the widget is still mounted before using its context.
+    if (!context.mounted) return;
+    Navigator.of(context).pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => GetStart()),
+      (route) => false,
+    );
   }
 
   Widget buildHomePage() {
@@ -211,7 +229,6 @@ class _HomePageState extends State<HomePage> {
               IconButton(
                 icon: const Icon(Icons.refresh, color: Colors.grey),
                 onPressed: () async {
-              
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Refreshing cars...')),
                   );
@@ -273,7 +290,10 @@ class _HomePageState extends State<HomePage> {
                     children: [
                       Text(
                         "Total cars: ${cars.length}",
-                        style: const TextStyle(color: Colors.grey, fontSize: 12),
+                        style: const TextStyle(
+                          color: Colors.grey,
+                          fontSize: 12,
+                        ),
                       ),
                       const Text(
                         "No cars available in this category",
@@ -309,7 +329,9 @@ class _HomePageState extends State<HomePage> {
                             borderRadius: const BorderRadius.vertical(
                               top: Radius.circular(15),
                             ),
-                            child: (car.imageUrl != null && car.imageUrl!.isNotEmpty)
+                            child:
+                                (car.imageUrl != null &&
+                                    car.imageUrl!.isNotEmpty)
                                 ? Image.network(
                                     car.imageUrl!,
                                     height: 180,
